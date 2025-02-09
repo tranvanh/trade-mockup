@@ -1,0 +1,14 @@
+[
+{
+  "directory": "/Users/a-bit/Desktop/Sources/TradeApiMockup/src/build",
+  "command": "/usr/bin/clang++  -I/Users/a-bit/Desktop/Sources/TradeApiMockup/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/Trade.dir/main.cpp.o -c /Users/a-bit/Desktop/Sources/TradeApiMockup/src/main.cpp",
+  "file": "/Users/a-bit/Desktop/Sources/TradeApiMockup/src/main.cpp",
+  "output": "CMakeFiles/Trade.dir/main.cpp.o"
+},
+{
+  "directory": "/Users/a-bit/Desktop/Sources/TradeApiMockup/src/build",
+  "command": "/usr/bin/clang++  -I/Users/a-bit/Desktop/Sources/TradeApiMockup/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/Trade.dir/Model.cpp.o -c /Users/a-bit/Desktop/Sources/TradeApiMockup/src/Model.cpp",
+  "file": "/Users/a-bit/Desktop/Sources/TradeApiMockup/src/Model.cpp",
+  "output": "CMakeFiles/Trade.dir/Model.cpp.o"
+}
+]
