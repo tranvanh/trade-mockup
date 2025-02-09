@@ -1,9 +1,9 @@
 #include "Model.h"
 #include "Common.h"
 #include <chrono>
-#include <format>
 #include <iomanip>
 #include <iostream>
+#include <atomic>
 #include <thread>
 #include <utility>
 
@@ -49,21 +49,15 @@ TradeModel::TradeModel() {
 }
 
 void TradeModel::generateTrade(TradeType tradeType) {
-    Trade trade;
-    trade.id = gIdCounter++;
-    trade.price = randomValueOfMax(10000);
-    trade.timeStamp = std::chrono::system_clock::now();
-    trade.tradeType = tradeType;
-    trade.volume = randomValueOfMax(1000);
-    std::cout << trade << std::endl;
-    std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(randomValueOfMax(10)*100));
-}
-
-void TradeModel::simulateMarket() {
-    int running = 15;
-    while (running--) {
-        generateTrade(TradeType::BUY);
-        generateTrade(TradeType::SELL);
+    while(true){
+        Trade trade;
+        trade.id = gIdCounter++;
+        trade.price = randomValueOfMax(10000);
+        trade.timeStamp = std::chrono::system_clock::now();
+        trade.tradeType = tradeType;
+        trade.volume = randomValueOfMax(1000);
+        std::cout << trade << std::endl;
+        std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(randomValueOfMax(10)*100));
     }
 }
 

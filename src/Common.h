@@ -2,6 +2,7 @@
 #include <iostream>
 #include <memory>
 #include <utility>
+#include <chrono>
 
 #define TRADE_API_NAMESPACE_BEGIN namespace TradeApi {
 #define TRADE_API_NAMESPACE_END }

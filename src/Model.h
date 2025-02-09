@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Common.h"
 #include <string>
 
 
@@ -22,7 +21,10 @@ struct Trade {
 };
 
 
-
+// must be thread safe queue
+// producer consumer
+// thread safe database
+// - unordered map
 class TradeDatabase{
     public:
     TradeDatabase() = default;
@@ -36,9 +38,6 @@ class TradeModel {
 
 public:
     TradeModel();
-    void simulateMarket();
-
-private:
     void generateTrade(TradeType tradeType);
 };
 

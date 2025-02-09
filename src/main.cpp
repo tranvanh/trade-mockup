@@ -1,6 +1,6 @@
-#include <iostream>
 #include "Common.h"
-#include "Model.h"
+#include "TradeApp.h"
+#include <iostream>
 
 // Trades
 // * model generating buy/sell THREAD - give certain delay of buy/sell generatio -> producer consumer
@@ -18,8 +18,8 @@
 
 int main() {
 
-    TradeApi::TradeModel tradeModel;
-    tradeModel.run();
+    TradeApi::TradeApp tradeApp;
+    tradeApp.run();
     std::cout << "hello test test" << std::endl;
     return 0;
 }
