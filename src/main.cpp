@@ -17,9 +17,7 @@
 // * Optimized for performance, uses floating window for history trades.
 
 int main() {
-
     TradeApi::TradeApp tradeApp;
     tradeApp.run();
-    std::cout << "hello test test" << std::endl;
     return 0;
 }
