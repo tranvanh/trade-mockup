@@ -1,23 +1,29 @@
+
+#include <functional>
 #include "TradeApp.h"
 #include "Model.h"
+#include "TradeDatabase.h"
 
 TRADE_API_NAMESPACE_BEGIN
 
-TradeApp::TradeApp(){}
+TradeApp::TradeApp() : mModel(*this), mDatabase(*this){}
 TradeApp::~TradeApp(){
     for(auto& t: mThreadPool){
         t.join();
     }    
 }
+
 void TradeApp::run(){
-    auto buy = [this]() {
-        mTradeModel.generateTrade(TradeType::BUY);
-    };
-    auto sell = [this]() {
-        mTradeModel.generateTrade(TradeType::SELL);
-    };
-    mThreadPool.emplace_back(buy);
-    mThreadPool.emplace_back(sell);
+    runBackgroundTask(std::bind_front(&TradeDatabase::run, &mDatabase));
+    mModel.simulate();
+}
+
+void TradeApp::registerTrade(const Trade& trade){
+    mDatabase.registerTrade(trade);
+}
+
+void TradeApp::runBackgroundTask(const std::function<void()>& f){
+    mThreadPool.emplace_back(f);
 }
 
 TRADE_API_NAMESPACE_END

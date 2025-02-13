@@ -1,5 +1,6 @@
 #include "Model.h"
 #include "Common.h"
+#include "TradeApp.h"
 #include <chrono>
 #include <iomanip>
 #include <iostream>
@@ -44,8 +45,14 @@ std::ostream& operator<<(std::ostream& os, const Trade& trade) {
               << "type=" << trade.tradeType << ")";
 }
 
-TradeModel::TradeModel() {
+TradeModel::TradeModel(TradeApp& app)
+    : mApplication(app) {
     std::srand(std::time(nullptr));
+}
+
+void TradeModel::simulate() {
+    mApplication.runBackgroundTask(std::bind_front(&TradeModel::generateTrade, this, TradeType::BUY));
+    mApplication.runBackgroundTask(std::bind_front(&TradeModel::generateTrade, this, TradeType::SELL));
 }
 
 void TradeModel::generateTrade(TradeType tradeType) {
@@ -56,7 +63,7 @@ void TradeModel::generateTrade(TradeType tradeType) {
         trade.timeStamp = std::chrono::system_clock::now();
         trade.tradeType = tradeType;
         trade.volume = randomValueOfMax(1000);
-        std::cout << trade << std::endl;
+        mApplication.registerTrade(trade);
         std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(randomValueOfMax(10)*100));
     }
 }

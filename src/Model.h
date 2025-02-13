@@ -1,10 +1,11 @@
 #pragma once
 
 #include <string>
-
+#include <list>
 
 TRADE_API_NAMESPACE_BEGIN
 
+class TradeApp;
 
 enum class TradeType { BUY, SELL };
 
@@ -20,24 +21,14 @@ struct Trade {
                          const timepoint_t &timepoint);
 };
 
-
-// must be thread safe queue
-// producer consumer
-// thread safe database
-// - unordered map
-class TradeDatabase{
-    public:
-    TradeDatabase() = default;
-    // store all trades
-    // search by id
-    // search by timestamp
-};
-
+/// Simulates a trade market and generates trades
 class TradeModel {
-    TradeDatabase mDatabase;
-
+    TradeApp& mApplication;
 public:
-    TradeModel();
+    TradeModel(TradeApp& app);
+    void simulate();
+    
+private:
     void generateTrade(TradeType tradeType);
 };
 
