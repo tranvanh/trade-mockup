@@ -10,7 +10,6 @@ template <typename Type>
 void ThreadSafeQueue<Type>::push(const Type& value) {
     std::lock_guard<std::mutex> lock(m);
     mQueue.emplace_back(value);
-    // std::cout << "PUSH " << value << std::endl;
     cv.notify_one();
 }
 
@@ -21,7 +20,6 @@ Type ThreadSafeQueue<Type>::pop() {
         return !mQueue.empty();
     });
     Type value = mQueue.front();
-    // std::cout << "POP " << value << std::endl;
     mQueue.pop_front();
     return value;
 }
@@ -41,45 +39,22 @@ void TradeBook::run() {
 
 void TradeBook::cleanUpBuyers() {
     while (mApplication.isRunning) {
-        std::cout << "CLEANING BUYERS" << std::endl;
         std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(2000));
         std::unique_lock<std::mutex> buyersLock(mBuyers.lock);
-
-        for (const auto& item : mBuyers.data) {
-            std::cout << item.second << std::endl;
-        }
-        std::cout << "--------------------------" << std::endl;
-
         std::erase_if(mBuyers.data, [](const std::pair<int, Trade>& item) {
             return item.second.volume <= 0;
         });
-
-        for (const auto& item : mBuyers.data) {
-            std::cout << item.second << std::endl;
-        }
-        std::cout << "FINISHED" << std::endl;
         buyersLock.unlock();
     }
 }
 
 void TradeBook::cleanUpSellers() {
     while (mApplication.isRunning) {
-        // std::cout << "CLEANING SELLERS" << std::endl;
         std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(2000));
         std::unique_lock<std::mutex> sellersLock(mSellers.lock);
-        // for (const auto& item : mSellers.data) {
-        //     std::cout << item.second << std::endl;
-        // }
-
         std::erase_if(mSellers.data, [](const std::pair<int, Trade>& item) {
             return item.second.volume <= 0;
         });
-
-        // std::cout << "--------------------------" << std::endl;
-        // for (const auto& item : mSellers.data) {
-        //     std::cout << item.second << std::endl;
-        // }
-        // std::cout << "FINISHED" << std::endl;
         sellersLock.unlock();
     }
 }
@@ -109,7 +84,6 @@ void TradeBook::processBuyer(Trade trade) {
         if (trade.price < seller.price) {
             break;
         }
-        // std::cout << "MATCH between: \n" << trade << "\n" << seller << std::endl;
         const int sellerVolume = seller.volume;
         seller.volume -= trade.volume;
         trade.volume -= sellerVolume;
@@ -119,12 +93,7 @@ void TradeBook::processBuyer(Trade trade) {
         }
     }
 
-
     buyersLock.unlock();
-    // \todo improve
-    if (volume > 0) {
-        // std::cout << "--------------------------" << std::endl;
-    }
     if (trade.volume > 0) {
         std::lock_guard<std::mutex> buyerLock(mBuyers.lock);
         mBuyers.data.insert({ trade.price, trade });
@@ -142,7 +111,6 @@ void TradeBook::processSeller(Trade trade) {
         if (trade.price > buyer.price) {
             break;
         }
-        // std::cout << "MATCH between: \n" << trade << "\n" << buyer << std::endl;
         const int buyerVolume = buyer.volume;
         buyer.volume -= trade.volume;
         trade.volume -= buyerVolume;
@@ -153,13 +121,6 @@ void TradeBook::processSeller(Trade trade) {
     }
 
     sellersLock.unlock();
-
-    // \todo improve
-    if (volume > 0) {
-        // std::cout << "--------------------------" << std::endl;
-    }
-
-
     if (trade.volume > 0) {
         std::lock_guard<std::mutex> buyerLock(mSellers.lock);
         mSellers.data.insert({ trade.price, trade });

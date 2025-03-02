@@ -28,13 +28,12 @@ public:
 };
 
 
-// we need order book
+// we need order book [x]
 // store trades which happened
 
 // must be thread safe queue
 // producer consumer
 // thread safe database
-// - unordered map
 class TradeBook {
     TradeApp&                           mApplication;
     ThreadSafeQueue<Trade>              mQueue;
