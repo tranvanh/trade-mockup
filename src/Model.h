@@ -13,12 +13,14 @@ struct Trade {
     uint64_t    id;
     timepoint_t timeStamp;
     TradeType   tradeType;
-    int price;
-    int volume;
+    int         price;
+    int         volume;
 
     friend std::ostream& operator<<(std::ostream& os, const Trade& trade);
-    friend std::ostream &operator<<(std::ostream &os,
-                         const timepoint_t &timepoint);
+    friend std::ostream& operator<<(std::ostream& os, const timepoint_t& timepoint);
+
+    static bool compareLowerPrice(const Trade& t1, const Trade& t2) { return t1.price < t2.price; }
+    static bool compareGreaterPrice(const Trade& t1, const Trade& t2) { return t1.price > t2.price; }
 };
 
 /// Simulates a trade market and generates trades
