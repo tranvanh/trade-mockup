@@ -3,12 +3,8 @@
 #include "Model.h"
 #include <condition_variable>
 #include <deque>
-#include <functional>
 #include <map>
-#include <queue>
-#include <set>
 #include <thread>
-#include <unordered_map>
 
 TRADE_API_NAMESPACE_BEGIN
 
@@ -26,12 +22,6 @@ public:
     bool empty() { return mQueue.empty(); }
 };
 
-// we need order book [x]
-// store trades which happened
-
-// must be thread safe queue
-// producer consumer
-// thread safe database
 class OrderBook {
     TradeApp&              mApplication;
     ThreadSafeQueue<Order> mBuyerQueue;
@@ -51,15 +41,16 @@ public:
     OrderBook(TradeApp& app);
     void registerOrder(const Order& t);
     void run();
-    // store all trades
-    // search by id
-    // search by timestamp
+
 private:
     void processBuyers();
     void processSellers();
 
     void cleanUpBuyers();
     void cleanUpSellers();
+
+    int getSoldVolumes(const int buyer, const int seller) const;
+    void matchOrders(Order& buyer, Order& seller);
 };
 
 TRADE_API_NAMESPACE_END

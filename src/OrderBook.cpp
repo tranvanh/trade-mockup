@@ -47,22 +47,24 @@ void OrderBook::run() {
 
 void OrderBook::cleanUpBuyers() {
     while (mApplication.isRunning) {
-        std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(2000));
+        std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(5000));
         std::unique_lock<std::mutex> buyersLock(mBuyers.lock);
         std::erase_if(mBuyers.data, [](const std::pair<int, Order>& item) {
             return item.second.volume <= 0;
         });
+        std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(2000)); // heavy load actor
         buyersLock.unlock();
     }
 }
 
 void OrderBook::cleanUpSellers() {
     while (mApplication.isRunning) {
-        std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(2000));
+        std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(5000));
         std::unique_lock<std::mutex> sellersLock(mSellers.lock);
         std::erase_if(mSellers.data, [](const std::pair<int, Order>& item) {
             return item.second.volume <= 0;
         });
+        std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(2000)); // heavy load actor
         sellersLock.unlock();
     }
 }
@@ -72,24 +74,13 @@ void OrderBook::processBuyers() {
         Order                        buyer = mBuyerQueue.pop();
         std::unique_lock<std::mutex> sellersLock(mSellers.lock);
         for (auto& [price, seller] : mSellers.data) {
+            if (seller.price > buyer.price || buyer.volume <= 0) {
+                break;
+            }
             if (seller.volume <= 0) {
                 continue;
             }
-            if (buyer.price < seller.price) {
-                break;
-            }
-            // todo correct the volume computation
-            Trade trade{ .buyer     = buyer,
-                         .seller    = seller,
-                         .volume    = buyer.volume,
-                         .tradeTime = std::chrono::system_clock::now() };
-            mApplication.registerTrade(trade);
-            const int sellerVolume = seller.volume;
-            seller.volume -= buyer.volume;
-            buyer.volume -= sellerVolume;
-            if (buyer.volume <= 0) {
-                break;
-            }
+            matchOrders(buyer, seller);
         }
         sellersLock.unlock();
         if (buyer.volume > 0) {
@@ -104,24 +95,13 @@ void OrderBook::processSellers() {
         Order                        seller = mSellerQueue.pop();
         std::unique_lock<std::mutex> buyersLock(mBuyers.lock);
         for (auto& [price, buyer] : mBuyers.data) {
+            if (seller.price > buyer.price || seller.volume <= 0) {
+                break;
+            }
             if (buyer.volume <= 0) {
                 continue;
             }
-            if (seller.price > buyer.price) {
-                break;
-            }
-            // todo correct the volume computation
-            Trade trade{ .buyer     = buyer,
-                         .seller    = seller,
-                         .volume    = seller.volume,
-                         .tradeTime = std::chrono::system_clock::now() };
-            mApplication.registerTrade(trade);
-            const int buyerVolume = buyer.volume;
-            buyer.volume -= seller.volume;
-            seller.volume -= buyerVolume;
-            if (seller.volume <= 0) {
-                break;
-            }
+            matchOrders(buyer, seller);
         }
         buyersLock.unlock();
         if (seller.volume > 0) {
@@ -129,6 +109,20 @@ void OrderBook::processSellers() {
             mSellers.data.insert({ seller.price, seller });
         }
     }
+}
+
+int OrderBook::getSoldVolumes(const int buyer, const int seller) const {
+    return buyer < seller ? buyer : seller;
+}
+
+void OrderBook::matchOrders(Order& buyer, Order& seller) {
+    Trade trade{ .buyer     = buyer,
+                 .seller    = seller,
+                 .volume    = getSoldVolumes(seller.volume, buyer.volume),
+                 .tradeTime = std::chrono::system_clock::now() };
+    mApplication.registerTrade(trade);
+    buyer.volume -= seller.volume;
+    seller.volume -= trade.volume;
 }
 
 TRADE_API_NAMESPACE_END

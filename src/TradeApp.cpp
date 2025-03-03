@@ -14,7 +14,7 @@ TradeApp::~TradeApp(){
 }
 
 void TradeApp::run() {
-    // 3 threads as result
+    // 6 threads as result
     isRunning = true;
     mBook.run();
     mModel.simulateMarket();

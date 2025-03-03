@@ -18,6 +18,7 @@ class TradeApp{
 public:
     TradeApp();
     ~TradeApp();
+    
     void run();
     void registerOrder(const Order& trade);
     void registerTrade(const Trade& trade);

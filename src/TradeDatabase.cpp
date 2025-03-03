@@ -18,7 +18,7 @@ TradeDatabase::TradeDatabase(TradeApp& application)
 
 void TradeDatabase::registerTrade(const Trade& trade){
     std::lock_guard<std::mutex> tradeLock(mTrades.lock);
-    std::cout << trade << std::endl;
+    std::cout << trade << std::endl; // \todo logger should run on other thread
     mTrades.data.insert(trade);
 }
 
