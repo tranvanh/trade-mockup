@@ -9,7 +9,7 @@
 
 #define CASSERT(Expr, Msg) IMPL_Assert(#Expr, Expr, __FILE__, __LINE__, Msg)
 
-static void IMPL_Assert(const char* expr_str, bool expr, const char* file, int line, const char* msg) {
+[[maybe_unused]] static void IMPL_Assert(const char* expr_str, bool expr, const char* file, int line, const char* msg) {
     if (!expr) {
         std::cerr << "Assert failed:\t" << msg << "\n"
                   << "Expected:\t" << expr_str << "\n"

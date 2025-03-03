@@ -34,31 +34,31 @@ public:
 // must be thread safe queue
 // producer consumer
 // thread safe database
-class TradeBook {
+class OrderBook {
     TradeApp&                           mApplication;
-    ThreadSafeQueue<Trade>              mQueue;
+    ThreadSafeQueue<Order>              mQueue;
 
     struct{
         std::mutex lock;
-        std::multimap<int, Trade> data;
+        std::multimap<int, Order, std::greater<int>>data;
     } mBuyers;
 
     struct{
         std::mutex lock;
-        std::multimap<int, Trade> data;
+        std::multimap<int, Order> data;
     } mSellers;
 
 public:
-    TradeBook(TradeApp& app);
-    void registerTrade(const Trade& t);
+OrderBook(TradeApp& app);
+    void registerOrder(const Order& t);
     void run();
     // store all trades
     // search by id
     // search by timestamp
 private:
 void processTrades();
-void processBuyer(Trade trade);
-void processSeller(Trade trade);
+void processBuyer(Order buyer);
+void processSeller(Order seller);
 
 void cleanUpBuyers();
 void cleanUpSellers();
