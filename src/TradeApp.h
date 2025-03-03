@@ -7,7 +7,6 @@
 #include <thread>
 #include <functional>
 
-
 TRADE_API_NAMESPACE_BEGIN
 
 class TradeApp{
@@ -25,7 +24,6 @@ public:
     void runBackgroundTask(const std::function<void()>& f);
 
     std::atomic<bool>  isRunning = false;
-
 };
 
 TRADE_API_NAMESPACE_END

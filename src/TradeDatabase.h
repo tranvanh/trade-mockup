@@ -1,9 +1,9 @@
 #pragma once
 
+#include "Model.h"
+#include <functional>
 #include <set>
 #include <thread>
-#include <functional>
-#include "Model.h"
 
 TRADE_API_NAMESPACE_BEGIN
 
@@ -19,20 +19,17 @@ struct Trade {
     static bool compareLowerPrice(const Trade& t1, const Trade& t2) { return t1.tradeTime < t2.tradeTime; }
 };
 
-
 class TradeDatabase {
-    TradeApp&                           mApplication;
-    struct{
-        std::mutex lock;
-        std::set<Trade, std::function<bool(const Trade&, const Trade&)>> data{Trade::compareLowerPrice};
+    TradeApp& mApplication;
+    struct {
+        std::mutex                                                       lock;
+        std::set<Trade, std::function<bool(const Trade&, const Trade&)>> data{ Trade::compareLowerPrice };
     } mTrades;
 
 public:
-TradeDatabase(TradeApp& app);
+    TradeDatabase(TradeApp& app);
     void registerTrade(const Trade& trade);
     void run();
-private:
-
 };
 
 TRADE_API_NAMESPACE_END

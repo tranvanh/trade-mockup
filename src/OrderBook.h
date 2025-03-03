@@ -4,12 +4,11 @@
 #include <condition_variable>
 #include <deque>
 #include <functional>
+#include <map>
 #include <queue>
+#include <set>
 #include <thread>
 #include <unordered_map>
-#include <map>
-#include <set>
-#include <vector>
 
 TRADE_API_NAMESPACE_BEGIN
 
@@ -27,7 +26,6 @@ public:
     bool empty() { return mQueue.empty(); }
 };
 
-
 // we need order book [x]
 // store trades which happened
 
@@ -35,33 +33,33 @@ public:
 // producer consumer
 // thread safe database
 class OrderBook {
-    TradeApp&                           mApplication;
-    ThreadSafeQueue<Order>              mQueue;
+    TradeApp&              mApplication;
+    ThreadSafeQueue<Order> mBuyerQueue;
+    ThreadSafeQueue<Order> mSellerQueue;
 
-    struct{
-        std::mutex lock;
-        std::multimap<int, Order, std::greater<int>>data;
+    struct {
+        std::mutex                            lock;
+        std::multimap<int, Order, std::greater<int>> data;
     } mBuyers;
 
-    struct{
-        std::mutex lock;
+    struct {
+        std::mutex         lock;
         std::multimap<int, Order> data;
     } mSellers;
 
 public:
-OrderBook(TradeApp& app);
+    OrderBook(TradeApp& app);
     void registerOrder(const Order& t);
     void run();
     // store all trades
     // search by id
     // search by timestamp
 private:
-void processTrades();
-void processBuyer(Order buyer);
-void processSeller(Order seller);
+    void processBuyers();
+    void processSellers();
 
-void cleanUpBuyers();
-void cleanUpSellers();
+    void cleanUpBuyers();
+    void cleanUpSellers();
 };
 
 TRADE_API_NAMESPACE_END

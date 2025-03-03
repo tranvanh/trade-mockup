@@ -5,7 +5,6 @@
 
 TRADE_API_NAMESPACE_BEGIN
 
-
 std::ostream& operator<<(std::ostream& os, const Trade& trade) {
     return os << "Trade" << "\n"
              << "Seller" << trade.seller << "\n"
@@ -22,4 +21,5 @@ void TradeDatabase::registerTrade(const Trade& trade){
     std::cout << trade << std::endl;
     mTrades.data.insert(trade);
 }
+
 TRADE_API_NAMESPACE_END
