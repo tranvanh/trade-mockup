@@ -75,8 +75,7 @@ void OrderBook::processTrades() {
 
 void OrderBook::processBuyer(Order buyer) {
     std::unique_lock<std::mutex> buyersLock(mBuyers.lock);
-    for (auto it = mSellers.data.lower_bound(buyer.price); it != mSellers.data.end(); ++it) {
-        Order& seller = it->second;
+    for(auto& [price, seller]: mSellers.data){
         if (seller.volume <= 0) {
             continue;
         }
@@ -108,32 +107,26 @@ void OrderBook::processBuyer(Order buyer) {
 // reimplement seller matching
 void OrderBook::processSeller(Order seller) {
     std::unique_lock<std::mutex> sellersLock(mSellers.lock);
-    auto                         it = mBuyers.data.upper_bound(seller.price);
-    if (mBuyers.data.size() > 0) {
-        do {
-            --it;
-            Order& buyer = it->second;
-            if (buyer.volume <= 0) {
-                continue;
-            }
-            if (seller.price > buyer.price) {
-                break;
-            }
-            // todo correct the volume computation
-            Trade trade;
-            trade.buyer = buyer, trade.seller = seller;
-            trade.volume    = seller.volume;
-            trade.tradeTime = std::chrono::system_clock::now();
-            mApplication.registerTrade(trade);
-            const int buyerVolume = buyer.volume;
-            buyer.volume -= seller.volume;
-            seller.volume -= buyerVolume;
-            if (seller.volume <= 0) {
-                break;
-            }
-        } while (it != mBuyers.data.begin());
+    for(auto& [price, buyer] : mBuyers.data){
+        if (buyer.volume <= 0) {
+            continue;
+        }
+        if (seller.price > buyer.price) {
+            break;
+        }
+        // todo correct the volume computation
+        Trade trade;
+        trade.buyer = buyer, trade.seller = seller;
+        trade.volume    = seller.volume;
+        trade.tradeTime = std::chrono::system_clock::now();
+        mApplication.registerTrade(trade);
+        const int buyerVolume = buyer.volume;
+        buyer.volume -= seller.volume;
+        seller.volume -= buyerVolume;
+        if (seller.volume <= 0) {
+            break;
+        }
     }
-
     sellersLock.unlock();
     if (seller.volume > 0) {
         std::lock_guard<std::mutex> buyerLock(mSellers.lock);
