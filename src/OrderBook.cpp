@@ -74,7 +74,7 @@ void OrderBook::processTrades() {
 }
 
 void OrderBook::processBuyer(Order buyer) {
-    std::unique_lock<std::mutex> buyersLock(mBuyers.lock);
+    std::unique_lock<std::mutex> sellersLock(mSellers.lock);
     for(auto& [price, seller]: mSellers.data){
         if (seller.volume <= 0) {
             continue;
@@ -83,11 +83,10 @@ void OrderBook::processBuyer(Order buyer) {
             break;
         }
         // todo correct the volume computation
-        Trade trade;
-        trade.buyer     = buyer;
-        trade.seller    = seller;
-        trade.volume    = buyer.volume;
-        trade.tradeTime = std::chrono::system_clock::now();
+        Trade trade{ .buyer     = buyer,
+                     .seller    = seller,
+                     .volume    = buyer.volume,
+                     .tradeTime = std::chrono::system_clock::now() };
         mApplication.registerTrade(trade);
         const int sellerVolume = seller.volume;
         seller.volume -= buyer.volume;
@@ -96,8 +95,7 @@ void OrderBook::processBuyer(Order buyer) {
             break;
         }
     }
-
-    buyersLock.unlock();
+    sellersLock.unlock();
     if (buyer.volume > 0) {
         std::lock_guard<std::mutex> buyerLock(mBuyers.lock);
         mBuyers.data.insert({ buyer.price, buyer });
@@ -106,7 +104,7 @@ void OrderBook::processBuyer(Order buyer) {
 
 // reimplement seller matching
 void OrderBook::processSeller(Order seller) {
-    std::unique_lock<std::mutex> sellersLock(mSellers.lock);
+    std::unique_lock<std::mutex> buyersLock(mBuyers.lock);
     for(auto& [price, buyer] : mBuyers.data){
         if (buyer.volume <= 0) {
             continue;
@@ -115,10 +113,11 @@ void OrderBook::processSeller(Order seller) {
             break;
         }
         // todo correct the volume computation
-        Trade trade;
-        trade.buyer = buyer, trade.seller = seller;
-        trade.volume    = seller.volume;
-        trade.tradeTime = std::chrono::system_clock::now();
+        Trade trade{ .buyer     = buyer,
+                     .seller    = seller,
+                     .volume    = seller.volume,
+                     .tradeTime = std::chrono::system_clock::now() };
+
         mApplication.registerTrade(trade);
         const int buyerVolume = buyer.volume;
         buyer.volume -= seller.volume;
@@ -127,7 +126,7 @@ void OrderBook::processSeller(Order seller) {
             break;
         }
     }
-    sellersLock.unlock();
+    buyersLock.unlock();
     if (seller.volume > 0) {
         std::lock_guard<std::mutex> buyerLock(mSellers.lock);
         mSellers.data.insert({ seller.price, seller });
