@@ -30,7 +30,7 @@ std::ostream& operator<<(std::ostream& os, OrderType type) {
         os << "BUY";
         break;
     default:
-        CASSERT(true, "Trade type undeclared");
+        ASSERT(true, "Trade type undeclared");
     }
     return os;
 }
