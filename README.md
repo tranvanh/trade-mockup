@@ -11,4 +11,4 @@
 - Logger
 
 ### Note:
-Purpose of this project is to practice technical topics. Namely concurrencies, cmake, design patterns
+Purpose of this project is to practice various technical topics
