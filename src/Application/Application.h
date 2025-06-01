@@ -1,6 +1,7 @@
 #pragma once
 
-#include "MarketGenerator.h"
+#include "StockMarketGenerator.h"
+#include "StockMarket.h"
 #include "TradeDatabase.h"
 #include "OrderBook.h"
 #include <list>
@@ -13,9 +14,7 @@
 // APPLICATION_NAMESPACE_BEGIN
 
 class TradeApp{
-    MarketGenerator mMarket;
-    OrderBook mBook;
-    TradeDatabase mDatabase;
+    StockMarketGenerator mGenerator;
     std::list<std::thread> mThreadPool;
 
 public:

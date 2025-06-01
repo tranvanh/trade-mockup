@@ -1,5 +1,6 @@
 #pragma once
 
+#include "StockMarket.h"
 #include "Order.h"
 #include <string>
 #include <list>
@@ -9,10 +10,12 @@
 class TradeApp;
 
 /// Simulates a trade market and generates orders
-class MarketGenerator {
+class StockMarketGenerator {
     TradeApp& mApplication;
+    StockMarket mStockMarket;
+
 public:
-MarketGenerator(TradeApp& app);
+    StockMarketGenerator(TradeApp& app);
     void simulateMarket();
     
 private:

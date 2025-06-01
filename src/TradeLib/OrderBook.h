@@ -18,34 +18,43 @@
 
 // TRADE_NAMESPACE_BEGIN
 
+class StockMarket;
+
+// Match orders the highest buyer with lowest buyer
 class OrderBook {
-    // TradeApp&              mApplication;
+    std::deque<std::thread> mThreadPool;
+
+    StockMarket&              mStockMarket;
     ThreadSafeQueue<Order> mBuyerQueue;
     ThreadSafeQueue<Order> mSellerQueue;
 
     struct {
-        std::mutex                            lock;
+        std::mutex                                   lock;
         std::multimap<int, Order, std::greater<int>> data;
     } mBuyers;
 
     struct {
-        std::mutex         lock;
+        std::mutex                lock;
         std::multimap<int, Order> data;
     } mSellers;
 
 public:
-    // OrderBook(TradeApp& app);
-    void registerOrder(const Order& t);
+    OrderBook(StockMarket& stockMarket);
+    ~OrderBook();
+    void registerOrder(const Order& order);
     void run();
 
 private:
     void processBuyers();
     void processSellers();
 
+    // We allow orders with negative volumes due to performance. After a certain time we clean invalid orders
     void cleanUpBuyers();
     void cleanUpSellers();
 
-    int getSoldVolumes(const int buyer, const int seller) const;
+    int  getSoldVolumes(const int buyer, const int seller) const;
+
+    // Make a trade and update volumes
     void matchOrders(Order& buyer, Order& seller);
 };
 

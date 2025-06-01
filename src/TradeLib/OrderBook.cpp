@@ -1,13 +1,13 @@
 #include "OrderBook.h"
-// #include "Application.h"
+#include "StockMarket.h"
 #include "Trade.h"
 #include <iostream>
 #include <queue>
 
 // TRADE_NAMESPACE_BEGIN
 
-// OrderBook::OrderBook(TradeApp& app)
-//     : mApplication(app) {}
+OrderBook::OrderBook(StockMarket& stockMarket)
+    : mStockMarket(stockMarket) {}
 
 void OrderBook::registerOrder(const Order& order) {
     switch (order.type) {
@@ -21,14 +21,20 @@ void OrderBook::registerOrder(const Order& order) {
 }
 
 void OrderBook::run() {
-    // mApplication.runBackgroundTask(std::bind_front(&OrderBook::processBuyers, this));
-    // mApplication.runBackgroundTask(std::bind_front(&OrderBook::processSellers, this));
-    // mApplication.runBackgroundTask(std::bind_front(&OrderBook::cleanUpBuyers, this));
-    // mApplication.runBackgroundTask(std::bind_front(&OrderBook::cleanUpSellers, this));
+    mThreadPool.emplace_back(std::bind_front(&OrderBook::processBuyers, this));
+    mThreadPool.emplace_back(std::bind_front(&OrderBook::processSellers, this));
+    mThreadPool.emplace_back(std::bind_front(&OrderBook::cleanUpBuyers, this));
+    mThreadPool.emplace_back(std::bind_front(&OrderBook::cleanUpSellers, this));
+}
+
+OrderBook::~OrderBook(){
+    for(auto& t: mThreadPool){
+        t.join();
+    }
 }
 
 void OrderBook::cleanUpBuyers() {
-    // while (mApplication.isRunning) {
+    while (mStockMarket.isActive()) {
         std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(5000));
         std::unique_lock<std::mutex> buyersLock(mBuyers.lock);
         std::erase_if(mBuyers.data, [](const std::pair<int, Order>& item) {
@@ -36,11 +42,11 @@ void OrderBook::cleanUpBuyers() {
         });
         std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(2000)); // heavy load actor
         buyersLock.unlock();
-    // }
+    }
 }
 
 void OrderBook::cleanUpSellers() {
-    // while (mApplication.isRunning) {
+    while (mStockMarket.isActive()) {
         std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(5000));
         std::unique_lock<std::mutex> sellersLock(mSellers.lock);
         std::erase_if(mSellers.data, [](const std::pair<int, Order>& item) {
@@ -48,11 +54,11 @@ void OrderBook::cleanUpSellers() {
         });
         std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(2000)); // heavy load actor
         sellersLock.unlock();
-    // }
+    }
 }
 
 void OrderBook::processBuyers() {
-    // while (mApplication.isRunning) {
+    while (mStockMarket.isActive()) {
         Order                        buyer = mBuyerQueue.pop();
         std::unique_lock<std::mutex> sellersLock(mSellers.lock);
         for (auto& [price, seller] : mSellers.data) {
@@ -69,11 +75,11 @@ void OrderBook::processBuyers() {
             std::unique_lock<std::mutex> buyerLock(mBuyers.lock);
             mBuyers.data.insert({ buyer.price, buyer });
         }
-    // }
+    }
 }
 
 void OrderBook::processSellers() {
-    // while (mApplication.isRunning) {
+    while (mStockMarket.isActive()) {
         Order                        seller = mSellerQueue.pop();
         std::unique_lock<std::mutex> buyersLock(mBuyers.lock);
         for (auto& [price, buyer] : mBuyers.data) {
@@ -90,7 +96,7 @@ void OrderBook::processSellers() {
             std::unique_lock<std::mutex> buyerLock(mSellers.lock);
             mSellers.data.insert({ seller.price, seller });
         }
-    // }
+    }
 }
 
 int OrderBook::getSoldVolumes(const int buyer, const int seller) const {
@@ -104,7 +110,7 @@ void OrderBook::matchOrders(Order& buyer, Order& seller) {
         .tradeTime = std::chrono::system_clock::now(),
         .volume    = getSoldVolumes(seller.volume, buyer.volume),
     };
-    // mApplication.registerTrade(trade);
+    mStockMarket.registerTrade(trade);
     buyer.volume -= seller.volume;
     seller.volume -= trade.volume;
 }

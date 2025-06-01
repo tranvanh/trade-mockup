@@ -1,4 +1,4 @@
-#include "MarketGenerator.h"
+#include "StockMarketGenerator.h"
 #include "Common.h"
 #include "Application.h"
 #include <chrono>
@@ -17,17 +17,18 @@ int randomValueOfMax(const int max) {
     return std::rand() / ((RAND_MAX + 1u) / max);
 }
 
-MarketGenerator::MarketGenerator(TradeApp& app)
+StockMarketGenerator::StockMarketGenerator(TradeApp& app)
     : mApplication(app) {
     std::srand(std::time(nullptr));
 }
 
-void MarketGenerator::simulateMarket() {
-    mApplication.runBackgroundTask(std::bind_front(&MarketGenerator::generateOrder, this, OrderType::BUY));
-    mApplication.runBackgroundTask(std::bind_front(&MarketGenerator::generateOrder, this, OrderType::SELL));
+void StockMarketGenerator::simulateMarket() {
+    mStockMarket.run();
+    mApplication.runBackgroundTask(std::bind_front(&StockMarketGenerator::generateOrder, this, OrderType::BUY));
+    mApplication.runBackgroundTask(std::bind_front(&StockMarketGenerator::generateOrder, this, OrderType::SELL));
 }
 
-void MarketGenerator::generateOrder(OrderType type) {
+void StockMarketGenerator::generateOrder(OrderType type) {
     while(true){
         Order order;
         order.id = gIdCounter++;
@@ -35,7 +36,7 @@ void MarketGenerator::generateOrder(OrderType type) {
         order.timeStamp = std::chrono::system_clock::now();
         order.type = type;
         order.volume = randomValueOfMax(1000);
-        mApplication.registerOrder(order);
+        mStockMarket.registerOrder(order);
         std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(randomValueOfMax(10)*100));
     }
 }
