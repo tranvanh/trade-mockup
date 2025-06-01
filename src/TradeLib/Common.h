@@ -1,5 +1,4 @@
 #pragma once
-#include <chrono>
 
-using timepoint_t = std::chrono::time_point<std::chrono::system_clock>;
-
+#define TRADE_NAMESPACE_BEGIN namespace Trade {
+#define TRADE_NAMESPACE_END }

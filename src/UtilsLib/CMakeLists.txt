@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Create a lib
 file(GLOB SOURCES *.cpp *.h)
+# add_definitions(-include Common.h)
 add_library(UtilsLib STATIC ${SOURCES})
 
 # Expose headers to other targets

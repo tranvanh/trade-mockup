@@ -1,23 +1,15 @@
 #pragma once
 
-#include "Model.h"
+#include "Trade.h"
 #include <functional>
 #include <set>
 #include <thread>
 
-TRADE_API_NAMESPACE_BEGIN
+// namespace Application {
+    class TradeApp;
+// }
 
-class TradeApp;
-
-struct Trade {
-    Order       seller;
-    Order       buyer;
-    timepoint_t tradeTime;
-    int         volume;
-
-    friend std::ostream& operator<<(std::ostream& os, const Trade& trade);
-    static bool compareLowerPrice(const Trade& t1, const Trade& t2) { return t1.tradeTime < t2.tradeTime; }
-};
+// TRADE_NAMESPACE_BEGIN
 
 class TradeDatabase {
     TradeApp& mApplication;
@@ -32,4 +24,4 @@ public:
     void run();
 };
 
-TRADE_API_NAMESPACE_END
+// TRADE_NAMESPACE_END

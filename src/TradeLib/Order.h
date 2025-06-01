@@ -1,6 +1,9 @@
 #pragma once
 
 #include <string>
+#include "TimePointUtils.h"
+
+// TRADE_NAMESPACE_BEGIN
 
 enum class OrderType { BUY, SELL };
 
@@ -16,3 +19,4 @@ struct Order {
     friend std::ostream& operator<<(std::ostream& os, const Order& trade);
 };
 
+// TRADE_NAMESPACE_END

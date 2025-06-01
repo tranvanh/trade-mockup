@@ -1,11 +1,10 @@
 
-#include <functional>
 #include "Application.h"
-#include "OrderBook.h"
+#include <functional>
 
-TRADE_API_NAMESPACE_BEGIN
+// APPLICATION_NAMESPACE_BEGIN
 
-TradeApp::TradeApp() : mModel(*this), mBook(*this), mDatabase(*this) {}
+TradeApp::TradeApp() : mMarket(*this), mDatabase(*this), isRunning(false) {}
 TradeApp::~TradeApp(){
     for(auto& t: mThreadPool){
         t.join();
@@ -31,4 +30,4 @@ void TradeApp::runBackgroundTask(const std::function<void()>& f){
     mThreadPool.emplace_back(f);
 }
 
-TRADE_API_NAMESPACE_END
+// APPLICATION_NAMESPACE_END

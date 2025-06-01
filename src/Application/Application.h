@@ -5,9 +5,12 @@
 #include "OrderBook.h"
 #include <list>
 #include <thread>
+#include <atomic>
 #include <functional>
+#include <Order.h>
+#include <Trade.h>
 
-TRADE_API_NAMESPACE_BEGIN
+// APPLICATION_NAMESPACE_BEGIN
 
 class TradeApp{
     MarketGenerator mMarket;
@@ -24,7 +27,7 @@ public:
     void registerTrade(const Trade& trade);
     void runBackgroundTask(const std::function<void()>& f);
 
-    std::atomic<bool>  isRunning = false;
+    std::atomic<bool>  isRunning;
 };
 
-TRADE_API_NAMESPACE_END
+// APPLICATION_NAMESPACE_END

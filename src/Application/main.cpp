@@ -1,5 +1,4 @@
-#include "Common.h"
-#include "StockApp.h"
+#include "Application.h"
 #include <iostream>
 
 // Trades
@@ -17,7 +16,7 @@
 // * Optimized for performance, uses floating window for history trades.
 
 int main() {
-    StockApp stockApp;
-    stockApp.run();
+    TradeApp app;
+    app.run();
     return 0;
 }

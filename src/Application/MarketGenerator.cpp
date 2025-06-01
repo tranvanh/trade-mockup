@@ -1,14 +1,15 @@
 #include "MarketGenerator.h"
 #include "Common.h"
-#include "TradeApp.h"
+#include "Application.h"
 #include <chrono>
 #include <iomanip>
 #include <iostream>
 #include <atomic>
 #include <thread>
 #include <utility>
+#include <functional>
 
-TRADE_API_NAMESPACE_BEGIN
+// APPLICATION_NAMESPACE_BEGIN
 
 std::atomic<uint64_t> gIdCounter = 0;
 
@@ -16,17 +17,17 @@ int randomValueOfMax(const int max) {
     return std::rand() / ((RAND_MAX + 1u) / max);
 }
 
-OrderModel::OrderModel(TradeApp& app)
+MarketGenerator::MarketGenerator(TradeApp& app)
     : mApplication(app) {
     std::srand(std::time(nullptr));
 }
 
-void OrderModel::simulateMarket() {
-    mApplication.runBackgroundTask(std::bind_front(&OrderModel::generateOrder, this, OrderType::BUY));
-    mApplication.runBackgroundTask(std::bind_front(&OrderModel::generateOrder, this, OrderType::SELL));
+void MarketGenerator::simulateMarket() {
+    mApplication.runBackgroundTask(std::bind_front(&MarketGenerator::generateOrder, this, OrderType::BUY));
+    mApplication.runBackgroundTask(std::bind_front(&MarketGenerator::generateOrder, this, OrderType::SELL));
 }
 
-void OrderModel::generateOrder(OrderType type) {
+void MarketGenerator::generateOrder(OrderType type) {
     while(true){
         Order order;
         order.id = gIdCounter++;
@@ -39,4 +40,4 @@ void OrderModel::generateOrder(OrderType type) {
     }
 }
 
-TRADE_API_NAMESPACE_END
+// APPLICATION_NAMESPACE_END

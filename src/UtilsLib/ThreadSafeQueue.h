@@ -5,6 +5,8 @@
 #include <map>
 #include <thread>
 
+// UTILSLIB_NAMESPACE_BEGIN
+
 template <typename Type>
 class ThreadSafeQueue {
     std::mutex              m;
@@ -34,3 +36,5 @@ Type ThreadSafeQueue<Type>::pop() {
     mQueue.pop_front();
     return value;
 }
+
+// UTILSLIB_NAMESPACE_END

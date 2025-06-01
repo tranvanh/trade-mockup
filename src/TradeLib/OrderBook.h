@@ -1,18 +1,25 @@
 #pragma once
 
-#include "Model.h"
+#include "ThreadSafeQueue.h"
+#include "Order.h"
 #include <condition_variable>
 #include <deque>
 #include <map>
 #include <thread>
-#include "UtilsLib/ThreadSafeQueue.h"
+// namespace Application {
+    // class TradeApp;
+// }
 
-TRADE_API_NAMESPACE_BEGIN
+// WTF
+// namespace UtilsLib{
+//     template<typename T>
+//     class ThreadSafeQueue;
+// }
 
-class TradeApp;
+// TRADE_NAMESPACE_BEGIN
 
 class OrderBook {
-    TradeApp&              mApplication;
+    // TradeApp&              mApplication;
     ThreadSafeQueue<Order> mBuyerQueue;
     ThreadSafeQueue<Order> mSellerQueue;
 
@@ -27,7 +34,7 @@ class OrderBook {
     } mSellers;
 
 public:
-    OrderBook(TradeApp& app);
+    // OrderBook(TradeApp& app);
     void registerOrder(const Order& t);
     void run();
 
@@ -42,4 +49,4 @@ private:
     void matchOrders(Order& buyer, Order& seller);
 };
 
-TRADE_API_NAMESPACE_END
+// TRADE_NAMESPACE_END

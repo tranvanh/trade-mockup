@@ -1,21 +1,22 @@
 #pragma once
 
+#include "Order.h"
 #include <string>
 #include <list>
 
-TRADE_API_NAMESPACE_BEGIN
+// APPLICATION_NAMESPACE_BEGIN
 
 class TradeApp;
 
 /// Simulates a trade market and generates orders
-class OrderModel {
+class MarketGenerator {
     TradeApp& mApplication;
 public:
-OrderModel(TradeApp& app);
+MarketGenerator(TradeApp& app);
     void simulateMarket();
     
 private:
     void generateOrder(OrderType tradeType);
 };
 
-TRADE_API_NAMESPACE_END
+// APPLICATION_NAMESPACE_END
