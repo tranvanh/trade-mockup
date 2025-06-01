@@ -12,4 +12,3 @@
 
 ### Note:
 Purpose of this project is to practice various design patterns, cmake, concurrencies and other technical topics
-test mirror
