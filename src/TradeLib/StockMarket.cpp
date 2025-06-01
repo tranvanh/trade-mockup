@@ -1,6 +1,9 @@
 #include "StockMarket.h"
+#include "Logger.h"
 
 void StockMarket::run() {
+    auto& logger = Logger::instance();
+    logger.log(Logger::LogLevel::DEBUG, "Initialize Stock market");
     mActive = true;
     mBook.run();
 }

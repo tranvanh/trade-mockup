@@ -1,5 +1,6 @@
 
 #include "TradeApp.h"
+#include "Logger.h"
 #include <functional>
 
 // APPLICATION_NAMESPACE_BEGIN
@@ -8,7 +9,8 @@ TradeApp::TradeApp()
     : mGenerator(*this)
     , mInvestor(mStockMarket) {
     registerCallback(mStockMarket.addOnTradeObserver([](const Trade& trade) {
-        std::cout << trade << std::endl;
+        auto& logger = Logger::instance();
+        logger.log(Logger::LogLevel::INFO, trade);
     }));
 }
 
@@ -19,6 +21,8 @@ TradeApp::~TradeApp() {
 }
 
 void TradeApp::run() {
+    auto& logger = Logger::instance();
+    logger.log(Logger::LogLevel::DEBUG, "Initialize application");
     isRunning = true;
     mGenerator.simulateMarket();
 }

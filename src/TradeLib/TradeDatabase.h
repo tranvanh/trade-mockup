@@ -12,14 +12,12 @@
 // TRADE_NAMESPACE_BEGIN
 
 class TradeDatabase {
-    // TradeApp& mApplication;
     struct {
         std::mutex                                                       lock;
         std::set<Trade, std::function<bool(const Trade&, const Trade&)>> data{ Trade::compareLowerPrice };
     } mTrades;
 
 public:
-    // TradeDatabase(TradeApp& app);
     void registerTrade(const Trade& trade);
     // void run();
 };

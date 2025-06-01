@@ -1,6 +1,7 @@
 #include "OrderBook.h"
 #include "StockMarket.h"
 #include "Trade.h"
+#include "Logger.h"
 #include <iostream>
 #include <queue>
 
@@ -21,6 +22,9 @@ void OrderBook::registerOrder(const Order& order) {
 }
 
 void OrderBook::run() {
+    auto& logger = Logger::instance();
+    logger.log(Logger::LogLevel::DEBUG, "Initialize Order book");
+
     mThreadPool.emplace_front(std::bind_front(&OrderBook::processBuyers, this));
     mThreadPool.emplace_front(std::bind_front(&OrderBook::processSellers, this));
     mThreadPool.emplace_front(std::bind_front(&OrderBook::cleanUpBuyers, this));
@@ -35,18 +39,24 @@ OrderBook::~OrderBook(){
 
 void OrderBook::cleanUpBuyers() {
     while (mStockMarket.isActive()) {
+        auto& logger = Logger::instance();
+        logger.log(Logger::LogLevel::DEBUG, "Cleaning invalid buyers...");
+
         std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(5000));
         std::unique_lock<std::mutex> buyersLock(mBuyers.lock);
         std::erase_if(mBuyers.data, [](const std::pair<int, Order>& item) {
             return item.second.volume <= 0;
         });
-        std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(2000)); // heavy load actor
+        std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(3000)); // heavy load actor
         buyersLock.unlock();
     }
 }
 
 void OrderBook::cleanUpSellers() {
     while (mStockMarket.isActive()) {
+        auto& logger = Logger::instance();
+        logger.log(Logger::LogLevel::DEBUG, "Cleaning invalid sellers...");
+
         std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(5000));
         std::unique_lock<std::mutex> sellersLock(mSellers.lock);
         std::erase_if(mSellers.data, [](const std::pair<int, Order>& item) {

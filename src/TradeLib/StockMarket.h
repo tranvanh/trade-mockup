@@ -25,6 +25,4 @@ public:
     void registerTrade(const Trade& trade);
 
     [[nodiscard]] CallbackLifetime addOnTradeObserver(const std::function<void(const Trade& trade)>& callback);
-    [[nodiscard]] CallbackLifetime addHighestBuyerChangeObserver(const std::function<void(const int price)>& callback);
-    [[nodiscard]] CallbackLifetime addLowestSellerChangeObserver(const std::function<void(const int price)>& callback);
 };

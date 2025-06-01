@@ -1,10 +1,12 @@
 #include "StockMarketGenerator.h"
 #include "TradeApp.h"
+#include "Logger.h"
 #include <chrono>
 #include <iomanip>
 #include <iostream>
 #include <atomic>
 #include <thread>
+#include <utility>
 #include <utility>
 #include <functional>
 
@@ -28,6 +30,9 @@ void StockMarketGenerator::simulateMarket() {
 }
 
 void StockMarketGenerator::generateOrder(OrderType type) {
+    auto& logger = Logger::instance();
+    logger.log(Logger::LogLevel::DEBUG, "Start generating orders ", type);
+
     while(mApplication.isRunning){
         Order order;
         order.id = gIdCounter++;

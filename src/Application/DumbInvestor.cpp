@@ -1,6 +1,7 @@
 #include "DumbInvestor.h"
 #include "StockMarket.h"
 #include "Trade.h"
+#include "Logger.h"
 
 DumbInvestor::DumbInvestor(StockMarket& stockMarket)
     : mStockMarket(stockMarket) {
@@ -23,6 +24,7 @@ void DumbInvestor::analyzeAndDisrupt(const Trade& trade) {
         order.type      = OrderType::BUY;
         order.volume    = 10; // Careful buyer
         mStockMarket.registerOrder(order);
-        std::cout << "disrupted" << std::endl;
+        auto& logger = Logger::instance();
+        logger.log(Logger::LogLevel::INFO, "Disrupted with ", order);
     }
 }
