@@ -1,12 +1,15 @@
 #include "TradeApp.h"
 #include <iostream>
 
-// Trades
+// Trades TODO
 // [x] model generating buy/sell THREAD - give certain delay of buy/sell generatio -> producer consumer
 // [x] mock database storing the information THREAD SAFE
 // [x] matching trade/sell
 // [ ] yield list of latest 100 trades happened around the given timestamp
 // [ ] iterator to navigate the trades chronologicaly
+// [ ] create server-client connection
+// [ ] add commands
+// [ ] error handling
 //
 // [x] Logger, of happened trades vs already happenning trades
 // -> logger for nice output
