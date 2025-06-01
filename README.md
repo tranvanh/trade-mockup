@@ -1,6 +1,6 @@
 # Trade Application
 - Generates the stock market for simulation purposes
-- Register happened trades ...
+- Dumb investor reacting to trades
 
 ## TradeLib - Shared
 - Trading specific components
@@ -8,3 +8,4 @@
 ## UtilsLib - Static
 - Observer pattern components
 - Thread safe queue
+- Logger

@@ -1,14 +1,13 @@
 #pragma once
-
-#include "ThreadSafeQueue.h"
 #include "Order.h"
+#include "ThreadSafeQueue.h"
 #include <condition_variable>
 #include <deque>
 #include <forward_list>
 #include <map>
 #include <thread>
 // namespace Application {
-    // class TradeApp;
+// class TradeApp;
 // }
 
 // WTF
@@ -25,7 +24,7 @@ class StockMarket;
 class OrderBook {
     std::forward_list<std::thread> mThreadPool;
 
-    StockMarket&              mStockMarket;
+    StockMarket&           mStockMarket;
     ThreadSafeQueue<Order> mBuyerQueue;
     ThreadSafeQueue<Order> mSellerQueue;
 
@@ -53,7 +52,7 @@ private:
     void cleanUpBuyers();
     void cleanUpSellers();
 
-    int  getSoldVolumes(const int buyer, const int seller) const;
+    int getSoldVolumes(const int buyer, const int seller) const;
 
     // Make a trade and update volumes
     void matchOrders(Order& buyer, Order& seller);

@@ -1,5 +1,6 @@
 #include "DumbInvestor.h"
 #include "StockMarket.h"
+#include "TimePointUtils.h"
 #include "Trade.h"
 #include "Logger.h"
 

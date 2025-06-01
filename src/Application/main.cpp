@@ -8,7 +8,7 @@
 // [ ] yield list of latest 100 trades happened around the given timestamp
 // [ ] iterator to navigate the trades chronologicaly
 //
-// * Logger, of happened trades vs already happenning trades
+// [x] Logger, of happened trades vs already happenning trades
 // -> logger for nice output
 
 // Deduplicator

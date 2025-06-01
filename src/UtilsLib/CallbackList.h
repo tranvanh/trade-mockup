@@ -26,7 +26,7 @@ public:
     }
 
     [[nodiscard]] CallbackLifetime add(Callback callback) {
-        CallbackId id = nextId++;
+        CallbackId                   id = nextId++;
         std::unique_lock<std::mutex> lock(mCallbacks.lock);
         mCallbacks.list.insert({ id, std::move(callback) });
         lock.unlock();

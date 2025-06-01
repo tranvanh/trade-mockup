@@ -1,8 +1,8 @@
 #pragma once
 #include "TimePointUtils.h"
+#include <chrono>
 #include <iostream>
 #include <mutex>
-#include <chrono>
 #include <sstream>
 
 class Logger {
@@ -10,7 +10,7 @@ public:
     enum class LogLevel { DEBUG, INFO, WARNING, ERROR };
 
 private:
-    Logger() = default;
+    Logger()  = default;
     ~Logger() = default;
 
     struct {
@@ -31,7 +31,7 @@ public:
         std::ostringstream stream;
         (stream << ... << args); // Fold expression (C++17)
 
-        auto                        now  = std::chrono::system_clock::now();
+        auto                        now = std::chrono::system_clock::now();
         std::lock_guard<std::mutex> lock(mOutput.lock);
         *mOutput.stream << now << " [" << levelToString(logLevel) << "] " << stream.str() << std::endl;
     }

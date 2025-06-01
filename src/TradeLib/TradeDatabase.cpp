@@ -4,7 +4,7 @@
 
 // TRADE_NAMESPACE_BEGIN
 
-void TradeDatabase::registerTrade(const Trade& trade){
+void TradeDatabase::registerTrade(const Trade& trade) {
     std::lock_guard<std::mutex> tradeLock(mTrades.lock);
     mTrades.data.insert(trade);
 }

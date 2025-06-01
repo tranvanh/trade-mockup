@@ -1,4 +1,3 @@
-
 #include "TradeApp.h"
 #include "Logger.h"
 #include <functional>
@@ -27,7 +26,7 @@ void TradeApp::run() {
     mGenerator.simulateMarket();
 }
 
-void TradeApp::runBackgroundTask(const std::function<void()>& f){
+void TradeApp::runBackgroundTask(const std::function<void()>& f) {
     mThreadPool.emplace_front(f);
 }
 

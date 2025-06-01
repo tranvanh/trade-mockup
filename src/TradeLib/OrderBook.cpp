@@ -1,7 +1,8 @@
 #include "OrderBook.h"
-#include "StockMarket.h"
-#include "Trade.h"
 #include "Logger.h"
+#include "StockMarket.h"
+#include "TimePointUtils.h"
+#include "Trade.h"
 #include <iostream>
 #include <queue>
 
@@ -31,38 +32,39 @@ void OrderBook::run() {
     mThreadPool.emplace_front(std::bind_front(&OrderBook::cleanUpSellers, this));
 }
 
-OrderBook::~OrderBook(){
-    for(auto& t: mThreadPool){
+OrderBook::~OrderBook() {
+    for (auto& t : mThreadPool) {
         t.join();
     }
 }
 
 void OrderBook::cleanUpBuyers() {
+    auto& logger = Logger::instance();
     while (mStockMarket.isActive()) {
-        auto& logger = Logger::instance();
-        logger.log(Logger::LogLevel::DEBUG, "Cleaning invalid buyers...");
 
         std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(5000));
         std::unique_lock<std::mutex> buyersLock(mBuyers.lock);
+        logger.log(Logger::LogLevel::DEBUG, "Start cleaning invalid buyers...");
         std::erase_if(mBuyers.data, [](const std::pair<int, Order>& item) {
             return item.second.volume <= 0;
         });
         std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(3000)); // heavy load actor
+        logger.log(Logger::LogLevel::DEBUG, "Finish cleaning invalid buyers...");
         buyersLock.unlock();
     }
 }
 
 void OrderBook::cleanUpSellers() {
+    auto& logger = Logger::instance();
     while (mStockMarket.isActive()) {
-        auto& logger = Logger::instance();
-        logger.log(Logger::LogLevel::DEBUG, "Cleaning invalid sellers...");
-
         std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(5000));
         std::unique_lock<std::mutex> sellersLock(mSellers.lock);
+        logger.log(Logger::LogLevel::DEBUG, "Start cleaning invalid sellers...");
         std::erase_if(mSellers.data, [](const std::pair<int, Order>& item) {
             return item.second.volume <= 0;
         });
         std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(2000)); // heavy load actor
+        logger.log(Logger::LogLevel::DEBUG, "Finish cleaning invalid sellers...");
         sellersLock.unlock();
     }
 }

@@ -1,5 +1,4 @@
 #pragma once
-
 #include "StockMarket.h"
 #include "Order.h"
 #include <string>

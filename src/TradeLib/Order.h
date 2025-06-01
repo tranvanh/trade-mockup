@@ -1,16 +1,15 @@
 #pragma once
 
-#include <string>
 #include "TimePointUtils.h"
+#include <string>
 
 // TRADE_NAMESPACE_BEGIN
 
-constexpr int PRICE_MAX = 10000;
+constexpr int PRICE_MAX  = 10000;
 constexpr int VOLUME_MAX = 1000;
 
 enum class OrderType { BUY, SELL };
 
-std::ostream& operator<<(std::ostream& os, const timepoint_t& timepoint);
 std::ostream& operator<<(std::ostream& os, OrderType type);
 struct Order {
     uint64_t    id;

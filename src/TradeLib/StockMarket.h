@@ -1,9 +1,7 @@
 #pragma once
-
 #include "OrderBook.h"
 #include "TradeDatabase.h"
 #include "CallbackList.h"
-
 #include <atomic>
 
 class StockMarket {

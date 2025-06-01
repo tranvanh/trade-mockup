@@ -1,12 +1,11 @@
 #pragma once
-
 #include "Trade.h"
 #include <functional>
 #include <set>
 #include <thread>
 
 // namespace Application {
-    class TradeApp;
+class TradeApp;
 // }
 
 // TRADE_NAMESPACE_BEGIN
