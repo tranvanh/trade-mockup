@@ -1,0 +1,4 @@
+#pragma once
+
+#define APPLICATION_NAMESPACE_BEGIN namespace APPLICATION {
+#define APPLICATION_NAMESPACE_END }

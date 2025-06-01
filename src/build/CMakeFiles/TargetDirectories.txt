@@ -1,3 +1,0 @@
-/Users/a-bit/Desktop/Sources/TradeApiMockup/src/build/CMakeFiles/Trade.dir
-/Users/a-bit/Desktop/Sources/TradeApiMockup/src/build/CMakeFiles/edit_cache.dir
-/Users/a-bit/Desktop/Sources/TradeApiMockup/src/build/CMakeFiles/rebuild_cache.dir
