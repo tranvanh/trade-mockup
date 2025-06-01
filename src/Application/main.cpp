@@ -1,4 +1,4 @@
-#include "Application.h"
+#include "TradeApp.h"
 #include <iostream>
 
 // Trades

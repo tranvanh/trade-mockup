@@ -3,7 +3,7 @@
 // TRADE_NAMESPACE_BEGIN
 
 std::ostream& operator<<(std::ostream& os, const Trade& trade) {
-    return os << "Trade" << "\n"
+    return os << "-----Trade-----" << "\n"
              << "Seller" << trade.seller << "\n"
              << "Buyer" << trade.buyer << "\n"
               << "time =" << trade.tradeTime << ","

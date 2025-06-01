@@ -1,6 +1,5 @@
 #include "StockMarketGenerator.h"
-#include "Common.h"
-#include "Application.h"
+#include "TradeApp.h"
 #include <chrono>
 #include <iomanip>
 #include <iostream>
@@ -29,13 +28,13 @@ void StockMarketGenerator::simulateMarket() {
 }
 
 void StockMarketGenerator::generateOrder(OrderType type) {
-    while(true){
+    while(mApplication.isRunning){
         Order order;
         order.id = gIdCounter++;
-        order.price = randomValueOfMax(10000);
+        order.price = randomValueOfMax(PRICE_MAX);
         order.timeStamp = std::chrono::system_clock::now();
         order.type = type;
-        order.volume = randomValueOfMax(1000);
+        order.volume = randomValueOfMax(VOLUME_MAX);
         mStockMarket.registerOrder(order);
         std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(randomValueOfMax(10)*100));
     }
