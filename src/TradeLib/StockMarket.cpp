@@ -11,4 +11,9 @@ void StockMarket::registerOrder(const Order& order) {
 
 void StockMarket::registerTrade(const Trade& trade) {
     mDatabase.registerTrade(trade);
+    mOnTradeCallbacks(trade);
+}
+
+[[nodiscard]] CallbackLifetime StockMarket::addOnTradeObserver(const std::function<void(const Trade& trade)>& callback){
+    return mOnTradeCallbacks.add(callback);
 }

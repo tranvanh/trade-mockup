@@ -18,7 +18,7 @@ int randomValueOfMax(const int max) {
 }
 
 StockMarketGenerator::StockMarketGenerator(TradeApp& app)
-    : mApplication(app) {
+    : mApplication(app), mStockMarket(app.getStockMarket()) {
     std::srand(std::time(nullptr));
 }
 

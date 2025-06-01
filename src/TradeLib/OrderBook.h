@@ -4,6 +4,7 @@
 #include "Order.h"
 #include <condition_variable>
 #include <deque>
+#include <forward_list>
 #include <map>
 #include <thread>
 // namespace Application {
@@ -22,7 +23,7 @@ class StockMarket;
 
 // Match orders the highest buyer with lowest buyer
 class OrderBook {
-    std::deque<std::thread> mThreadPool;
+    std::forward_list<std::thread> mThreadPool;
 
     StockMarket&              mStockMarket;
     ThreadSafeQueue<Order> mBuyerQueue;

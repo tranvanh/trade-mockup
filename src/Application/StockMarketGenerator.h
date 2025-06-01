@@ -12,7 +12,7 @@ class TradeApp;
 /// Simulates a trade market and generates orders
 class StockMarketGenerator {
     TradeApp& mApplication;
-    StockMarket mStockMarket;
+    StockMarket& mStockMarket;
 
 public:
     StockMarketGenerator(TradeApp& app);

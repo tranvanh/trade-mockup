@@ -2,9 +2,9 @@
 
 #include "StockMarketGenerator.h"
 #include "StockMarket.h"
-#include "TradeDatabase.h"
-#include "OrderBook.h"
-#include <list>
+#include "CallbackOwner.h"
+
+#include <forward_list>
 #include <thread>
 #include <atomic>
 #include <functional>
@@ -13,9 +13,10 @@
 
 // APPLICATION_NAMESPACE_BEGIN
 
-class TradeApp{
+class TradeApp : CallbackOwner{
     StockMarketGenerator mGenerator;
-    std::list<std::thread> mThreadPool;
+    StockMarket mStockMarket;
+    std::forward_list<std::thread> mThreadPool;
 
 public:
     TradeApp();
@@ -25,6 +26,7 @@ public:
     void registerOrder(const Order& trade);
     void registerTrade(const Trade& trade);
     void runBackgroundTask(const std::function<void()>& f);
+    StockMarket& getStockMarket();
 
     std::atomic<bool>  isRunning;
 };

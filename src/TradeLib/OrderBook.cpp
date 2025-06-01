@@ -21,10 +21,10 @@ void OrderBook::registerOrder(const Order& order) {
 }
 
 void OrderBook::run() {
-    mThreadPool.emplace_back(std::bind_front(&OrderBook::processBuyers, this));
-    mThreadPool.emplace_back(std::bind_front(&OrderBook::processSellers, this));
-    mThreadPool.emplace_back(std::bind_front(&OrderBook::cleanUpBuyers, this));
-    mThreadPool.emplace_back(std::bind_front(&OrderBook::cleanUpSellers, this));
+    mThreadPool.emplace_front(std::bind_front(&OrderBook::processBuyers, this));
+    mThreadPool.emplace_front(std::bind_front(&OrderBook::processSellers, this));
+    mThreadPool.emplace_front(std::bind_front(&OrderBook::cleanUpBuyers, this));
+    mThreadPool.emplace_front(std::bind_front(&OrderBook::cleanUpSellers, this));
 }
 
 OrderBook::~OrderBook(){
