@@ -1,4 +1,5 @@
 
 class Client{
+    public:
     Client();
 };
