@@ -1,0 +1,144 @@
+
+AccessModifierOffset: -4
+AlignAfterOpenBracket: Align
+# TODO: clang13+broken AlignArrayOfStructures: Left
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveBitFields: Consecutive
+AlignConsecutiveDeclarations: Consecutive
+AlignConsecutiveMacros: Consecutive
+AlignEscapedNewlines: Right
+AlignOperands: Align
+AlignTrailingComments: true
+AllowAllArgumentsOnNextLine: true # has effect only on initializer lists, not function calls
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortBlocksOnASingleLine: Never
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortEnumsOnASingleLine: true # false puts opening brace on a new line...
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLambdasOnASingleLine: Empty
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakAfterReturnType: None
+AlwaysBreakBeforeMultilineStrings: false
+AlwaysBreakTemplateDeclarations: Yes
+
+BinPackArguments: false
+BinPackParameters: false
+BitFieldColonSpacing: Both
+# BraceWrapping # Unused, since BreakBeforeBraces is not Custom
+# BreakAfterJavaFieldAnnotations - nope, Java
+BreakBeforeBinaryOperators: None
+BreakBeforeBraces: Attach
+BreakBeforeConceptDeclarations: true
+BreakBeforeTernaryOperators: true
+BreakConstructorInitializers: BeforeComma
+BreakInheritanceList: BeforeComma # Causes all inheritance lists to use 1 class per line.
+BreakStringLiterals: true
+
+ColumnLimit: 110
+CommentPragmas: '^ INCLUDEPURGE_SAMPLE|ReSharper disable'
+CompactNamespaces: true
+ConstructorInitializerIndentWidth: 4
+ContinuationIndentWidth: 4
+Cpp11BracedListStyle: false
+
+DeriveLineEnding: true
+DerivePointerAlignment: false
+# DisableFormat: false # Unnecessary
+
+EmptyLineAfterAccessModifier: Never
+EmptyLineBeforeAccessModifier: LogicalBlock
+# ExperimentalAutoDetectBinPacking: false # Unnecessary
+
+FixNamespaceComments: true
+# ForEachMacros # We are not using any
+
+# IfMacros # We are not using any
+IncludeBlocks: Merge
+IncludeIsMainRegex: '(\.Test|\.Benchmark)?$'
+IndentAccessModifiers: false
+IndentCaseBlocks: false
+IndentCaseLabels: false
+IndentExternBlock: Indent
+#IndentGotoLabels - We are not using any
+IndentPPDirectives: AfterHash
+IndentRequires: false
+IndentWidth: 4
+IndentWrappedFunctionNames: false
+# InsertTrailingCommas - only for Javascript
+
+KeepEmptyLinesAtTheStartOfBlocks: true
+
+LambdaBodyIndentation: Signature
+# Language: Cpp # If we enable this, formatting the file NativeHandle.h fails...
+
+MacroBlockBegin: 'BEGIN_EVENT_TABLE|BEGIN_FUNCTION_MAP'
+MacroBlockEnd: 'END_EVENT_TABLE|END_FUNCTION_MAP'
+MaxEmptyLinesToKeep: 2
+
+NamespaceIndentation: All
+# NamespaceMacros We are not deliberately using this
+
+PackConstructorInitializers: Never
+PPIndentWidth: 3 # This excludes the initial # sign. With it, we are at 4 and have the same indentation as regular code
+PenaltyBreakBeforeFirstCallParameter: 9999999
+PenaltyBreakComment: 300
+PenaltyBreakFirstLessLess: 9999999
+PenaltyBreakString: 1000
+PenaltyExcessCharacter: 1000000
+PenaltyReturnTypeOnItsOwnLine: 9999999
+PointerAlignment: Left
+
+QualifierAlignment: Custom
+QualifierOrder: ['inline',  'static', 'volatile', 'constexpr', 'const', 'type' ]
+
+# RawStringFormats - some way to format other language code?
+# ReferenceAlignment - unnecessary - PointerAlignment is used by default
+ReflowComments: true
+
+ShortNamespaceLines: 25
+SortIncludes: CaseInsensitive
+# SortJavaStaticImport
+# SortUsingDeclarations
+SpaceAfterCStyleCast: false
+SpaceAfterLogicalNot: false
+SpaceAfterTemplateKeyword: true
+SpaceAroundPointerQualifiers: Default # use PointerAlignment
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCaseColon: false
+SpaceBeforeCpp11BracedList: false
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
+SpaceBeforeParens: ControlStatements
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceBeforeSquareBrackets: false
+SpaceInEmptyBlock: false # TODO: change to true? big changelog
+SpaceInEmptyParentheses: false
+SpacesBeforeTrailingComments: 1
+SpacesInAngles: Never
+SpacesInCStyleCastParentheses: false
+SpacesInConditionalStatement: false
+# SpacesInContainerLiterals - not C++
+# TODO: clang14 - is this actually useful? SpacesInLineCommentPrefix:
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+Standard: Latest
+StatementAttributeLikeMacros: [ MAX2022_CONST ]
+
+StatementMacros: [ LEGION_NAMESPACE_BEGIN,
+                   LEGION_NAMESPACE_END,
+                   CORONA_NAMESPACE_BEGIN,
+                   CORONA_NAMESPACE_END,
+                   SCATTER_NAMESPACE_BEGIN,
+                   SCATTER_NAMESPACE_END,
+                   TELEMETRY_NAMESPACE_BEGIN,
+                   TELEMETRY_NAMESPACE_END,
+                   ListView_GetItemText ]
+
+# TabWidth: - not using
+# TypenameMacros - not using
+
+# UseCRLF: We use DeriveLineEnding
+UseTab: Never
+
+# WhitespaceSensitiveMacros - not using
