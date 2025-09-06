@@ -20,10 +20,7 @@ private:
     LogLevel mLogLevel = LogLevel::DEBUG;
 
 public:
-    static Logger& instance() {
-        static Logger logger;
-        return logger;
-    }
+    static Logger& instance();
     void setOutputStream(std::ostream& out);
     void setLevel(LogLevel logLevel) { mLogLevel = logLevel; }
     template <typename... Args>

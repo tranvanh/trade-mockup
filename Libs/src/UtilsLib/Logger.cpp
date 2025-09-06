@@ -1,9 +1,9 @@
 #include "UtilsLib/Logger.h"
 
-// Logger& Logger::instance() {
-//     static Logger logger;
-//     return logger;
-// }
+Logger& Logger::instance() {
+    static Logger logger;
+    return logger;
+}
 
 void Logger::setOutputStream(std::ostream& out) {
     std::lock_guard<std::mutex> lock(mOutput.lock);
