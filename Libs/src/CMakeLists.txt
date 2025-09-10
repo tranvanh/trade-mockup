@@ -1,3 +1,2 @@
 add_subdirectory(TradeLib)
-add_subdirectory(TradeClient)
 add_subdirectory(UtilsLib)

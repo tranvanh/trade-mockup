@@ -12,7 +12,7 @@ target_link_libraries(TradeLib PRIVATE UtilsLib)
 
 target_include_directories(TradeLib  PUBLIC
  #not really understanding, not exposing our path to someone who will install the lib?
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
     $<INSTALL_INTERFACE:include>)
 # target_link_libraries(UtilsLib PRIVATE Boost::asio)
 
