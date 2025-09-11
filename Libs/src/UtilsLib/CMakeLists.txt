@@ -1,5 +1,3 @@
-set(BOOST_INCLUDE_LIBRARIES asio)
-set(BOOST_ENABLE_CMAKE ON)
 
 # Create a lib
 file(GLOB SOURCES *.cpp *.h)
@@ -7,7 +5,7 @@ add_library(UtilsLib STATIC ${SOURCES})
 
 target_include_directories(UtilsLib  PUBLIC
  #not really understanding, not exposing our path to someone who will install the lib?
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
     $<INSTALL_INTERFACE:include>)
 
 # install libraries

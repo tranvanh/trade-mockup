@@ -1,5 +1,5 @@
 {
-    "cmake.sourceDirectory": "/home/tranvanh/coding/trade-mockup/src",
+    "cmake.sourceDirectory": "/home/tranvanh/coding/trade-mockup/ClientApplication",
     "files.associations": {
         "iomanip": "cpp",
         "thread": "cpp",

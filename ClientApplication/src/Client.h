@@ -1,5 +1,0 @@
-
-class Client{
-    public:
-    Client();
-};
