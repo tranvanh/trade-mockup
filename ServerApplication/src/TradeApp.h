@@ -1,6 +1,7 @@
 #pragma once
 #include "UtilsLib/CallbackOwner.h"
 #include "DumbInvestor.h"
+#include "UtilsLib/Server.h"
 #include "TradeLib/StockMarket.h"
 #include "StockMarketGenerator.h"
 #include <atomic>
@@ -15,8 +16,8 @@
 class TradeApp : CallbackOwner {
     StockMarketGenerator mGenerator;
     StockMarket          mStockMarket;
-
     DumbInvestor mInvestor;
+    Server mServer;
 
     std::forward_list<std::thread> mThreadPool;
 
@@ -31,6 +32,9 @@ public:
     StockMarket& getStockMarket();
 
     std::atomic<bool> isRunning = false;
+
+private:
+    void processServerMessage(const std::string& msg);
 };
 
 // APPLICATION_NAMESPACE_END
