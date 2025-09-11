@@ -33,11 +33,11 @@ bool Client::connectToServer(const char* url, const int port)const {
     return true;
 }
 
-SocketData Client::receive() const {
-    SocketData data;
-    data.size = recv(mSocket, data.buffer, BUFSIZ, 0);
-    return data;
-}
+// SocketData Client::receive() const {
+//     SocketData data;
+//     data.size = recv(mSocket, data.buffer, BUFSIZ, 0);
+//     return data;
+// }
 
 bool Client::sendMessage(const char* msg) const{
     auto& logger = Logger::instance();

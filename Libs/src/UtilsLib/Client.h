@@ -10,6 +10,6 @@ public:
     // Receive from socket and returns buffer with number of bytes recieved
     // Does not guarantee the message is complete, there could be some left to receive. It is up to the caller
     // to handle
-    SocketData receive() const;
+    // SocketData receive() const;
     bool sendMessage(const char* msg) const;
 };

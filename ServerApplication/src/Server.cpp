@@ -11,7 +11,7 @@ Server::Server(const AddressType addressType, const std::string& address)
     : mAddressType(addressType)
     , mAddress(address) {}
 
-bool Server::startListen(const int port, const std::function<void(const SocketData)>& onReceive) {
+bool Server::startListen(const int port, std::function<void(std::vector<char>, const int)> onReceive) {
     auto&       logger = Logger::instance();
     int         clientSocket;
     socklen_t   socketLen;
@@ -38,7 +38,12 @@ bool Server::startListen(const int port, const std::function<void(const SocketDa
     }
 
     logger.log(Logger::LogLevel::INFO, "Binding...");
-
+    // \todo make this debug only begin
+    int yes = 1;
+    if (setsockopt(mSocket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) < 0) {
+        perror("setsockopt");
+    }
+    // debug only end
     if (bind(mSocket, (struct sockaddr*)&socketAddress, sizeof(socketAddress)) < 0) {
         perror("bind");
         return 2;
@@ -53,17 +58,17 @@ bool Server::startListen(const int port, const std::function<void(const SocketDa
         perror("client accept");
         return 4;
     }
+    std::vector<char> buffer(BUFSIZ);
+    int recvLength = -1;
     while (true) {
-        SocketData data;
-        if ((data.size = recv(clientSocket, data.buffer, BUFSIZ, 0)) < 0) {
+        if ((recvLength = recv(clientSocket, buffer.data(), BUFSIZ, 0)) < 0) {
             perror("client recv");
             return 4;
         }
-        if(data.size == 0){
+        if(recvLength == 0){
             return true;
         }
-        onReceive(std::move(data));
-        // close(clientSocket);
+        onReceive(std::vector<char>(buffer.begin(), buffer.begin()+ recvLength), recvLength);
     }
     return true;
 }

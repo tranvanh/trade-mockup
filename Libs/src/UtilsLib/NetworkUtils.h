@@ -1,16 +1,16 @@
 #pragma once
 #include <memory>
 
-struct SocketData{
-    char buffer[BUFSIZ+1];
-    int size = 0;
-    SocketData() = default;
-    SocketData(const SocketData&) = delete;
-    SocketData(SocketData&& other){
-        std::swap(buffer, other.buffer);
-        size = other.size;
-    }
-};
+// struct SocketData{
+//     char buffer[BUFSIZ+1];
+//     int size = 0;
+//     SocketData() = default;
+//     SocketData(const SocketData&other) { std::memcpy(buffer, other.buffer, size);};
+//     SocketData(SocketData&& other){
+//         std::swap(buffer, other.buffer);
+//         size = other.size;
+//     }
+// };
 
 class NetworkComponent {
 protected:
