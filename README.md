@@ -11,6 +11,7 @@
 
 ## UtilsLib - Static
 - Observer pattern components
+- Server and Client using unix sockets
 - Thread safe queue
 - Logger
 
