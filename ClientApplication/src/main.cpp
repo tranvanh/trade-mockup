@@ -2,7 +2,6 @@
 #include <iostream>
 
 int main() {
-    // Logger::instance().log(Logger::LogLevel::INFO, "TEST");
     Client client;
     client.openSocket();
     client.connectToServer("time.nist.gov");
@@ -12,7 +11,5 @@ int main() {
     }
     std::string test(data.buffer, data.size);
     std::cout << test << std::endl;
-
-
     return 0;
 }

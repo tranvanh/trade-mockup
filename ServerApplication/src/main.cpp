@@ -1,6 +1,6 @@
 #include "TradeApp.h"
-#include <iostream>
-
+// #include <iostream>
+// #include <UtilsLib/Logger.h>
 // Trades TODO
 // [x] model generating buy/sell THREAD - give certain delay of buy/sell generatio -> producer consumer
 // [x] mock database storing the information THREAD SAFE
@@ -19,6 +19,7 @@
 // * Optimized for performance, uses floating window for history trades.
 
 int main() {
+    // Logger::instance(Logger::LogLevel::INFO, "TEST");
     TradeApp app;
     app.run();
     return 0;

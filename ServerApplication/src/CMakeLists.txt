@@ -1,3 +1,5 @@
+set(CMAKE_PREFIX_PATH "/home/tranvanh/coding/trade-mockup/includeLibs")
+
 find_package(UtilsLib)
 find_package(TradeLib)
 
