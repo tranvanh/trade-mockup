@@ -1,47 +1,27 @@
 #include "UtilsLib/Client.h"
-#include <iostream>
-#include <string>
+#include "UtilsLib/Logger.h"
 #include <cstring>
-#include <string_view>
+#include <netdb.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <netdb.h>
-#include "UtilsLib/Logger.h"
 
-Client::~Client() {
-    if(close(mSocket) < 0){
-        herror(nullptr);
-    }
-}
-
-bool Client::openSocket() {
-    auto&              logger = Logger::instance();
-    logger.log(Logger::LogLevel::INFO, "Openning socket...");
-    if ((mSocket = socket(PF_INET, SOCK_STREAM, 0)) < 0) {
-        logger.log(Logger::LogLevel::ERROR, "Failed to open socket");
-        return false;
-    }
-    logger.log(Logger::LogLevel::INFO, "Opened");
-    return true;
-}
-
-bool Client::connectToServer(const std::string& url){
-    Logger&              logger = Logger::instance();
+bool Client::connectToServer(const std::string& url) {
+    Logger&     logger = Logger::instance();
     sockaddr_in socketAddress;
-    hostent* host;
+    hostent*    host;
     std::memset(&socketAddress, '\0', sizeof(socketAddress));
 
-    socketAddress.sin_family      = AF_INET;
-    socketAddress.sin_port        = htons(13);
+    socketAddress.sin_family = AF_INET;
+    socketAddress.sin_port   = htons(8080);
     if ((host = gethostbyname(url.c_str())) == NULL) {
         logger.log(Logger::LogLevel::ERROR, "Failed to connect to server");
         herror(url.c_str());
         return 2;
     }
     memcpy(&socketAddress.sin_addr, host->h_addr_list[0], host->h_length);
-    
+
     // \todo handle timeout or unsuccesful connection
     logger.log(Logger::LogLevel::INFO, "Connecting to the server...");
     if (connect(mSocket, (sockaddr*)&socketAddress, sizeof(socketAddress)) < 0) {

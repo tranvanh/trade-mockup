@@ -1,3 +1,4 @@
+
 # Create a lib
 file(GLOB SOURCES *.cpp *.h)
 add_library(UtilsLib STATIC ${SOURCES})
