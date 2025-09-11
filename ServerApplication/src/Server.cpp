@@ -1,18 +1,18 @@
 #include "Server.h"
 #include "UtilsLib/Logger.h"
+#include <arpa/inet.h>
 #include <cstring>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <arpa/inet.h>
 
 Server::Server(const AddressType addressType, const std::string& address)
     : mAddressType(addressType)
     , mAddress(address) {}
-    
+
 bool Server::startListen(const int port, const std::function<void(const SocketData)>& onReceive) {
-    auto& logger = Logger::instance();
+    auto&       logger = Logger::instance();
     int         clientSocket;
     socklen_t   socketLen;
     sockaddr_in socketAddress;
@@ -39,7 +39,7 @@ bool Server::startListen(const int port, const std::function<void(const SocketDa
 
     logger.log(Logger::LogLevel::INFO, "Binding...");
 
-    if (bind(mSocket, (struct sockaddr *)&socketAddress, sizeof(socketAddress)) < 0) {
+    if (bind(mSocket, (struct sockaddr*)&socketAddress, sizeof(socketAddress)) < 0) {
         perror("bind");
         return 2;
     }
@@ -48,19 +48,22 @@ bool Server::startListen(const int port, const std::function<void(const SocketDa
     constexpr int BACKLOG = 4; // todo improve
     listen(mSocket, BACKLOG);
     logger.log(Logger::LogLevel::INFO, "Listening...");
+    socketLen = sizeof(socketAddress);
+    if ((clientSocket = accept(mSocket, (struct sockaddr*)&socketAddress, &socketLen)) < 0) {
+        perror("client accept");
+        return 4;
+    }
     while (true) {
-        socketLen = sizeof(socketAddress);
-        if ((clientSocket = accept(mSocket, (struct sockaddr*)&socketAddress, &socketLen)) < 0) {
-            perror("client accept");
-            return 4;
-        }
         SocketData data;
         if ((data.size = recv(clientSocket, data.buffer, BUFSIZ, 0)) < 0) {
             perror("client recv");
             return 4;
         }
+        if(data.size == 0){
+            return true;
+        }
         onReceive(std::move(data));
-        close(clientSocket);
+        // close(clientSocket);
     }
     return true;
 }

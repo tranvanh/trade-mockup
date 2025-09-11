@@ -1,6 +1,6 @@
 // #include "TradeApp.h"
 #include <iostream>
-// // #include <UtilsLib/Logger.h>
+#include <UtilsLib/Logger.h>
 // // Trades TODO
 // // [x] model generating buy/sell THREAD - give certain delay of buy/sell generatio -> producer consumer
 // // [x] mock database storing the information THREAD SAFE
@@ -31,7 +31,9 @@
 int main() {
     Server server(Server::AddressType::ANY);
     server.openSocket();
+    Logger::instance().setLevel(Logger::LogLevel::INFO);
     server.startListen(8080, [](const SocketData data){
+        Logger::instance().log(Logger::LogLevel::DEBUG, "msg received");
         std::string test(data.buffer, data.size);
         std::cout << test << std::endl;
     });

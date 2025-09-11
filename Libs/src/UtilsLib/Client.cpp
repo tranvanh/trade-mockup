@@ -7,17 +7,17 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-bool Client::connectToServer(const std::string& url) {
+bool Client::connectToServer(const char* url, const int port)const {
     Logger&     logger = Logger::instance();
     sockaddr_in socketAddress;
     hostent*    host;
     std::memset(&socketAddress, '\0', sizeof(socketAddress));
 
     socketAddress.sin_family = AF_INET;
-    socketAddress.sin_port   = htons(8080);
-    if ((host = gethostbyname(url.c_str())) == NULL) {
+    socketAddress.sin_port   = htons(port);
+    if ((host = gethostbyname(url)) == NULL) {
         logger.log(Logger::LogLevel::ERROR, "Failed to connect to server");
-        herror(url.c_str());
+        herror(url);
         return 2;
     }
     memcpy(&socketAddress.sin_addr, host->h_addr_list[0], host->h_length);
@@ -37,4 +37,17 @@ SocketData Client::receive() const {
     SocketData data;
     data.size = recv(mSocket, data.buffer, BUFSIZ, 0);
     return data;
+}
+
+bool Client::sendMessage(const char* msg) const{
+    auto& logger = Logger::instance();
+    const char* req = "Hello server";
+    logger.log(Logger::LogLevel::DEBUG, "Sending ... {", msg, "}");
+    if(send(getSocket(), msg, strlen(msg), 0) < 0){
+        logger.log(Logger::LogLevel::ERROR, "Error while sending message");
+        herror(msg);
+        return false;
+    }
+    logger.log(Logger::LogLevel::DEBUG, "Sent");
+    return true;
 }
