@@ -30,10 +30,11 @@ void StockMarketGenerator::simulateMarket() {
 
 void StockMarketGenerator::generateOrder(OrderType type) {
     auto& logger = Logger::instance();
+    logger.setLevel(Logger::LogLevel::DEBUG);
     logger.log(Logger::LogLevel::DEBUG, "Start generating orders ", type);
 
     while(mApplication.isRunning){
-        logger.log(Logger::LogLevel::DEBUG, "Generating", type);
+        logger.log(Logger::LogLevel::DEBUG, "Generating ", type);
         Order order;
         order.id = randomValueOfMax(ID_COUNT);
         order.price = randomValueOfMax(PRICE_MAX);

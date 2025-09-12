@@ -10,9 +10,8 @@ void ClientApplication::run() {
     // add assert checking the socket
     mClient.connectToServer("127.0.0.1", 8080);
     if (mSimulation) {
-        while(isRunning){
-            mGenerator.simulateMarket();
-        }
+        mGenerator.simulateMarket();
+        while(isRunning){}
     } else {
         processUserInputs();
     }
