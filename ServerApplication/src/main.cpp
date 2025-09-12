@@ -11,7 +11,7 @@
 // - [x] Create server-client connection
 // - [x] Add commands and the input handling for client side
 // - [ ] Error handling of connection/communication/parsing issues
-// - [ ] Heavy load handling, used clientApp with simulate currently crashes as the buffer communication buffer gets overwhelmed
+// - [x] Heavy load handling, used clientApp with simulate currently crashes as the buffer communication buffer gets overwhelmed
 // - [ ] Handle multiple clients and handle reconnection, handle failed connection with try to reconnect
 // - [x] Logger
 
