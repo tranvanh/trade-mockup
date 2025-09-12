@@ -7,7 +7,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(json)
 
-set(CMAKE_PREFIX_PATH "/home/tranvanh/coding/trade-mockup/includeLibs/")
+set(CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/../includeLibs)
 
 find_package(UtilsLib)
 find_package(TradeLib)
