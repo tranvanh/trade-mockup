@@ -80,6 +80,9 @@ void OrderBook::processBuyers() {
             if (seller.volume <= 0) {
                 continue;
             }
+            if (seller.id == buyer.id) {
+                continue;
+            }
             matchOrders(buyer, seller);
         }
         sellersLock.unlock();
@@ -99,6 +102,9 @@ void OrderBook::processSellers() {
                 break;
             }
             if (buyer.volume <= 0) {
+                continue;
+            }
+            if (buyer.id == seller.id) {
                 continue;
             }
             matchOrders(buyer, seller);

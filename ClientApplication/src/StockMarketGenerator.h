@@ -1,20 +1,18 @@
 #pragma once
-#include "TradeLib/StockMarket.h"
-#include "TradeLib/Order.h"
+#include <TradeLib/Order.h>
 #include <string>
 #include <list>
 
 // APPLICATION_NAMESPACE_BEGIN
 
-class TradeApp;
+class ClientApplication;
 
 /// Simulates a trade market and generates orders
 class StockMarketGenerator {
-    TradeApp& mApplication;
-    StockMarket& mStockMarket;
+    ClientApplication& mApplication;
 
 public:
-    StockMarketGenerator(TradeApp& app);
+    StockMarketGenerator(ClientApplication& app);
     void simulateMarket();
     
 private:

@@ -33,16 +33,9 @@ bool Client::connectToServer(const char* url, const int port)const {
     return true;
 }
 
-// SocketData Client::receive() const {
-//     SocketData data;
-//     data.size = recv(mSocket, data.buffer, BUFSIZ, 0);
-//     return data;
-// }
-
 bool Client::sendMessage(const char* msg) const{
     auto& logger = Logger::instance();
-    const char* req = "Hello server";
-    logger.log(Logger::LogLevel::DEBUG, "Sending ... {", msg, "}");
+    logger.log(Logger::LogLevel::DEBUG, "Sending ... ", msg, " | len = ", strlen(msg));
     if(send(getSocket(), msg, strlen(msg), 0) < 0){
         logger.log(Logger::LogLevel::ERROR, "Error while sending message");
         herror(msg);

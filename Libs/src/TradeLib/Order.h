@@ -8,27 +8,12 @@
 constexpr int PRICE_MAX  = 10000;
 constexpr int VOLUME_MAX = 1000;
 
-enum class OrderType { BUY, SELL };
+enum class OrderType { BUY = 0, SELL = 1};
 
 std::ostream& operator<<(std::ostream& os, OrderType type);
 
-// std::ostream& operator<<(std::ostream& os, OrderType type) {
-//     switch (type) {
-//     case (OrderType::SELL):
-//         os << "SELL";
-//         break;
-//     case (OrderType::BUY):
-//         os << "BUY";
-//         break;
-//     default:
-//         // ASSERT(false, "Trade type undeclared");
-//         break;
-//     }
-//     return os;
-// }
-
 struct Order {
-    uint64_t    id;
+    uint64_t    id = 0;
     timepoint_t timeStamp;
     OrderType   type;
     int         price;
