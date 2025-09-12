@@ -7,7 +7,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-bool Client::connectToServer(const char* url, const int port)const {
+bool Client::connectToServer(const char* url, const int port) const {
     Logger&     logger = Logger::instance();
     sockaddr_in socketAddress;
     hostent*    host;
@@ -33,14 +33,30 @@ bool Client::connectToServer(const char* url, const int port)const {
     return true;
 }
 
-bool Client::sendMessage(const char* msg) const{
+bool Client::sendMessage(const char* msg) const {
     auto& logger = Logger::instance();
     logger.log(Logger::LogLevel::DEBUG, "Sending ... ", msg, " | len = ", strlen(msg));
-    if(send(getSocket(), msg, strlen(msg), 0) < 0){
+    std::lock_guard<std::mutex> lock(mSendLock);
+    if (!sendSize(msg) || !sendContent(msg)) {
         logger.log(Logger::LogLevel::ERROR, "Error while sending message");
         herror(msg);
         return false;
     }
     logger.log(Logger::LogLevel::DEBUG, "Sent");
+    return true;
+}
+
+bool Client::sendSize(const char* msg) const {
+    size_t msgSize = strlen(msg);
+    if (send(getSocket(), &msgSize, sizeof(msgSize), 0) < 0) {
+        return false;
+    }
+    return true;
+}
+
+bool Client::sendContent(const char* msg) const {
+    if (send(getSocket(), msg, strlen(msg), 0) < 0) {
+        return false;
+    }
     return true;
 }
