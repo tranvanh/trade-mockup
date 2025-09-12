@@ -19,6 +19,16 @@
 
 Client and Server applications share common utility libraries providing various useful functionality. Thus the goal is to have UtilsLabs as generic as possible, which could be reused for any other future projects
 
+## How to
+
+In order to run Client or Server, you must have UtilsLib and TradeLib installed.
+
+### Installing
+
+From the root directory call `cmake -S ./Libs -B ./Libs/build`, `cmake --build ./Libs/build` and lastly `cmake --install ./Libs/build`. You can specify your own installation prefix. Note that in Client application and Server application, both have my path which is a working state and will be further improve. If you're installing to the system include. Simply remove CMAKE_PREFIX_PATH or specify yours.
+
+To build and run Client application call `cmake -S ./ClientApplication -B ./ClientApplication/build`, `cmake --build ./ClientApplication/build`. The path to executable is `./ClientApplication/build/src/clientApp`. The same process applies to Server application.
+
 ### Note:
 Purpose of this project is to practice various technical topics as thread safety, networking, design patterns, heavy load handling, optimization.
 
@@ -34,3 +44,4 @@ Purpose of this project is to practice various technical topics as thread safety
 - [ ] Heavy load handling, used clientApp with simulate currently crashes as the buffer communication buffer gets overwhelmed
 - [ ] Handle multiple clients and handle reconnection, handle failed connection with try to reconnect
 - [x] Logger
+- [ ] Restructure UtilsLib folders
