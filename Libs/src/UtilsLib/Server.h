@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+TRANVANH_NAMESPACE_BEGIN
+
 class Server : public NetworkComponent {
 public:
     enum class AddressType {
@@ -23,3 +25,5 @@ private:
     bool receiveSize(const int clientSocket, size_t& out) const;
     bool receiveContent(const int clientSocket, const size_t msgLen, std::vector<char>& out) const;
 };
+
+TRANVANH_NAMESPACE_END

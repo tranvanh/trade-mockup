@@ -1,7 +1,7 @@
 #include "TradeLib/Order.h"
 #include <chrono>
 
-// TRADE_NAMESPACE_BEGIN
+TRANVANH_NAMESPACE_BEGIN
 
 std::ostream& operator<<(std::ostream& os, OrderType type) {
     switch (type) {
@@ -12,7 +12,7 @@ std::ostream& operator<<(std::ostream& os, OrderType type) {
         os << "BUY";
         break;
     default:
-        // ASSERT(false, "Trade type undeclared");
+        ASSERT(false, "Trade type undeclared");
         break;
     }
     return os;
@@ -27,4 +27,4 @@ std::ostream& operator<<(std::ostream& os, const Order& order) {
               << " type=" << order.type << ")";
 }
 
-// TRADE_NAMESPACE_END
+TRANVANH_NAMESPACE_END

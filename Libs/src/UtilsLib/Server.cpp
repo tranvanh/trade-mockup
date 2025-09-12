@@ -7,6 +7,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+TRANVANH_NAMESPACE_BEGIN
+
 Server::Server(const AddressType addressType, const std::string& address)
     : mAddressType(addressType)
     , mAddress(address) {}
@@ -117,3 +119,5 @@ bool Server::receiveContent(const int clientSocket, const size_t msgLen, std::ve
     }
     return true;
 }
+
+TRANVANH_NAMESPACE_END

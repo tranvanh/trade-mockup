@@ -1,16 +1,8 @@
 #pragma once
+#include "UtilsLib/Common.h"
 #include <memory>
 
-// struct SocketData{
-//     char buffer[BUFSIZ+1];
-//     int size = 0;
-//     SocketData() = default;
-//     SocketData(const SocketData&other) { std::memcpy(buffer, other.buffer, size);};
-//     SocketData(SocketData&& other){
-//         std::swap(buffer, other.buffer);
-//         size = other.size;
-//     }
-// };
+TRANVANH_NAMESPACE_BEGIN
 
 class NetworkComponent {
 protected:
@@ -23,3 +15,5 @@ public:
     int  getSocket() const;
     bool openSocket();
 };
+
+TRANVANH_NAMESPACE_END

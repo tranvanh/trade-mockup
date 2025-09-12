@@ -1,9 +1,10 @@
 #pragma once
 
+#include "UtilsLib/Common.h"
 #include "UtilsLib/TimePointUtils.h"
 #include <string>
 
-// TRADE_NAMESPACE_BEGIN
+TRANVANH_NAMESPACE_BEGIN
 
 constexpr int PRICE_MAX  = 10000;
 constexpr int VOLUME_MAX = 1000;
@@ -22,4 +23,5 @@ struct Order {
     friend std::ostream& operator<<(std::ostream& os, const Order& trade);
 };
 
-// TRADE_NAMESPACE_END
+TRANVANH_NAMESPACE_END
+

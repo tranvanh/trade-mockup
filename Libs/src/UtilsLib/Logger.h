@@ -1,9 +1,12 @@
 #pragma once
+#include "UtilsLib/Common.h"
 #include "UtilsLib/TimePointUtils.h"
 #include <chrono>
 #include <iostream>
 #include <mutex>
 #include <sstream>
+
+TRANVANH_NAMESPACE_BEGIN
 
 class Logger {
 public:
@@ -21,8 +24,8 @@ private:
 
 public:
     static Logger& instance();
-    void setOutputStream(std::ostream& out);
-    void setLevel(LogLevel logLevel) { mLogLevel = logLevel; }
+    void           setOutputStream(std::ostream& out);
+    void           setLevel(LogLevel logLevel) { mLogLevel = logLevel; }
     template <typename... Args>
     void log(LogLevel logLevel, Args&&... args) {
         if (logLevel < mLogLevel) {
@@ -39,3 +42,5 @@ public:
 private:
     std::string levelToString(LogLevel level);
 };
+
+TRANVANH_NAMESPACE_END

@@ -10,8 +10,6 @@
 #include <utility>
 #include <functional>
 
-// APPLICATION_NAMESPACE_BEGIN
-
 constexpr int ID_COUNT  = 100; // Possible Number of simulated IDs
 
 int randomValueOfMax(const int max) {
@@ -44,5 +42,3 @@ void StockMarketGenerator::generateOrder(OrderType type) {
         std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(randomValueOfMax(10)*100));
     }
 }
-
-// APPLICATION_NAMESPACE_END

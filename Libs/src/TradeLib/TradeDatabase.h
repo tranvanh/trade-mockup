@@ -4,11 +4,7 @@
 #include <set>
 #include <thread>
 
-// namespace Application {
-class TradeApp;
-// }
-
-// TRADE_NAMESPACE_BEGIN
+TRANVANH_NAMESPACE_BEGIN
 
 class TradeDatabase {
     struct {
@@ -18,7 +14,6 @@ class TradeDatabase {
 
 public:
     void registerTrade(const Trade& trade);
-    // void run();
 };
 
-// TRADE_NAMESPACE_END
+TRANVANH_NAMESPACE_END

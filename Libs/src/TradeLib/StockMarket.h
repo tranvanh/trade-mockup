@@ -4,6 +4,7 @@
 #include "UtilsLib/CallbackList.h"
 #include <atomic>
 
+TRANVANH_NAMESPACE_BEGIN
 class StockMarket {
     OrderBook        mBook;
     TradeDatabase    mDatabase;
@@ -22,5 +23,8 @@ public:
     void registerOrder(const Order& order);
     void registerTrade(const Trade& trade);
 
-    [[nodiscard]] CallbackLifetime addOnTradeObserver(const std::function<void(const Trade& trade)>& callback);
+    [[nodiscard]] CallbackLifetime addOnTradeObserver(
+        const std::function<void(const Trade& trade)>& callback);
 };
+
+TRANVANH_NAMESPACE_END

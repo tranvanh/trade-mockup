@@ -10,7 +10,7 @@
 #include <UtilsLib/CallbackOwner.h>
 #include <UtilsLib/Server.h>
 
-// APPLICATION_NAMESPACE_BEGIN
+using namespace tranvanh;
 
 class ServerApplication
     : public CallbackOwner
@@ -30,4 +30,3 @@ private:
     void processServerMessage(const std::string& msg);
 };
 
-// APPLICATION_NAMESPACE_END

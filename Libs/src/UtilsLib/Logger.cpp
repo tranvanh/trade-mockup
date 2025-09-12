@@ -1,5 +1,7 @@
 #include "UtilsLib/Logger.h"
 
+TRANVANH_NAMESPACE_BEGIN
+
 Logger& Logger::instance() {
     static Logger logger;
     return logger;
@@ -23,3 +25,5 @@ std::string Logger::levelToString(LogLevel level) {
     }
     return "UNKNOWN";
 }
+
+TRANVANH_NAMESPACE_END

@@ -2,7 +2,7 @@
 #include "TradeLib/Order.h"
 #include "UtilsLib/TimePointUtils.h"
 
-// TRADE_NAMESPACE_BEGIN
+TRANVANH_NAMESPACE_BEGIN
 
 struct Trade {
     Order       seller;
@@ -14,4 +14,4 @@ struct Trade {
     static bool          compareLowerPrice(const Trade& t1, const Trade& t2);
 };
 
-// TRADE_NAMESPACE_END
+TRANVANH_NAMESPACE_END
