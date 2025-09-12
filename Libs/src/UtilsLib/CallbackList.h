@@ -3,6 +3,8 @@
 #include <mutex>
 #include <unordered_map>
 
+TRANVANH_NAMESPACE_BEGIN
+
 using CallbackId         = std::size_t;
 static CallbackId nextId = 0;
 
@@ -36,3 +38,5 @@ public:
         });
     }
 };
+
+TRANVANH_NAMESPACE_END

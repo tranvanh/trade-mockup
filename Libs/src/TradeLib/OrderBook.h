@@ -6,17 +6,8 @@
 #include <forward_list>
 #include <map>
 #include <thread>
-// namespace Application {
-// class TradeApp;
-// }
 
-// WTF
-// namespace UtilsLib{
-//     template<typename T>
-//     class ThreadSafeQueue;
-// }
-
-// TRADE_NAMESPACE_BEGIN
+TRANVANH_NAMESPACE_BEGIN
 
 class StockMarket;
 
@@ -58,4 +49,4 @@ private:
     void matchOrders(Order& buyer, Order& seller);
 };
 
-// TRADE_NAMESPACE_END
+TRANVANH_NAMESPACE_END

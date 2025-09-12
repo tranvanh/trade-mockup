@@ -1,10 +1,11 @@
 #pragma once
+#include "UtilsLib/Common.h"
 #include <condition_variable>
 #include <deque>
 #include <map>
 #include <thread>
 
-// UTILSLIB_NAMESPACE_BEGIN
+TRANVANH_NAMESPACE_BEGIN
 
 template <typename Type>
 class ThreadSafeQueue {
@@ -36,4 +37,4 @@ Type ThreadSafeQueue<Type>::pop() {
     return value;
 }
 
-// UTILSLIB_NAMESPACE_END
+TRANVANH_NAMESPACE_END

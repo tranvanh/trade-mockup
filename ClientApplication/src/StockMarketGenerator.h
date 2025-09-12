@@ -3,7 +3,7 @@
 #include <string>
 #include <list>
 
-// APPLICATION_NAMESPACE_BEGIN
+using namespace tranvanh;
 
 class ClientApplication;
 
@@ -19,4 +19,3 @@ private:
     void generateOrder(OrderType tradeType);
 };
 
-// APPLICATION_NAMESPACE_END

@@ -5,12 +5,13 @@
 #include <UtilsLib/Application.h>
 #include <UtilsLib/Client.h>
 
+using namespace tranvanh;
+
 class ClientApplication : public Application {
     uint mId = 0;
     enum Command { BUY, SELL, EXIT };
     bool                 mSimulation = false;
     StockMarketGenerator mGenerator;
-    // DumbInvestor mInvestor;
 
     Client                                         mClient;
     const std::unordered_map<std::string, Command> mCommands = {

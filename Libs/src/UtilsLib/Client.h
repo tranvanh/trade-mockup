@@ -1,6 +1,8 @@
 #pragma once
 #include "UtilsLib/NetworkUtils.h"
 
+TRANVANH_NAMESPACE_BEGIN
+
 class Client : public NetworkComponent {
     mutable std::mutex mSendLock;
 
@@ -15,3 +17,5 @@ private:
     bool sendSize(const char* msg) const;
     bool sendContent(const char* msg) const;
 };
+
+TRANVANH_NAMESPACE_END

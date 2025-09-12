@@ -7,6 +7,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+TRANVANH_NAMESPACE_BEGIN
+
 bool Client::connectToServer(const char* url, const int port) const {
     Logger&     logger = Logger::instance();
     sockaddr_in socketAddress;
@@ -60,3 +62,5 @@ bool Client::sendContent(const char* msg) const {
     }
     return true;
 }
+
+TRANVANH_NAMESPACE_END

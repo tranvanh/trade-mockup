@@ -1,5 +1,8 @@
 #pragma once
+#include "UtilsLib/Common.h"
 #include <functional>
+
+TRANVANH_NAMESPACE_BEGIN
 
 class CallbackLifetime {
     std::function<void()> mRemoveCallback;
@@ -18,3 +21,5 @@ public:
         }
     }
 };
+
+TRANVANH_NAMESPACE_END

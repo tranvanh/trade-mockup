@@ -6,6 +6,8 @@
 #include <unistd.h>
 #include <netdb.h>
 
+TRANVANH_NAMESPACE_BEGIN
+
 NetworkComponent::~NetworkComponent() {
     if(close(mSocket) < 0){
         herror(nullptr);
@@ -23,3 +25,5 @@ bool NetworkComponent::openSocket() {
     logger.log(Logger::LogLevel::INFO, "Opened");
     return true;
 }
+
+TRANVANH_NAMESPACE_END

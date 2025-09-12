@@ -5,9 +5,6 @@
 #include <functional>
 #include <vector>
 #include <string>
-// #include <memory>
-
-// APPLICATION_NAMESPACE_BEGIN
 
 ServerApplication::ServerApplication() : mServer(Server::AddressType::ANY) {
     registerCallback(mStockMarket.addOnTradeObserver([](const Trade& trade) {
@@ -60,5 +57,3 @@ void ServerApplication::processServerMessage(const std::string& msg){
     order.timeStamp = std::chrono::system_clock::now();
     mStockMarket.registerOrder(order);
 }
-
-// APPLICATION_NAMESPACE_END

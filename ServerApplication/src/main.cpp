@@ -1,5 +1,6 @@
 #include "ServerApplication.h"
 #include <iostream>
+#include <UtilsLib/Common.h>
 #include <UtilsLib/Logger.h>
 
 // ### TODO
@@ -21,6 +22,7 @@
 
 int main() {
     // Logger::instance(Logger::LogLevel::INFO, "TEST");
+    using namespace tranvanh;
     Logger::instance().setLevel(Logger::LogLevel::DEBUG);
     ServerApplication app;
     app.run();
