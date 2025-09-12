@@ -20,7 +20,7 @@
 
 class StockMarket;
 
-// Match orders the highest buyer with lowest buyer
+// Match orders the highest buyer with lowest seller
 class OrderBook {
     std::forward_list<std::thread> mThreadPool;
 
