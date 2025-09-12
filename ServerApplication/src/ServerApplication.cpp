@@ -1,28 +1,28 @@
-#include "TradeApp.h"
-#include "UtilsLib/Logger.h"
-#include "TradeLib/Order.h"
+#include "ServerApplication.h"
+#include <UtilsLib/Logger.h>
+#include <TradeLib/Order.h>
+#include <nlohmann/json.hpp>
 #include <functional>
 #include <vector>
+#include <string>
 // #include <memory>
 
 // APPLICATION_NAMESPACE_BEGIN
 
-TradeApp::TradeApp()
-    : mGenerator(*this)
-    , mInvestor(mStockMarket), mServer(Server::AddressType::ANY) {
+ServerApplication::ServerApplication() : mServer(Server::AddressType::ANY) {
     registerCallback(mStockMarket.addOnTradeObserver([](const Trade& trade) {
         auto& logger = Logger::instance();
         logger.log(Logger::LogLevel::INFO, trade);
     }));
 }
 
-TradeApp::~TradeApp() {
+ServerApplication::~ServerApplication() {
     for (auto& t : mThreadPool) {
         t.join();
     }
 }
 
-void TradeApp::run() {
+void ServerApplication::run() {
     auto& logger = Logger::instance();
     logger.log(Logger::LogLevel::DEBUG, "Initialize application");
     isRunning = true;
@@ -37,14 +37,9 @@ void TradeApp::run() {
         });
        
     });
-    // mGenerator.simulateMarket();
 }
 
-void TradeApp::runBackgroundTask(const std::function<void()>& f) {
-    mThreadPool.emplace_front(f);
-}
-
-StockMarket& TradeApp::getStockMarket() {
+StockMarket& ServerApplication::getStockMarket() {
     return mStockMarket;
 }
 std::atomic<uint64_t> gIdCounterXXX = 0;
@@ -52,15 +47,17 @@ std::atomic<uint64_t> gIdCounterXXX = 0;
 int randomValueOfMaxXXX(const int max) {
     return std::rand() / ((RAND_MAX + 1u) / max);
 }
-void TradeApp::processServerMessage(const std::string& msg){
+void ServerApplication::processServerMessage(const std::string& msg){
     auto& logger = Logger::instance();
     logger.log(Logger::LogLevel::INFO, "Processing server message...", msg);
+
     Order order;
-    order.id = gIdCounterXXX++;
-    order.price = 1;
+    nlohmann::json msgJson = nlohmann::json::parse(msg);
+    msgJson["id"].get_to(order.id);
+    msgJson["price"].get_to(order.price);
+    msgJson["volume"].get_to(order.volume);
+    order.type = msgJson["type"].get<int>() == 0 ? OrderType::BUY : OrderType::SELL;
     order.timeStamp = std::chrono::system_clock::now();
-    order.type = msg == "buy" ? OrderType::BUY : OrderType::SELL;
-    order.volume = 1;
     mStockMarket.registerOrder(order);
 }
 

@@ -1,57 +1,35 @@
-#include "UtilsLib/Client.h"
-#include "UtilsLib/Logger.h"
-#include <iostream>
-#include <netinet/in.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <unordered_map>
+#include "ClientApplication.h"
+#include <UtilsLib/Logger.h>
+#include <thread>
 
-// class Test : public Client {
-// public:
-//     void sendMessage() {
-//         const char* req = "Hello server";
-//         send(getSocket(), req, strlen(req), 0);
-//         Logger::instance().log(Logger::LogLevel::INFO, "msg sent");
-//     }
-// };
-
-int main() {
+int main(int argc, char * argv[]) {
     auto& logger = Logger::instance();
-    Client  client;
-    client.openSocket();
-    client.connectToServer("127.0.0.1", 8080);
+    if(argc == 0){
+         logger.log(Logger::LogLevel::ERROR, "No id number specified");
+         return 1;
+    }
 
-    enum Command { SEND, EXIT };
-    const std::unordered_map<std::string, Command> commands = {
-        { "send", SEND },
-        { "exit", EXIT },
-    };
-
-    std::string command = "";
-    while (std::cin >> command) {
-        logger.log(Logger::LogLevel::INFO, "Command: ", command);
-        // std::transform(command.begin(), command.end(), command.begin(), ::tolower);
-        const auto commandIter = commands.find(command);
-        if (commandIter == commands.end()) {
-            logger.log(Logger::LogLevel::INFO, "Command not found");
-            continue;
+    int id = strtol(argv[1], nullptr, 0);
+    if(id < 0){
+        logger.log(Logger::LogLevel::ERROR, "Invalid id");
+        return 1;
+    }
+    bool simulate = false;
+    if(argc > 2){
+        std::string argument(argv[2]);
+        if(argument == "simulate"){
+            logger.log(Logger::LogLevel::INFO, "Order simulation enabled");
+            logger.log(Logger::LogLevel::INFO, "Simulation will start shortly...");
+            simulate = true;
+            // Time for user to register the log
+            std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(2000));
         }
-        switch (commandIter->second) {
-        case Command::SEND: {
-            std::string msg;
-            std::cin >> msg;
-            client.sendMessage(msg.c_str());
-            break;
-        }
-        case Command::EXIT:
-            return 0;
-        default:
-            logger.log(Logger::LogLevel::INFO, "Command behaviour not defined");
-            break;
+        else{
+            logger.log(Logger::LogLevel::WARNING, "Invalid is argument and it will be ignored...");
         }
     }
+
+    ClientApplication app(id, simulate);
+    app.run();
     return 0;
 }
