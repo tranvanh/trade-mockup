@@ -13,12 +13,6 @@ ServerApplication::ServerApplication() : mServer(Server::AddressType::ANY) {
     }));
 }
 
-ServerApplication::~ServerApplication() {
-    for (auto& t : mThreadPool) {
-        t.join();
-    }
-}
-
 void ServerApplication::run() {
     auto& logger = Logger::instance();
     logger.log(Logger::LogLevel::DEBUG, "Initialize application");
@@ -27,7 +21,7 @@ void ServerApplication::run() {
     mServer.openSocket();
     Logger::instance().setLevel(Logger::LogLevel::INFO);
     mServer.startListen(8080, [this](std::vector<char> bufferData, const int len){
-          auto& logger = Logger::instance();
+        auto& logger = Logger::instance();
         logger.log(Logger::LogLevel::INFO, "Received message...");
         runBackgroundTask([this, bufferData, len]() {
             processServerMessage(std::string(bufferData.data(), len));

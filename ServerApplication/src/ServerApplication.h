@@ -21,7 +21,6 @@ class ServerApplication
 
 public:
     ServerApplication();
-    ~ServerApplication();
 
     virtual void run() override;
     StockMarket& getStockMarket();
