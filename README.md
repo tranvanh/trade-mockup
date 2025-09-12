@@ -1,8 +1,10 @@
 # Client Application
-- Sends orders to server
+- Sends orders to server in json format
+- Option to simulate order creations for stress testing
 
 # Server Application
 - Processes orders and delegades them to the market
+- Serves as a communication layer between the market and the client
 
 ## TradeLib - Shared
 - Trading specific components
@@ -15,11 +17,20 @@
 - Thread safe queue
 - Logger
 
+Client and Server applications share common utility libraries providing various useful functionality. Thus the goal is to have UtilsLabs as generic as possible, which could be reused for any other future projects
+
 ### Note:
-Purpose of this project is to practice various technical topics
+Purpose of this project is to practice various technical topics as thread safety, networking, design patterns, heavy load handling, optimization.
 
-### Depricated functionality
-
-Will move these to client application
-- Generates the stock market for simulation purposes
-- Dumb investor reacting to trades
+### TODO
+- [x] Model generating buy/sell THREAD - give certain delay of buy/sell generation
+- [x] Mock database storing the information THREAD SAFE
+- [x] Matching trade/sell
+- [ ] Yield list of latest 100 trades happened around the given timestamp
+- [ ] Iterator to navigate the trades chronologicaly
+- [x] Create server-client connection
+- [x] Add commands and the input handling for client side
+- [ ] Error handling of connection/communication/parsing issues
+- [ ] Heavy load handling, used clientApp with simulate currently crashes as the buffer communication buffer gets overwhelmed
+- [ ] Handle multiple clients and handle reconnection, handle failed connection with try to reconnect
+- [x] Logger
