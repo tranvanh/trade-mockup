@@ -13,19 +13,19 @@
 // - [x] Add commands and the input handling for client side
 // - [ ] Error handling of connection/communication/parsing issues
 // - [x] Heavy load handling, used clientApp with simulate currently crashes as the buffer communication buffer gets overwhelmed
-// - [ ] Handle multiple clients and handle reconnection, handle failed connection with try to reconnect
+// - [x] Handle multiple clients and handle reconnection with event polling
+// - [ ] Handle failed connection with try to reconnect
 // - [x] Logger
+// - [ ] Add thread scheduler to applications
 
 // Deduplicator
 // * De-duplicates any message from the exchange based on its unique id.
 // * Optimized for performance, uses floating window for history trades.
 
 int main() {
-    // Logger::instance(Logger::LogLevel::INFO, "TEST");
     using namespace tranvanh;
     Logger::instance().setLevel(Logger::LogLevel::DEBUG);
     ServerApplication app;
     app.run();
-    
     return 0;
 }
