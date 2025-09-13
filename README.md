@@ -8,12 +8,12 @@
 
 ## TradeLib - Shared
 - Trading specific components
-- Order book with order matching algorithm
+- Order book with order matching algorithm. Matching highest buyer with lowest seller
 - Stock market manager registering orders and trades
 
 ## UtilsLib - Static
 - Observer pattern components
-- Server and Client using unix sockets
+- Server and Client using unix sockets. Client sends message size first and the content later, unsuring content consistency on receiving end.
 - Thread safe queue
 - Logger
 
