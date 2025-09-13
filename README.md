@@ -47,6 +47,7 @@ Purpose of this project is to practice various technical topics as thread safety
 - [x] Heavy load handling, used clientApp with simulate currently crashes as the buffer communication buffer gets overwhelmed
 - [x] Handle multiple clients and handle reconnection
 - [ ] Handle failed connection with try to reconnect
+- [ ] Add UDP version of the server. Handle sequencing and packate order reliability
 - [ ] Handle arguments properly, handle user inputs properly too
 - [x] Logger
 - [ ] Add thread scheduler to application to limit worker resources
