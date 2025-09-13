@@ -27,7 +27,10 @@ In order to run Client or Server, you must have UtilsLib and TradeLib installed.
 
 From the root directory call `cmake -S ./Libs -B ./Libs/build`, `cmake --build ./Libs/build` and lastly `cmake --install ./Libs/build`. You can specify your own installation prefix. Note that in Client application and Server application, both have my path which is a working state and will be further improve. If you're installing to the system include. Simply remove CMAKE_PREFIX_PATH or specify yours.
 
-To build and run Client application call `cmake -S ./ClientApplication -B ./ClientApplication/build`, `cmake --build ./ClientApplication/build`. The path to executable is `./ClientApplication/build/src/clientApp`. The same process applies to Server application.
+To build and run Client application call `cmake -S ./ClientApplication -B ./ClientApplication/build`, `cmake --build ./ClientApplication/build`. The path to executable is `./ClientApplication/build/src/clientApp <userId> [simulate]`.
+ `<userId>` is just an identification, could be any positive number, `simulate` is optional argument to simulate the order creation, id's are randomly generated.
+ 
+ Same build process applies to Server application, except it does not have arguments.
 
 ### Note:
 Purpose of this project is to practice various technical topics as thread safety, networking, design patterns, heavy load handling, optimization.
