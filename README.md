@@ -42,6 +42,8 @@ Purpose of this project is to practice various technical topics as thread safety
 - [x] Add commands and the input handling for client side
 - [ ] Error handling of connection/communication/parsing issues
 - [x] Heavy load handling, used clientApp with simulate currently crashes as the buffer communication buffer gets overwhelmed
-- [ ] Handle multiple clients and handle reconnection, handle failed connection with try to reconnect
+- [x] Handle multiple clients and handle reconnection
+- [ ] Handle failed connection with try to reconnect
 - [x] Logger
+- [ ] Add thread scheduler to application to limit worker resources
 - [ ] Restructure UtilsLib folders
