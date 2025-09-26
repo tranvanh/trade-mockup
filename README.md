@@ -1,3 +1,6 @@
+[### Note:
+Purpose of this project is to practice various technical topics as thread safety, networking, design patterns, heavy load handling, optimization. Overall goal is to build efficent mock trading platform having multiple clients connecting to one single server, acting as a market and processing the orders.
+
 # Client Application
 - Sends orders to server in json format
 - Option to simulate order creations for stress testing
@@ -32,9 +35,6 @@ To build and run Client application call `cmake -S ./ClientApplication -B ./Clie
  
  Same build process applies to Server application, except it does not have arguments.
 
-### Note:
-Purpose of this project is to practice various technical topics as thread safety, networking, design patterns, heavy load handling, optimization.
-
 ### TODO
 - [x] Model generating buy/sell THREAD - give certain delay of buy/sell generation
 - [x] Mock database storing the information THREAD SAFE
@@ -48,7 +48,11 @@ Purpose of this project is to practice various technical topics as thread safety
 - [x] Handle multiple clients and handle reconnection
 - [ ] Handle failed connection with try to reconnect
 - [ ] Add UDP version of the server. Handle sequencing and packate order reliability
-- [ ] Handle arguments properly, handle user inputs properly too
+- [x] Handle arguments properly
+- [x] Handle user inputs properly
 - [x] Logger
-- [ ] Add thread scheduler to application to limit worker resources
+- [x] Add thread pool
+- [ ] Add thread scheduler
+- [ ] Optimize Buyer/Seller processing and cleaning using the scheduler
+- [ ] Increase performance in optimization buy dividing the order list to buckets with their own locks.
 - [ ] Restructure UtilsLib folders
