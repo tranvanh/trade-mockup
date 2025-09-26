@@ -1,4 +1,4 @@
-[### Note:
+### Note:
 Purpose of this project is to practice various technical topics as thread safety, networking, design patterns, heavy load handling, optimization. Overall goal is to build efficent mock trading platform having multiple clients connecting to one single server, acting as a market and processing the orders.
 
 # Client Application
