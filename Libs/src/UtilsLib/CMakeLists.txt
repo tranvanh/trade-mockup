@@ -1,4 +1,5 @@
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # Create a lib
 file(GLOB SOURCES *.cpp *.h)
 add_library(UtilsLib STATIC ${SOURCES})

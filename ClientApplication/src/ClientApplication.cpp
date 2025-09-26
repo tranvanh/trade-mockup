@@ -5,6 +5,7 @@
 #include <UtilsLib/Logger.h>
 
 void ClientApplication::run() {
+    Application::run();
     isRunning = true;
     mClient.openSocket();
     // add assert checking the socket

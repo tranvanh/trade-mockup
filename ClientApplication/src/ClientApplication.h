@@ -22,7 +22,7 @@ class ClientApplication : public Application {
 
 public:
     ClientApplication(const uint id, const bool isSimulation = false)
-        : mId(id)
+        : Application(2), mId(id)
         , mSimulation(isSimulation)
         , mGenerator(*this){};
     virtual void run() override;

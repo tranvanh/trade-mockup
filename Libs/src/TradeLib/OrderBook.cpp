@@ -12,6 +12,7 @@ OrderBook::OrderBook(StockMarket& stockMarket)
     : mStockMarket(stockMarket) {}
 
 void OrderBook::registerOrder(const Order& order) {
+    // \Todo optimize processing of orders
     switch (order.type) {
     case OrderType::BUY:
         mBuyerQueue.push(order);

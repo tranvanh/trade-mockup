@@ -1,5 +1,4 @@
 #include "ServerApplication.h"
-#include <iostream>
 #include <UtilsLib/Common.h>
 #include <UtilsLib/Logger.h>
 

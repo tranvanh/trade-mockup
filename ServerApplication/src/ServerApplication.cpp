@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 
-ServerApplication::ServerApplication() : mServer(Server::AddressType::ANY) {
+ServerApplication::ServerApplication() : Application(5), mServer(Server::AddressType::ANY) {
     registerCallback(mStockMarket.addOnTradeObserver([](const Trade& trade) {
         auto& logger = Logger::instance();
         logger.log(Logger::LogLevel::INFO, trade);
@@ -14,6 +14,7 @@ ServerApplication::ServerApplication() : mServer(Server::AddressType::ANY) {
 }
 
 void ServerApplication::run() {
+    Application::run();
     auto& logger = Logger::instance();
     logger.log(Logger::LogLevel::DEBUG, "Initialize application");
     isRunning = true;

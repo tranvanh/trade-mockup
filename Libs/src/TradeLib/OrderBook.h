@@ -11,7 +11,8 @@ TRANVANH_NAMESPACE_BEGIN
 
 class StockMarket;
 
-// Match orders the highest buyer with lowest seller
+/// Match orders the highest buyer with lowest seller
+/// Runs 4 dedicated threads for processing and cleaning
 class OrderBook {
     std::forward_list<std::thread> mThreadPool;
 

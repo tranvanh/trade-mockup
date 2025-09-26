@@ -1,16 +1,19 @@
-#include "Application.h"
+#include "UtilsLib/Application.h"
+#include "UtilsLib/Logger.h"
 
 TRANVANH_NAMESPACE_BEGIN
 
 Application::~Application() {
     isRunning = false;
-    for (auto& t : mThreadPool) {
-        t.join();
-    }
+    mThreadPool.stop();
+}
+
+void Application::run() {
+    mThreadPool.run();
 }
 
 void Application::runBackgroundTask(std::function<void()> f) {
-    mThreadPool.emplace_front(std::move(f));
+    mThreadPool.addTask(std::move(f));
 }
 
 TRANVANH_NAMESPACE_END
