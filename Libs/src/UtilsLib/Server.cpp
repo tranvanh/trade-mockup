@@ -120,10 +120,12 @@ bool Server::poll(sockaddr_in                                       socketAddres
             }
         }
     }
+    return true;
 // Linux-specific code
 #else
     ASSERT(false, "Missing implementation for given os");
-// Other OS (e.g. Windows, BSD, etc.)
+    // Other OS (e.g. Windows, BSD, etc.)
+    return false;
 #endif
 }
 
