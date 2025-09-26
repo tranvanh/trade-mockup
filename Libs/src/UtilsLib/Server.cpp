@@ -3,10 +3,13 @@
 #include <arpa/inet.h>
 #include <cstring>
 #include <fcntl.h>
-#include <sys/epoll.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#if defined(__linux__)
+#   include <sys/epoll.h>
+#endif
 
 TRANVANH_NAMESPACE_BEGIN
 
@@ -66,6 +69,7 @@ bool Server::startListen(const int port, std::function<void(std::vector<char>, c
 bool Server::poll(sockaddr_in                                       socketAddress,
                   socklen_t                                         socketLen,
                   std::function<void(std::vector<char>, const int)> onReceive) {
+#if defined(__linux__)
     auto&       logger = Logger::instance();
     epoll_event ev, events[MAX_EVENTS];
     int         epollfd = epoll_create1(0);
@@ -116,6 +120,11 @@ bool Server::poll(sockaddr_in                                       socketAddres
             }
         }
     }
+// Linux-specific code
+#else
+    ASSERT(false, "Missing implementation for given os");
+// Other OS (e.g. Windows, BSD, etc.)
+#endif
 }
 
 bool Server::receive(const int clientSocket, std::function<void(std::vector<char>, const int)> onReceive) {
@@ -130,8 +139,8 @@ bool Server::receive(const int clientSocket, std::function<void(std::vector<char
     bool success = true;
     switch (clientConnetion.state) {
     case ClientConnection::State::WAITING: {
-        success               = receiveSize(clientSocket, clientConnetion.msgLen);
-        if(success){
+        success = receiveSize(clientSocket, clientConnetion.msgLen);
+        if (success) {
             clientConnetion.state = ClientConnection::State::SIZE_RECEIVED;
         }
         break;
