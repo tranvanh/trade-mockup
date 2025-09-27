@@ -6,7 +6,9 @@
 #include <vector>
 #include <string>
 
-ServerApplication::ServerApplication() : Application(6), mServer(Server::AddressType::ANY) {
+constexpr int THREAD_COUNT = 6;
+
+ServerApplication::ServerApplication() : Application(THREAD_COUNT), mServer(Server::AddressType::ANY) {
     registerCallback(mStockMarket.addOnTradeObserver([](const Trade& trade) {
         auto& logger = Logger::instance();
         logger.log(Logger::LogLevel::INFO, trade);
@@ -31,9 +33,6 @@ void ServerApplication::run() {
     });
 }
 
-StockMarket& ServerApplication::getStockMarket() {
-    return mStockMarket;
-}
 std::atomic<uint64_t> gIdCounterXXX = 0;
 
 int randomValueOfMaxXXX(const int max) {

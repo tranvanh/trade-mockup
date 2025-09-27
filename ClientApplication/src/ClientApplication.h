@@ -7,6 +7,8 @@
 
 using namespace tranvanh;
 
+constexpr int THREAD_COUNT = 2;
+
 class ClientApplication : public Application {
     uint mId = 0;
     enum CommandType { BUY, SELL, EXIT, INVALID };
@@ -22,7 +24,7 @@ class ClientApplication : public Application {
 
 public:
     ClientApplication(const uint id, const bool isSimulation = false)
-        : Application(2)
+        : Application(THREAD_COUNT)
         , mId(id)
         , mSimulation(isSimulation)
         , mGenerator(*this){};

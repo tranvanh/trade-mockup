@@ -20,9 +20,7 @@ class ServerApplication
 
 public:
     ServerApplication();
-
     virtual void run() override;
-    StockMarket& getStockMarket();
 
 private:
     void processServerMessage(const std::string& msg);
