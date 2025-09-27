@@ -17,7 +17,6 @@ class ServerApplication
     , public Application {
     StockMarket                    mStockMarket;
     Server                         mServer;
-    std::forward_list<std::thread> mThreadPool;
 
 public:
     ServerApplication();

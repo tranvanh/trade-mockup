@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 
-ServerApplication::ServerApplication() : Application(5), mServer(Server::AddressType::ANY) {
+ServerApplication::ServerApplication() : Application(6), mServer(Server::AddressType::ANY) {
     registerCallback(mStockMarket.addOnTradeObserver([](const Trade& trade) {
         auto& logger = Logger::instance();
         logger.log(Logger::LogLevel::INFO, trade);
@@ -18,7 +18,7 @@ void ServerApplication::run() {
     auto& logger = Logger::instance();
     logger.log(Logger::LogLevel::DEBUG, "Initialize application");
     isRunning = true;
-    mStockMarket.run();
+    runBackgroundTask([this](){mStockMarket.run();});
     mServer.openSocket();
     Logger::instance().setLevel(Logger::LogLevel::INFO);
     mServer.startListen(8080, [this](std::vector<char> bufferData, const int len){
@@ -45,7 +45,7 @@ void ServerApplication::processServerMessage(const std::string& msg){
 
     Order order;
     nlohmann::json msgJson = nlohmann::json::parse(msg);
-    msgJson["id"].get_to(order.id);
+    msgJson["clientId"].get_to(order.clientId);
     msgJson["price"].get_to(order.price);
     msgJson["volume"].get_to(order.volume);
     order.type = msgJson["type"].get<int>() == 0 ? OrderType::BUY : OrderType::SELL;

@@ -3,32 +3,22 @@
 #include "UtilsLib/ThreadSafeQueue.h"
 #include <condition_variable>
 #include <deque>
-#include <forward_list>
 #include <map>
 #include <thread>
+#include <unordered_set>
+
 
 TRANVANH_NAMESPACE_BEGIN
 
 class StockMarket;
 
-/// Match orders the highest buyer with lowest seller
-/// Runs 4 dedicated threads for processing and cleaning
+/// We receive orders through one serialized queue. Order then gets processed, the order book is always in
+/// valid state. All is done on main thread, but note that registerOrder can be called from different threads
 class OrderBook {
-    std::forward_list<std::thread> mThreadPool;
-
-    StockMarket&           mStockMarket;
-    ThreadSafeQueue<Order> mBuyerQueue;
-    ThreadSafeQueue<Order> mSellerQueue;
-
-    struct {
-        std::mutex                                   lock;
-        std::multimap<int, Order, std::greater<int>> data;
-    } mBuyers;
-
-    struct {
-        std::mutex                lock;
-        std::multimap<int, Order> data;
-    } mSellers;
+    StockMarket&                                 mStockMarket;
+    ThreadSafeQueue<Order>                       mOrderQueue;
+    std::multimap<int, Order, std::greater<int>> mBuyers;
+    std::multimap<int, Order>                    mSellers;
 
 public:
     OrderBook(StockMarket& stockMarket);
@@ -37,12 +27,11 @@ public:
     void run();
 
 private:
-    void processBuyers();
-    void processSellers();
+    void processBuyer(Order buyer);
+    void processSeller(Order seller);
 
-    // We allow orders with negative volumes due to performance. After a certain time we clean invalid orders
-    void cleanUpBuyers();
-    void cleanUpSellers();
+    void cleanUpBuyers(const std::unordered_set<int>& toRemove);
+    void cleanUpSellers(const std::unordered_set<int>& toRemove);
 
     int getSoldVolumes(const int buyer, const int seller) const;
 

@@ -4,7 +4,7 @@ TRANVANH_NAMESPACE_BEGIN
 
 std::ostream& operator<<(std::ostream& os, const Trade& trade) {
     return os << "Trade:"
-              << " buyer=" << std::setw(4) << trade.buyer.id << " seller=" << std::setw(4) << trade.seller.id
+              << " buyer=" << std::setw(4) << trade.buyer.clientId << " seller=" << std::setw(4) << trade.seller.clientId
               << " price=" << std::setw(5) << trade.buyer.price << " volume=" << std::setw(4) << trade.volume;
 }
 

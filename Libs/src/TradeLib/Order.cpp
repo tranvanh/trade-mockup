@@ -20,7 +20,7 @@ std::ostream& operator<<(std::ostream& os, OrderType type) {
 
 std::ostream& operator<<(std::ostream& os, const Order& order) {
     return os << "Order("
-              << "id=" << order.id << ","
+              << "id=" << order.clientId << ","
               << " timestamp=" << order.timeStamp << ","
               << " price=" << order.price << ","
               << " volume=" << order.volume << ","

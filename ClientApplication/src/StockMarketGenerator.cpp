@@ -34,7 +34,7 @@ void StockMarketGenerator::generateOrder(OrderType type) {
     while(mApplication.isRunning){
         logger.log(Logger::LogLevel::DEBUG, "Generating ", type);
         Order order;
-        order.id = randomValueOfMax(ID_COUNT);
+        order.clientId = randomValueOfMax(ID_COUNT);
         order.price = randomValueOfMax(PRICE_MAX);
         order.type = type;
         order.volume = randomValueOfMax(VOLUME_MAX);

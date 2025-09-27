@@ -6,6 +6,8 @@
 
 TRANVANH_NAMESPACE_BEGIN
 class StockMarket {
+    // \todo add more books for various symbols. Each running in its own thread
+    // \todo add publisher
     OrderBook        mBook;
     TradeDatabase    mDatabase;
     std::atomic_bool mActive = false;

@@ -4,7 +4,6 @@
 #include "UtilsLib/Logger.h"
 #include "UtilsLib/TimePointUtils.h"
 #include <iostream>
-#include <queue>
 
 TRANVANH_NAMESPACE_BEGIN
 
@@ -12,110 +11,77 @@ OrderBook::OrderBook(StockMarket& stockMarket)
     : mStockMarket(stockMarket) {}
 
 void OrderBook::registerOrder(const Order& order) {
-    // \Todo optimize processing of orders
-    switch (order.type) {
-    case OrderType::BUY:
-        mBuyerQueue.push(order);
-        break;
-    case OrderType::SELL:
-        mSellerQueue.push(order);
-        break;
-    }
+    mOrderQueue.push(order);
 }
 
 void OrderBook::run() {
     auto& logger = Logger::instance();
     logger.log(Logger::LogLevel::DEBUG, "Initialize Order book");
-
-    mThreadPool.emplace_front(std::bind_front(&OrderBook::processBuyers, this));
-    mThreadPool.emplace_front(std::bind_front(&OrderBook::processSellers, this));
-    mThreadPool.emplace_front(std::bind_front(&OrderBook::cleanUpBuyers, this));
-    mThreadPool.emplace_front(std::bind_front(&OrderBook::cleanUpSellers, this));
-}
-
-OrderBook::~OrderBook() {
-    for (auto& t : mThreadPool) {
-        t.join();
-    }
-}
-
-void OrderBook::cleanUpBuyers() {
-    auto& logger = Logger::instance();
     while (mStockMarket.isActive()) {
-
-        std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(5000));
-        std::unique_lock<std::mutex> buyersLock(mBuyers.lock);
-        logger.log(Logger::LogLevel::DEBUG, "Start cleaning invalid buyers...");
-        std::erase_if(mBuyers.data, [](const std::pair<int, Order>& item) {
-            return item.second.volume <= 0;
-        });
-        std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(3000)); // heavy load actor
-        logger.log(Logger::LogLevel::DEBUG, "Finish cleaning invalid buyers...");
-        buyersLock.unlock();
-    }
-}
-
-void OrderBook::cleanUpSellers() {
-    auto& logger = Logger::instance();
-    while (mStockMarket.isActive()) {
-        std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(5000));
-        std::unique_lock<std::mutex> sellersLock(mSellers.lock);
-        logger.log(Logger::LogLevel::DEBUG, "Start cleaning invalid sellers...");
-        std::erase_if(mSellers.data, [](const std::pair<int, Order>& item) {
-            return item.second.volume <= 0;
-        });
-        std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(2000)); // heavy load actor
-        logger.log(Logger::LogLevel::DEBUG, "Finish cleaning invalid sellers...");
-        sellersLock.unlock();
-    }
-}
-
-void OrderBook::processBuyers() {
-    while (mStockMarket.isActive()) {
-        Order                        buyer = mBuyerQueue.pop();
-        std::unique_lock<std::mutex> sellersLock(mSellers.lock);
-        for (auto& [price, seller] : mSellers.data) {
-            if (seller.price > buyer.price || buyer.volume <= 0) {
-                break;
-            }
-            if (seller.volume <= 0) {
-                continue;
-            }
-            if (seller.id == buyer.id) {
-                continue;
-            }
-            matchOrders(buyer, seller);
-        }
-        sellersLock.unlock();
-        if (buyer.volume > 0) {
-            std::unique_lock<std::mutex> buyerLock(mBuyers.lock);
-            mBuyers.data.insert({ buyer.price, buyer });
+        const Order order = mOrderQueue.pop();
+        switch (order.type) {
+        case OrderType::BUY:
+            processBuyer(order);
+            break;
+        case OrderType::SELL:
+            processSeller(order);
+            break;
         }
     }
 }
 
-void OrderBook::processSellers() {
-    while (mStockMarket.isActive()) {
-        Order                        seller = mSellerQueue.pop();
-        std::unique_lock<std::mutex> buyersLock(mBuyers.lock);
-        for (auto& [price, buyer] : mBuyers.data) {
+OrderBook::~OrderBook() {}
+
+void OrderBook::cleanUpBuyers(const std::unordered_set<int>& toRemove) {
+    std::erase_if(mBuyers, [&toRemove](const std::pair<int, Order>& item) {
+        return toRemove.contains(item.second.clientId);
+    });
+}
+
+void OrderBook::cleanUpSellers(const std::unordered_set<int>& toRemove) {
+    std::erase_if(mSellers, [&toRemove](const std::pair<int, Order>& item) {
+        return toRemove.contains(item.second.clientId);
+    });
+}
+
+void OrderBook::processBuyer(Order buyer) {
+    std::unordered_set<int> toRemove;
+    for (auto& [price, seller] : mSellers) {
+        if (seller.price > buyer.price || buyer.volume <= 0) {
+            break;
+        }
+        if (seller.clientId == buyer.clientId) {
+            continue;
+        }
+        matchOrders(buyer, seller);
+        if (seller.volume <= 0) {
+            toRemove.insert(seller.clientId);
+        }
+    }
+    if (buyer.volume > 0) {
+        mBuyers.insert({ buyer.price, buyer });
+    }
+    cleanUpSellers(toRemove);
+}
+
+void OrderBook::processSeller(Order seller) {
+        std::unordered_set<int> toRemove;
+        for (auto& [price, buyer] : mBuyers) {
             if (seller.price > buyer.price || seller.volume <= 0) {
                 break;
             }
-            if (buyer.volume <= 0) {
-                continue;
-            }
-            if (buyer.id == seller.id) {
+            if (buyer.clientId == seller.clientId) {
                 continue;
             }
             matchOrders(buyer, seller);
+            if(buyer.volume <= 0){
+                toRemove.insert(seller.clientId);
+            }
         }
-        buyersLock.unlock();
         if (seller.volume > 0) {
-            std::unique_lock<std::mutex> buyerLock(mSellers.lock);
-            mSellers.data.insert({ seller.price, seller });
+            mSellers.insert({ seller.price, seller });
         }
-    }
+        cleanUpBuyers(toRemove);
 }
 
 int OrderBook::getSoldVolumes(const int buyer, const int seller) const {
