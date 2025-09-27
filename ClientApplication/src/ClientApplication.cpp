@@ -12,72 +12,84 @@ void ClientApplication::run() {
     mClient.connectToServer("127.0.0.1", 8080);
     if (mSimulation) {
         mGenerator.simulateMarket();
-        while(isRunning){}
+        while (isRunning) {
+        }
     } else {
         processUserInputs();
     }
 }
 
 void ClientApplication::processUserInputs() const {
-    auto&       logger  = Logger::instance();
-    std::string command = "";
-    while (std::cin >> command) {
-        logger.log(Logger::LogLevel::DEBUG, "Command: ", command);
-        const auto commandIter = mCommands.find(command);
-        if (commandIter == mCommands.end()) {
-            logger.log(Logger::LogLevel::INFO, "Command not found");
+    std::string line;
+    while (std::cout << "> " && std::getline(std::cin, line)) {
+        if (line.empty())
             continue;
+        Command cmd = parseCommand(line);
+        switch(cmd.type){
+            case CommandType::INVALID:
+                Logger::instance().log(Logger::LogLevel::ERROR, "Invalid command");
+                break;
+            case CommandType::EXIT:
+                return;
+            default:
+                handleCommand(cmd);
+                break;
         }
+    }
+}
+
+void ClientApplication::handleCommand(const Command& cmd) const{
         Order order;
-        order.id = mId;
-        switch (commandIter->second) {
-        case Command::SELL: {
+        order.clientId = mId;
+        order.price = cmd.price;
+        order.volume = cmd.volume;
+        switch (cmd.type) {
+        case CommandType::SELL: {
             order.type = OrderType::SELL;
-            proccessOrderInput(order);
             registerOrder(std::move(order));
             break;
         }
-        case Command::BUY: {
+        case CommandType::BUY: {
             order.type = OrderType::BUY;
-            proccessOrderInput(order);
             registerOrder(std::move(order));
             break;
         }
-        case Command::EXIT:
-            return;
         default:
-            logger.log(Logger::LogLevel::INFO, "Command behaviour not defined");
+            ASSERT(false, "Command behaviour not defined");
             break;
         }
-        // Clear the stream from invalid trailing text
-        // std::cin.clear();
-        // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+}
+
+ClientApplication::Command ClientApplication::parseCommand(const std::string& line) const {
+    Command cmd;
+    std::istringstream iss(line);
+    std::string        symbol;
+    if (!(iss >> symbol)) {
+        return cmd;
     }
-}
-
-void ClientApplication::proccessOrderInput(Order& order) const {
-
-    // \todo must me some validation
-    std::cin >> order.price;
-    std::cin >> order.volume;
-}
-
-std::string escape_quotes(const std::string& input) {
-    std::string output;
-    output.reserve(input.size() * 2); // reserve extra space
-
-    for (char c : input) {
-        if (c == '"') {
-            output.push_back('\\'); // add escape
+    int    volume;
+    double price;
+    if (symbol == "buy") {
+        if (iss >> price >> volume && price > 0 && volume > 0) {
+            cmd.type   = CommandType::BUY;
+            cmd.price  = price;
+            cmd.volume = volume;
         }
-        output.push_back(c);
+    } else if (symbol == "sell") {
+        if (iss >> price >> volume && price > 0 && volume > 0) {
+            cmd.type   = CommandType::SELL;
+            cmd.volume = volume;
+            cmd.price  = price;
+        }
+    } else if (symbol == "exit") {
+        cmd.type = CommandType::EXIT;
     }
-    return output;
+    return cmd;
 }
 
 void ClientApplication::registerOrder(Order order) const {
     nlohmann::json msgJson;
-    msgJson["id"]     = order.id;
+    msgJson["clientId"]     = order.clientId;
     msgJson["type"]   = int(order.type);
     msgJson["price"]  = order.price;
     msgJson["volume"] = order.volume;
