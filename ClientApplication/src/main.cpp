@@ -1,7 +1,9 @@
 #include "ClientApplication.h"
+#include <UtilsLib/Logger.h>
 #include <cxxopts.hpp>
 
 int main(int argc, char* argv[]) {
+    Logger::instance().setLevel(Logger::LogLevel::DEBUG);
     bool simulate = false;
     int  id       = 0;
     try {
@@ -17,12 +19,12 @@ int main(int argc, char* argv[]) {
         }
         if (result.count("id")) {
             id = result["id"].as<int>();
-        } else {
-            std::cerr << "Error: --id required\n";
-            return 1;
-        }
-        if (result.count("simulate")) {
+        } else if (result.count("simulate")) {
             simulate = result["simulate"].as<bool>();
+        }
+        else {
+            std::cerr << "Error: --id or --simulate required\n";
+            return 1;
         }
     } catch (const std::exception& e) {
         std::cerr << "Argument parsing error: " << e.what() << "\n";

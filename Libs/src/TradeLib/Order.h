@@ -14,7 +14,7 @@ enum class OrderType { BUY = 0, SELL = 1};
 std::ostream& operator<<(std::ostream& os, OrderType type);
 
 struct Order {
-    uint64_t    id = 0;
+    uint64_t    clientId = 0;
     timepoint_t timeStamp;
     OrderType   type;
     int         price;
