@@ -53,6 +53,9 @@ To build and run Client application call `cmake -S ./ClientApplication -B ./Clie
 - [x] Logger
 - [x] Add thread pool
 - [ ] Add thread scheduler
-- [ ] Optimize Buyer/Seller processing and cleaning using the scheduler
-- [ ] Increase performance in optimization buy dividing the order list to buckets with their own locks.
+- [ ] Add multiple symbols to the stock market
 - [ ] Restructure UtilsLib folders
+- [ ] Add google tests (Order book, network sending/receiving, command parsing)
+- [ ] Implement polling for macos and windows
+- [ ] Assert, debug, release builds
+- [ ] Add asserts
