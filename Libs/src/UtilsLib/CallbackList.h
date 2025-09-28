@@ -22,6 +22,7 @@ class CallbackList<Ret(Args...)> {
 
 public:
     void operator()(Args&&... args) {
+        std::lock_guard<std::mutex> lock(mCallbacks.lock);
         for (const auto& callback : mCallbacks.list) {
             callback.second(std::forward<Args>(args)...);
         }
