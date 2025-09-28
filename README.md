@@ -55,7 +55,8 @@ To build and run Client application call `cmake -S ./ClientApplication -B ./Clie
 - [ ] Add thread scheduler
 - [ ] Add multiple symbols to the stock market
 - [ ] Restructure UtilsLib folders
-- [ ] Add google tests (Order book, network sending/receiving, command parsing)
+- [x] Add google tests 
+- [ ] Add tests for Order book, network sending/receiving, command parsing
 - [ ] Implement polling for macos and windows
 - [ ] Assert, debug, release builds
 - [ ] Add asserts
