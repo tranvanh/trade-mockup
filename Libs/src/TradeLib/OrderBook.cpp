@@ -18,13 +18,14 @@ void OrderBook::run() {
     auto& logger = Logger::instance();
     logger.log(Logger::LogLevel::DEBUG, "Initialize Order book");
     while (mStockMarket.isActive()) {
-        const Order order = mOrderQueue.pop();
-        switch (order.type) {
+        const auto order = mOrderQueue.pop();
+        ASSERT(order.has_value(), "Invalid order value");
+        switch (order->type) {
         case OrderType::BUY:
-            processBuyer(order);
+            processBuyer(*order);
             break;
         case OrderType::SELL:
-            processSeller(order);
+            processSeller(*order);
             break;
         }
     }

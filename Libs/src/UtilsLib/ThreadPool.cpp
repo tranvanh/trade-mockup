@@ -18,7 +18,11 @@ void ThreadPool::run() {
         mWorkers.emplace_back([this]() {
             while (mIsRunning) {
                 auto task = mTasksQueue.pop();
-                task();
+                if(!mIsRunning){
+                    return;
+                }
+                ASSERT(task.has_value(), "Invalid task value");
+                (*task)();
             }
         });
     }
@@ -26,9 +30,14 @@ void ThreadPool::run() {
 
 void ThreadPool::stop() {
     mIsRunning = false;
+    mTasksQueue.stop();
 }
 
-void ThreadPool::addTask(std::function<void()> task){
+void ThreadPool::addTask(const std::function<void()>& task){
+    mTasksQueue.push(task);
+}
+
+void ThreadPool::addTask(std::function<void()>&& task){
     mTasksQueue.push(std::move(task));
 }
 
