@@ -15,7 +15,8 @@ class ThreadPool {
 public:
     ThreadPool(const int workersCount);
     ~ThreadPool();
-    void addTask(std::function<void()> task);
+    void addTask(const std::function<void()>& task);
+    void addTask(std::function<void()>&& task);
     void run();
     void stop();
 };

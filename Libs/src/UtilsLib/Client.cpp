@@ -1,6 +1,7 @@
 #include "UtilsLib/Client.h"
 #include "UtilsLib/Logger.h"
 #include <cstring>
+#include <thread>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -23,16 +24,20 @@ bool Client::connectToServer(const char* url, const int port) const {
         return 2;
     }
     memcpy(&socketAddress.sin_addr, host->h_addr_list[0], host->h_length);
-
-    // \todo handle timeout or unsuccesful connection
-    logger.log(Logger::LogLevel::INFO, "Connecting to the server...");
-    if (connect(mSocket, (sockaddr*)&socketAddress, sizeof(socketAddress)) < 0) {
-        logger.log(Logger::LogLevel::ERROR, "Error while connecting to the address");
-        close(mSocket);
-        return 2;
+    for (int i = 0; i < TRY_COUNT; ++i) {
+        logger.log(Logger::LogLevel::INFO, "Trying to connect... [", i + 1, "/", TRY_COUNT, "]");
+        if(i > 0){
+            std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(3000));
+        }
+        if (connect(mSocket, (sockaddr*)&socketAddress, sizeof(socketAddress)) < 0) {
+            logger.log(Logger::LogLevel::ERROR, "Error while connecting");
+            continue;
+        }
+        logger.log(Logger::LogLevel::INFO, "Connected");
+        return true;
     }
-    logger.log(Logger::LogLevel::INFO, "Connected");
-    return true;
+    close(mSocket);
+    return false;
 }
 
 bool Client::sendMessage(const char* msg) const {

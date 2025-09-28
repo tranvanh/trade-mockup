@@ -19,18 +19,18 @@ void ServerApplication::run() {
     Application::run();
     auto& logger = Logger::instance();
     logger.log(Logger::LogLevel::DEBUG, "Initialize application");
-    isRunning = true;
     runBackgroundTask([this](){mStockMarket.run();});
-    mServer.openSocket();
-    Logger::instance().setLevel(Logger::LogLevel::INFO);
-    mServer.startListen(8080, [this](std::vector<char> bufferData, const int len){
+    auto onReceive = [this](std::vector<char> bufferData, const int len){
         auto& logger = Logger::instance();
         logger.log(Logger::LogLevel::INFO, "Received message...");
         runBackgroundTask([this, bufferData, len]() {
             processServerMessage(std::string(bufferData.data(), len));
         });
        
-    });
+    };
+    if(!mServer.openSocket() ||  mServer.startListen(8080, onReceive)){
+        stop();
+    }
 }
 
 std::atomic<uint64_t> gIdCounterXXX = 0;
