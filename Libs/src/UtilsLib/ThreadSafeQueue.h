@@ -15,6 +15,7 @@ class ThreadSafeQueue {
 
 public:
     void push(const Type& value);
+    void push(Type&& value);
     Type pop();
     bool empty() { return mQueue.empty(); }
 };
@@ -23,6 +24,13 @@ template <typename Type>
 void ThreadSafeQueue<Type>::push(const Type& value) {
     std::lock_guard<std::mutex> lock(m);
     mQueue.emplace_back(value);
+    cv.notify_one();
+}
+
+template <typename Type>
+void ThreadSafeQueue<Type>::push(Type&& value) {
+    std::lock_guard<std::mutex> lock(m);
+    mQueue.emplace_back(std::move(value));
     cv.notify_one();
 }
 
