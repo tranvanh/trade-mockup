@@ -16,6 +16,7 @@ public:
         : mThreadPool(threadCount) {}
     virtual ~Application();
     virtual void     run();
+    virtual void     stop();
     void             runBackgroundTask(std::function<void()> f);
     std::atomic_bool isRunning = false;
 };

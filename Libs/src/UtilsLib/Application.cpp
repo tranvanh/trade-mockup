@@ -9,7 +9,13 @@ Application::~Application() {
 }
 
 void Application::run() {
+    isRunning = true;
     mThreadPool.run();
+}
+
+void Application::stop() {
+    isRunning = false;
+    mThreadPool.stop();
 }
 
 void Application::runBackgroundTask(std::function<void()> f) {

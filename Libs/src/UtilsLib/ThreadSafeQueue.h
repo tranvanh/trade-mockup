@@ -4,6 +4,7 @@
 #include <deque>
 #include <map>
 #include <thread>
+#include <optional>
 
 TRANVANH_NAMESPACE_BEGIN
 
@@ -12,12 +13,18 @@ class ThreadSafeQueue {
     std::mutex              m;
     std::condition_variable cv;
     std::deque<Type>        mQueue;
+    std::atomic_bool mStop = false;
+
 
 public:
     void push(const Type& value);
     void push(Type&& value);
-    Type pop();
-    bool empty() { return mQueue.empty(); }
+    std::optional<Type> pop();
+    bool empty() {
+        std::lock_guard<std::mutex> lock(m);
+        return mQueue.empty();
+    }
+    void stop();
 };
 
 template <typename Type>
@@ -35,14 +42,23 @@ void ThreadSafeQueue<Type>::push(Type&& value) {
 }
 
 template <typename Type>
-Type ThreadSafeQueue<Type>::pop() {
+std::optional<Type> ThreadSafeQueue<Type>::pop() {
     std::unique_lock<std::mutex> lock(m);
     cv.wait(lock, [this]() {
-        return !mQueue.empty();
+        return !mQueue.empty() || mStop;
     });
+    if(mStop){
+        return std::nullopt;
+    }
     Type value = mQueue.front();
     mQueue.pop_front();
     return value;
+}
+
+template <typename Type>
+void ThreadSafeQueue<Type>::stop(){
+    mStop = true;
+    cv.notify_all();
 }
 
 TRANVANH_NAMESPACE_END
