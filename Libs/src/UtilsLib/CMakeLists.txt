@@ -9,6 +9,12 @@ target_include_directories(UtilsLib  PUBLIC
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
     $<INSTALL_INTERFACE:include>)
 
+target_compile_definitions(UtilsLib PUBLIC
+    $<$<CONFIG:Release>:RELEASE_BUILD>
+    $<$<CONFIG:ASSERT>:ASSERT_BUILD>
+    $<$<CONFIG:DEBUG>:DEBUG_BUILD>
+)
+
 # install libraries
 install(TARGETS UtilsLib
   EXPORT UtilsLibTargets

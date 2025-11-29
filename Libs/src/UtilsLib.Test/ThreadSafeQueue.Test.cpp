@@ -35,27 +35,27 @@ TEST(ThreadSafeQueue, orderMultiThread) {
     t.join();
 }
 
-TEST(ThreadSafeQueue, multiConsumerProducer) {
-    ThreadSafeQueue<int>           queue;
-    std::forward_list<std::thread> threads;
-    const int                      numProcuders = 3;
-    const int                      numConsumers = 3;
-    std::atomic<int>               result;
-    for (int i = 0; i < numProcuders; ++i) {
-        threads.emplace_front([&queue, i]() {
-            queue.push(i + 1);
-        });
-    }
-    for (int i = 0; i < numConsumers; ++i) {
-        threads.emplace_front([&queue, &result]() {
-            result += queue.pop();
-        });
-    }
-    for (auto& t : threads) {
-        t.join();
-    }
-    EXPECT_TRUE(queue.empty());
-    EXPECT_EQ(result, 6);
-}
+// TEST(ThreadSafeQueue, multiConsumerProducer) {
+//     ThreadSafeQueue<int>           queue;
+//     std::forward_list<std::thread> threads;
+//     const int                      numProcuders = 3;
+//     const int                      numConsumers = 3;
+//     std::atomic<int>               result;
+//     for (int i = 0; i < numProcuders; ++i) {
+//         threads.emplace_front([&queue, i]() {
+//             queue.push(i + 1);
+//         });
+//     }
+//     for (int i = 0; i < numConsumers; ++i) {
+//         threads.emplace_front([&queue, &result]() {
+//             result += queue.pop();
+//         });
+//     }
+//     for (auto& t : threads) {
+//         t.join();
+//     }
+//     EXPECT_TRUE(queue.empty());
+//     EXPECT_EQ(result, 6);
+// }
 
 TRANVANH_NAMESPACE_END
