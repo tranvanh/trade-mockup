@@ -19,3 +19,18 @@ add_executable(serverApp ${SOURCES})
 
 target_compile_options(serverApp PRIVATE -Wall -Wextra -Wpedantic -Werror)
 target_link_libraries(serverApp PRIVATE UtilsLib TradeLib nlohmann_json::nlohmann_json)
+
+# Install your executable
+install(TARGETS serverApp
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
+            GROUP_EXECUTE GROUP_READ
+            WORLD_EXECUTE WORLD_READ
+)
+
+# Install other files (optional)
+install(FILES 
+    ${LIB_PATH}/lib/libTradeLib.so
+    DESTINATION lib
+)
