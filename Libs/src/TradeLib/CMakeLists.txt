@@ -6,9 +6,7 @@ file(GLOB SOURCES *.cpp *.h)
 # add_definitions(-include Common.h)
 add_library(TradeLib SHARED ${SOURCES})
 
-# Link the static library 'UtilsLib'
-# Locate UtilsLib
-target_link_libraries(TradeLib PRIVATE UtilsLib)
+find_package(UtilsLib)
 
 target_include_directories(TradeLib  PUBLIC
  #not really understanding, not exposing our path to someone who will install the lib?

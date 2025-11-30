@@ -7,7 +7,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(json)
 
-set(CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/../includeLibs)
+set(LIB_PATH ${CMAKE_SOURCE_DIR}/../includeLibs)
+
+set(CMAKE_PREFIX_PATH ${LIB_PATH})
 
 find_package(UtilsLib)
 find_package(TradeLib)

@@ -36,4 +36,22 @@ if(BUILD_TESTS)
     FetchContent_MakeAvailable(googletest)
 endif()
 
+# Option to build tests
+option(BUILD_BENCHMARK "Build benchmark" OFF)
+enable_testing()
+if(BUILD_BENCHMARK)
+    include(FetchContent)
+    FetchContent_Declare(
+        googlebenchmark
+        GIT_REPOSITORY https://github.com/google/benchmark.git
+        GIT_TAG v1.9.4
+        GIT_SHALLOW TRUE
+    )
+    # Configure benchmark options before making it available
+    set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Disable benchmark tests" FORCE)
+    set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "Disable gtest tests in benchmark" FORCE)
+    FetchContent_MakeAvailable(googlebenchmark)
+endif()
+
+
 add_subdirectory(src)
