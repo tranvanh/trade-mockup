@@ -12,4 +12,4 @@ cmake -S . -B ./build -G "Ninja Multi-Config" -DBUILD_TESTS=OFF
 echo "Building..."
 cmake --build ./build --config "$CONFIG"
 echo "Installing..."
-cmake --install ./build --config "$CONFIG" --prefix="$HOME/coding/trade-mockup/includeLibs/"
+cmake --install ./build --config "$CONFIG" --prefix="../includeLibs/"

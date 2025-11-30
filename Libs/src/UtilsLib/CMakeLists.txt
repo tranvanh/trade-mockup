@@ -2,9 +2,9 @@
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # Create a lib
 file(GLOB SOURCES *.cpp *.h)
-add_library(UtilsLib STATIC ${SOURCES})
+add_library(UtilsLib SHARED ${SOURCES})
 
-target_include_directories(UtilsLib  PUBLIC
+target_include_directories(UtilsLib PUBLIC
  #not really understanding, not exposing our path to someone who will install the lib?
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
     $<INSTALL_INTERFACE:include>)
