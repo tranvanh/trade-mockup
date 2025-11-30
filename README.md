@@ -56,7 +56,9 @@ To build Client application call `build.sh Release clean`. The path to executabl
 - [ ] Add multiple symbols to the stock market
 - [ ] Restructure UtilsLib folders
 - [x] Add google tests 
+- [x] Add Google benchmark
 - [ ] Add tests for Order book, network sending/receiving, command parsing
+- [ ] Add benchmarks for TradeLib
 - [ ] Implement polling for macos and windows
 - [x] Assert, debug, release builds
 - [x] Add asserts
