@@ -12,10 +12,21 @@
 // - [x] Add commands and the input handling for client side
 // - [ ] Error handling of connection/communication/parsing issues
 // - [x] Heavy load handling, used clientApp with simulate currently crashes as the buffer communication buffer gets overwhelmed
-// - [x] Handle multiple clients and handle reconnection with event polling
+// - [x] Handle multiple clients and handle reconnection
 // - [ ] Handle failed connection with try to reconnect
+// - [ ] Add UDP version of the server. Handle sequencing and packate order reliability
+// - [x] Handle arguments properly
+// - [x] Handle user inputs properly
 // - [x] Logger
-// - [ ] Add thread scheduler to applications
+// - [x] Add thread pool
+// - [ ] Add thread scheduler
+// - [ ] Add multiple symbols to the stock market
+// - [ ] Restructure UtilsLib folders
+// - [x] Add google tests
+// - [ ] Add tests for Order book, network sending/receiving, command parsing
+// - [ ] Implement polling for macos and windows
+// - [x] Assert, debug, release builds
+// - [x] Add asserts
 
 // Deduplicator
 // * De-duplicates any message from the exchange based on its unique id.
