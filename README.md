@@ -9,18 +9,30 @@ Purpose of this project is to practice various technical topics as thread safety
 - Processes orders and delegades them to the market
 - Serves as a communication layer between the market and the client
 
-## TradeLib - Shared
-- Trading specific components
-- Order book with order matching algorithm. Matching highest buyer with lowest seller
-- Stock market manager registering orders and trades
+# Libs
+- independent libraries, intended to be installed
 
-## UtilsLib - Static
-- Observer pattern components
-- Server and Client using unix sockets. Client sends message size first and the content later, unsuring content consistency on receiving end.
-- Thread safe queue
-- Logger
+- **TradeLib - Shared**
+    - Trading specific components
+    - Order book with order matching algorithm. Matching highest buyer with lowest seller
+    - Stock market manager registering orders and trades
+  
+- **TradeLib.Test**
+    - Using Google tests
+  
+- **TradeLib.Benchmark**
+-    Using Google benchmark
 
-Client and Server applications share common utility libraries providing various useful functionality. Thus the goal is to have UtilsLabs as generic as possible, which could be reused for any other future projects
+- **UtilsLib - Shared**
+    - Observer pattern components
+    - Server and Client using unix sockets. Client sends message size first and the content later, unsuring content consistency on receiving end.
+    - Thread safe queue
+    - Logger
+
+- **UtilsLib.Test**
+    - Using Google tests
+
+Client and Server applications share common utility libraries providing various useful functionality. Thus the goal is to have UtilsLibs as generic as possible, which could be reused for any other future projects
 
 ## How to
 
