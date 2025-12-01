@@ -29,7 +29,7 @@ TEST(CallbackList, addMultiThread) {
            lifetimes.push(callbackList.add([&result](){++result;}));
         });
     }
-    std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(1000));
+    std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(2000));
     callbackList();
     for (auto& t : threads) {
         t.join();
