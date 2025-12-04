@@ -1,4 +1,5 @@
 #include "TradeLib/Order.h"
+#include "UtilsLib/Serialization.h"
 #include <chrono>
 
 TRANVANH_NAMESPACE_BEGIN
@@ -18,13 +19,13 @@ std::ostream& operator<<(std::ostream& os, OrderType type) {
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const Order& order) {
+std::ostream& Order::serialize(std::ostream& os) const{
     return os << "Order("
-              << "id=" << order.clientId << ","
-              << " timestamp=" << order.timeStamp << ","
-              << " price=" << order.price << ","
-              << " volume=" << order.volume << ","
-              << " type=" << order.type << ")";
+              << "id=" << clientId << ","
+              << " timestamp=" << timeStamp << ","
+              << " price=" << price << ","
+              << " volume=" << volume << ","
+              << " type=" << type << ")";
 }
 
 TRANVANH_NAMESPACE_END
