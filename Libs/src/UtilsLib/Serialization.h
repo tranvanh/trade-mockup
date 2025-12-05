@@ -5,6 +5,19 @@
 
 TRANVANH_NAMESPACE_BEGIN
 
+/// Concept for pairs
+template<typename T>
+concept Pair = requires {
+    typename T::first_type;
+    typename T::second_type;
+};
+
+/// Overload for pairs
+template<Pair P>
+std::ostream& operator<<(std::ostream& os, const P& p) {
+    return os << "{" << p.first << ": " << p.second << "}";
+}
+
 /// Helper traits to check for string like structures
 template<typename T>
 struct is_string_like : std::false_type {};
@@ -39,19 +52,6 @@ std::ostream& operator<<(std::ostream& os, const SR& range) {
     }
     os << "]";
     return os;
-}
-
-/// Concept for pairs
-template<typename T>
-concept Pair = requires {
-    typename T::first_type;
-    typename T::second_type;
-};
-
-/// Overload for pairs
-template<Pair P>
-std::ostream& operator<<(std::ostream& os, const P& p) {
-    return os << "{" << p.first << ": " << p.second << "}";
 }
 
 /// Interface used for Seriazable objects
