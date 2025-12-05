@@ -9,10 +9,10 @@ protected:
     const int TRY_COUNT                       = 3;
     int       mSocket                         = -1;
     NetworkComponent()                        = default;
-    NetworkComponent(const NetworkComponent&) = delete;
     virtual ~NetworkComponent();
 
 public:
+    NetworkComponent(const NetworkComponent&) = delete;
     int  getSocket() const;
     bool openSocket();
 };
