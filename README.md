@@ -21,13 +21,16 @@ Purpose of this project is to practice various technical topics as thread safety
     - Using Google tests
   
 - **TradeLib.Benchmark**
--    Using Google benchmark
+    - Using Google benchmark
 
 - **UtilsLib - Shared**
     - Observer pattern components
     - Server and Client using unix sockets. Client sends message size first and the content later, unsuring content consistency on receiving end.
     - Thread safe queue
     - Logger
+
+- **UtilsLib.Sandbox**
+    - Sandbox place to test UtilsLibs
 
 - **UtilsLib.Test**
     - Using Google tests
@@ -72,3 +75,5 @@ To build Client application call `build.sh Release clean`. The path to executabl
 - [ ] Implement polling for macos and windows
 - [x] Assert, debug, release builds
 - [x] Add asserts
+- [x] Add Sandbox target
+- [x] Add Serialization utilities

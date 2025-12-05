@@ -1,9 +1,9 @@
 #include "TradeLib/StockMarket.h"
-#include "TradeLib/Trade.h"
 #include "TradeLib/Order.h"
+#include "TradeLib/Trade.h"
 #include "UtilsLib/TimePointUtils.h"
-#include <gtest/gtest.h>
 #include <chrono>
+#include <gtest/gtest.h>
 #include <sstream>
 
 TRANVANH_NAMESPACE_BEGIN
@@ -16,41 +16,36 @@ TEST(StockMarket, IsInactiveByDefault) {
 TEST(StockMarket, ObserverReceivesRegisteredTrade) {
     StockMarket market;
 
-    int callbackCount = 0;
-    Trade lastTrade{};
-    auto lifetime = market.addOnTradeObserver([&](const Trade& t) {
+    int   callbackCount = 0;
+    Trade* lastTrade = nullptr;
+    auto  lifetime = market.addOnTradeObserver([&](const Trade& t) {
         ++callbackCount;
-        lastTrade = t;
+        EXPECT_EQ(lastTrade, nullptr);
+        lastTrade = new Trade(t);
     });
 
     Order buyer{
-        .clientId = 1,
-        .timeStamp = std::chrono::system_clock::now(),
-        .type = OrderType::BUY,
-        .price = 100,
-        .volume = 10,
+        1, std::chrono::system_clock::now(), OrderType::BUY, 100, 10,
     };
     Order seller{
-        .clientId = 2,
-        .timeStamp = std::chrono::system_clock::now(),
-        .type = OrderType::SELL,
-        .price = 100,
-        .volume = 5,
+        2, std::chrono::system_clock::now(), OrderType::SELL, 100, 5,
     };
 
     Trade trade{
-        .seller = seller,
-        .buyer = buyer,
-        .tradeTime = std::chrono::system_clock::now(),
-        .volume = 5,
+        seller,
+        buyer,
+        std::chrono::system_clock::now(),
+        5,
     };
 
     market.registerTrade(trade);
 
+    EXPECT_NE(lastTrade, nullptr);
     EXPECT_EQ(callbackCount, 1);
-    EXPECT_EQ(lastTrade.volume, 5);
-    EXPECT_EQ(lastTrade.buyer.clientId, 1);
-    EXPECT_EQ(lastTrade.seller.clientId, 2);
+    EXPECT_EQ(lastTrade->volume, 5);
+    EXPECT_EQ(lastTrade->buyer.clientId, 1);
+    EXPECT_EQ(lastTrade->seller.clientId, 2);
+    delete lastTrade;
 }
 
 TRANVANH_NAMESPACE_END

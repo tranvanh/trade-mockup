@@ -1,6 +1,7 @@
 #pragma once
 
 #include "UtilsLib/Common.h"
+#include "UtilsLib/Serialization.h"
 #include "UtilsLib/TimePointUtils.h"
 #include <string>
 
@@ -13,14 +14,21 @@ enum class OrderType { BUY = 0, SELL = 1};
 
 std::ostream& operator<<(std::ostream& os, OrderType type);
 
-struct Order {
+struct Order : public Serializable {
     uint64_t    clientId = 0;
     timepoint_t timeStamp;
     OrderType   type;
     int         price;
     int         volume;
 
-    friend std::ostream& operator<<(std::ostream& os, const Order& trade);
+    Order(const uint64_t id, const timepoint_t ts, const OrderType type, const int price, const int volume)
+        : clientId(id)
+        , timeStamp(ts)
+        , type(type)
+        , price(price)
+        , volume(volume) {}
+
+    virtual std::ostream& serialize(std::ostream& os) const override;
 };
 
 TRANVANH_NAMESPACE_END

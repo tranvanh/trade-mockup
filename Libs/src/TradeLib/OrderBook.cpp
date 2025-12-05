@@ -91,10 +91,10 @@ int OrderBook::getSoldVolumes(const int buyer, const int seller) const {
 
 void OrderBook::matchOrders(Order& buyer, Order& seller) {
     Trade trade{
-        .seller    = seller,
-        .buyer     = buyer,
-        .tradeTime = std::chrono::system_clock::now(),
-        .volume    = getSoldVolumes(seller.volume, buyer.volume),
+        seller,
+        buyer,
+        std::chrono::system_clock::now(),
+        getSoldVolumes(seller.volume, buyer.volume),
     };
     mStockMarket.registerTrade(trade);
     buyer.volume -= seller.volume;
