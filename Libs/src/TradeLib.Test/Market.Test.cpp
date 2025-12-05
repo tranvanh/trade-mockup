@@ -1,4 +1,4 @@
-#include "TradeLib/StockMarket.h"
+#include "TradeLib/Market.h"
 #include "TradeLib/Order.h"
 #include "TradeLib/Trade.h"
 #include "UtilsLib/TimePointUtils.h"
@@ -8,13 +8,13 @@
 
 TRANVANH_NAMESPACE_BEGIN
 
-TEST(StockMarket, IsInactiveByDefault) {
-    StockMarket market;
+TEST(Market, IsInactiveByDefault) {
+    Market market;
     EXPECT_FALSE(market.isActive());
 }
 
-TEST(StockMarket, ObserverReceivesRegisteredTrade) {
-    StockMarket market;
+TEST(Market, ObserverReceivesRegisteredTrade) {
+    Market market;
 
     int   callbackCount = 0;
     Trade* lastTrade = nullptr;

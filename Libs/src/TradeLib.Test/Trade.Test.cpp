@@ -1,6 +1,6 @@
 #include "TradeLib/Trade.h"
+#include "TradeLib/Market.h"
 #include "TradeLib/Order.h"
-#include "TradeLib/StockMarket.h"
 #include <chrono>
 #include <gtest/gtest.h>
 #include <sstream>

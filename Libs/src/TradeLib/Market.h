@@ -1,23 +1,17 @@
 #pragma once
 #include "TradeLib/OrderBook.h"
-#include "TradeLib/TradeDatabase.h"
-#include "UtilsLib/CallbackList.h"
 #include <atomic>
+#include "TradeLib/Trade.h"
 
 TRANVANH_NAMESPACE_BEGIN
-class StockMarket {
+class Market {
     // \todo add more books for various symbols. Each running in its own thread
     // \todo add publisher
     OrderBook        mBook;
-    TradeDatabase    mDatabase;
     std::atomic_bool mActive = false;
 
-    CallbackList<void(const Trade& trade)> mOnTradeCallbacks;
-
 public:
-    StockMarket()
-        : mBook(*this){};
-    ~StockMarket() { mActive = false; };
+    ~Market() { mActive = false; };
 
     void run();
     bool isActive() { return mActive; }
