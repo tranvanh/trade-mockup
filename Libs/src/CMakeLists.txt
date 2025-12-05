@@ -1,5 +1,6 @@
 add_subdirectory(TradeLib)
 add_subdirectory(UtilsLib)
+add_subdirectory(UtilsLib.Sandbox)
 if(BUILD_TESTS)
     add_subdirectory(UtilsLib.Test)
     add_subdirectory(TradeLib.Test)
