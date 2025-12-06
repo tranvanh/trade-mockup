@@ -19,13 +19,12 @@ struct Order : public Serializable {
     int         volume = 0;
     timepoint_t timeStamp;
 
-
-    Order(const int id, const OrderType type, const int price, const int volume, const timepoint_t ts)
+    Order(const int id, const OrderType type, const int price, const int volume)
         : clientId(id)
         , type(type)
         , price(price)
         , volume(volume)
-        , timeStamp(ts) {}
+        , timeStamp(std::chrono::system_clock::now()) {}
 
     virtual std::ostream& serialize(std::ostream& os) const override;
 };

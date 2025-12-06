@@ -31,11 +31,7 @@ void StockMarketGenerator::generateOrder(OrderType type) {
     logger.log(Logger::LogLevel::DEBUG, "Start generating orders ", type);
     while(mApplication.isRunning){
         logger.log(Logger::LogLevel::DEBUG, "Generating ", type);
-        Order order;
-        order.clientId = randomValueOfMax(ID_COUNT);
-        order.price = randomValueOfMax(PRICE_MAX);
-        order.type = type;
-        order.volume = randomValueOfMax(VOLUME_MAX);
+        Order order(randomValueOfMax(ID_COUNT), type,  randomValueOfMax(PRICE_MAX),randomValueOfMax(VOLUME_MAX));
         mApplication.registerOrder(std::move(order));
         std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(randomValueOfMax(10)*100));
     }

@@ -18,7 +18,7 @@ static void BM_OrderBook_SingleRegisterOrder(benchmark::State& state) {
     for (auto _ : state) {
         state.PauseTiming();
         auto  book = std::make_unique<OrderBook>();
-        Order order(42, OrderType::BUY, 100, 10, std::chrono::system_clock::now());
+        Order order(666, OrderType::BUY, 100, 10, std::chrono::system_clock::now());
         state.ResumeTiming();
         book->registerOrder(order);
         benchmark::ClobberMemory();

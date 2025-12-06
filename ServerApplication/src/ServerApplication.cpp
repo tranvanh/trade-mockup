@@ -26,28 +26,25 @@ void ServerApplication::run() {
         runBackgroundTask([this, bufferData, len]() {
             processServerMessage(std::string(bufferData.data(), len));
         });
-       
     };
     if(!mServer.openSocket() ||  mServer.startListen(8080, onReceive)){
         stop();
     }
 }
 
-std::atomic<uint64_t> gIdCounterXXX = 0;
-
-int randomValueOfMaxXXX(const int max) {
-    return std::rand() / ((RAND_MAX + 1u) / max);
-}
 void ServerApplication::processServerMessage(const std::string& msg){
     auto& logger = Logger::instance();
     logger.log(Logger::LogLevel::INFO, "Processing server message...", msg);
 
-    Order order;
+    int clientId = 0;
+    int price = 0;
+    int volume = 0;
+    OrderType type = OrderType::BUY;
     nlohmann::json msgJson = nlohmann::json::parse(msg);
-    msgJson["clientId"].get_to(order.clientId);
-    msgJson["price"].get_to(order.price);
-    msgJson["volume"].get_to(order.volume);
-    order.type = msgJson["type"].get<int>() == 0 ? OrderType::BUY : OrderType::SELL;
-    order.timeStamp = std::chrono::system_clock::now();
+    msgJson["clientId"].get_to(clientId);
+    msgJson["price"].get_to(price);
+    msgJson["volume"].get_to(volume);
+    type = msgJson["type"].get<int>() == 0 ? OrderType::BUY : OrderType::SELL;
+    Order order(clientId, type, price, volume);
     mStockMarket.registerOrder(order);
 }
