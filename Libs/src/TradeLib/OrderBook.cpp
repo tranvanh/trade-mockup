@@ -5,30 +5,21 @@
 
 TRANVANH_NAMESPACE_BEGIN
 
+OrderBook::~OrderBook() {
+    mOrderQueue.stop();
+}
+
 void OrderBook::registerOrder(const Order& order) {
     mOrderQueue.push(order);
 }
 
-void OrderBook::processOrders() {
+void OrderBook::pollOrders() {
     auto& logger = Logger::instance();
     logger.log(Logger::LogLevel::DEBUG, "Initialize Order book");
     const auto order = mOrderQueue.pop();
     ASSERT(order.has_value(), "Invalid order value");
     processOrder(*order);
 }
-//
-// void OrderBook::cleanUpBuyers(const std::unordered_set<int>& toRemove) {
-//     std::erase_if(mBuyers, [&toRemove](const std::pair<int, Order>& item) {
-//         return toRemove.contains(item.second.clientId);
-//     });
-// }
-//
-// void OrderBook::cleanUpSellers(const std::unordered_set<int>& toRemove) {
-//     std::erase_if(mSellers, [&toRemove](const std::pair<int, Order>& item) {
-//         return toRemove.contains(item.second.clientId);
-//     });
-// }
-
 
 void OrderBook::processOrder(const Order& order) {
     switch (order.type) {

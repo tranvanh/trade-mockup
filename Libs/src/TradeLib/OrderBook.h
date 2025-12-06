@@ -21,30 +21,30 @@ class OrderBook {
     };
 
     ThreadSafeQueue<Order>                       mOrderQueue;
+
+    // \todo use one single container and reduce code
+    // \todo try to use flat container
     std::map<int, std::shared_ptr<PriceLevel>, std::greater<>> mBuyers;
     std::map<int, std::shared_ptr<PriceLevel>>                    mSellers;
 
 public:
+
+    ~OrderBook();
     void registerOrder(const Order& order);
-    void processOrders();
+    void pollOrders();
 
     CallbackList<void(const Trade& trade)> onTradeCallbacks;
 
 private:
-
     void processOrder(const Order& buyer);
     void insertBuyer(const Order& buyer);
     void insertSeller(const Order& seller);
+    void matchOrders(Order& buyer, PriceLevel& seller);
+
     void processBuyer(Order buyer);
     void processSeller(Order seller);
 
-    // void cleanUpBuyers(const std::unordered_set<int>& toRemove);
-    // void cleanUpSellers(const std::unordered_set<int>& toRemove);
-
     int getSoldVolumes(const int buyer, const int seller) const;
-
-    // Make a trade and update volumes
-    void matchOrders(Order& buyer, PriceLevel& seller);
 };
 
 TRANVANH_NAMESPACE_END

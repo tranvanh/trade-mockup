@@ -1,6 +1,7 @@
 #pragma once
 #include "TradeLib/OrderBook.h"
 #include <atomic>
+#include "UtilsLib/CallbackList.h"
 #include "TradeLib/Trade.h"
 
 TRANVANH_NAMESPACE_BEGIN
@@ -15,12 +16,11 @@ public:
 
     void run();
     bool isActive() { return mActive; }
-
     void registerOrder(const Order& order);
-    void registerTrade(const Trade& trade);
 
     [[nodiscard]] CallbackLifetime addOnTradeObserver(
         const std::function<void(const Trade& trade)>& callback);
+
 };
 
 TRANVANH_NAMESPACE_END
