@@ -3,8 +3,8 @@
 #include <condition_variable>
 #include <deque>
 #include <map>
-#include <thread>
 #include <optional>
+#include <thread>
 
 TRANVANH_NAMESPACE_BEGIN
 
@@ -13,17 +13,19 @@ class ThreadSafeQueue {
     std::mutex              m;
     std::condition_variable cv;
     std::deque<Type>        mQueue;
-    std::atomic_bool mStop = false;
+    bool                    mStop = false;
 
 
 public:
+    ~ThreadSafeQueue() { stop(); }
     void push(const Type& value);
     void push(Type&& value);
+    // Blocking
     std::optional<Type> pop();
-    bool empty() {
-        std::lock_guard<std::mutex> lock(m);
-        return mQueue.empty();
-    }
+    // Non-Blocking
+    std::optional<Type> try_pop();
+
+    bool                empty();
     void stop();
 };
 
@@ -47,7 +49,7 @@ std::optional<Type> ThreadSafeQueue<Type>::pop() {
     cv.wait(lock, [this]() {
         return !mQueue.empty() || mStop;
     });
-    if(mStop){
+    if (mStop) {
         return std::nullopt;
     }
     Type value = mQueue.front();
@@ -56,7 +58,25 @@ std::optional<Type> ThreadSafeQueue<Type>::pop() {
 }
 
 template <typename Type>
-void ThreadSafeQueue<Type>::stop(){
+std::optional<Type> ThreadSafeQueue<Type>::try_pop() {
+    std::unique_lock<std::mutex> lock(m);
+    if (mQueue.empty() || mStop) {
+        return std::nullopt;
+    }
+    Type value = mQueue.front();
+    mQueue.pop_front();
+    return value;
+}
+
+template <typename Type>
+bool               ThreadSafeQueue<Type>:: empty(){
+    std::lock_guard<std::mutex> lock(m);
+    return mQueue.empty();
+}
+
+template <typename Type>
+void ThreadSafeQueue<Type>::stop() {
+    std::lock_guard<std::mutex> lock(m);
     mStop = true;
     cv.notify_all();
 }
