@@ -1,10 +1,8 @@
 #include "TradeLib/Market.h"
 #include "TradeLib/Order.h"
 #include "TradeLib/Trade.h"
-#include "UtilsLib/Serialization.h"
 #include <chrono>
 #include <gtest/gtest.h>
-#include <sstream>
 
 TRANVANH_NAMESPACE_BEGIN
 
@@ -32,8 +30,8 @@ TEST(Market, ObserverReceivesRegisteredTrade) {
     };
 
     Trade trade{
-        seller,
-        buyer,
+        seller.clientId,
+        buyer.clientId,
         std::chrono::system_clock::now(),
         5,
     };
@@ -43,8 +41,8 @@ TEST(Market, ObserverReceivesRegisteredTrade) {
     EXPECT_NE(lastTrade, nullptr);
     EXPECT_EQ(callbackCount, 1);
     EXPECT_EQ(lastTrade->volume, 5);
-    EXPECT_EQ(lastTrade->buyer.clientId, 1);
-    EXPECT_EQ(lastTrade->seller.clientId, 2);
+    EXPECT_EQ(lastTrade->buyerId, 1);
+    EXPECT_EQ(lastTrade->sellerId, 2);
     delete lastTrade;
 }
 

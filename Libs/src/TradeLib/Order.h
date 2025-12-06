@@ -13,7 +13,7 @@ enum class OrderType { BUY = 0, SELL = 1};
 std::ostream& operator<<(std::ostream& os, OrderType type);
 
 struct Order : public Serializable {
-    uint64_t    clientId = 0;
+    int    clientId = 0;
     timepoint_t timeStamp;
     OrderType   type;
     int         price;
