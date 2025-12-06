@@ -38,30 +38,15 @@ void ClientApplication::processUserInputs() const {
     }
 }
 
-void ClientApplication::handleCommand(const Command& cmd) const{
-        Order order;
-        order.clientId = mId;
-        order.price = cmd.price;
-        order.volume = cmd.volume;
-        switch (cmd.type) {
-        case CommandType::SELL: {
-            order.type = OrderType::SELL;
-            registerOrder(std::move(order));
-            break;
-        }
-        case CommandType::BUY: {
-            order.type = OrderType::BUY;
-            registerOrder(std::move(order));
-            break;
-        }
-        default:
-            ASSERT(false, "Command behaviour not defined");
-            break;
-        }
+void ClientApplication::handleCommand(const Command& cmd) const {
+    ASSERT(cmd.type == CommandType::BUY || cmd.type == CommandType::SELL, "Command behaviour not defined");
+    OrderType type = cmd.type == CommandType::BUY ? OrderType::BUY : OrderType::SELL;
+    Order     order(mId, type, cmd.price, cmd.volume);
+    registerOrder(std::move(order));
 }
 
 ClientApplication::Command ClientApplication::parseCommand(const std::string& line) const {
-    Command cmd;
+    Command            cmd;
     std::istringstream iss(line);
     std::string        symbol;
     if (!(iss >> symbol)) {
@@ -93,6 +78,6 @@ void ClientApplication::registerOrder(Order order) const {
     msgJson["type"]   = int(order.type);
     msgJson["price"]  = order.price;
     msgJson["volume"] = order.volume;
-    std::string msg   = nlohmann::to_string(msgJson);
+    const std::string msg   = nlohmann::to_string(msgJson);
     mClient.sendMessage(msg.c_str());
 }

@@ -4,7 +4,7 @@
 #include <functional>
 #include <thread>
 #include <TradeLib/Order.h>
-#include <TradeLib/StockMarket.h>
+#include <TradeLib/Market.h>
 #include <TradeLib/Trade.h>
 #include <UtilsLib/Application.h>
 #include <UtilsLib/CallbackOwner.h>
@@ -15,7 +15,7 @@ using namespace tranvanh;
 class ServerApplication
     : public CallbackOwner
     , public Application {
-    StockMarket                    mStockMarket;
+    Market                    mStockMarket;
     Server                         mServer;
 
 public:

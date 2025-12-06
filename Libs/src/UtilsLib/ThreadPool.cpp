@@ -7,6 +7,7 @@ ThreadPool::ThreadPool(const int workersCount)
     , mIsRunning(false) {}
 
 ThreadPool::~ThreadPool() {
+    stop();
     for (auto& worker : mWorkers) {
         worker.join();
     }

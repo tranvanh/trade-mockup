@@ -1,20 +1,18 @@
-#include "TradeLib/StockMarket.h"
+#include "TradeLib/Market.h"
 #include "TradeLib/Order.h"
 #include "TradeLib/Trade.h"
-#include "UtilsLib/TimePointUtils.h"
 #include <chrono>
 #include <gtest/gtest.h>
-#include <sstream>
 
 TRANVANH_NAMESPACE_BEGIN
 
-TEST(StockMarket, IsInactiveByDefault) {
-    StockMarket market;
+TEST(Market, IsInactiveByDefault) {
+    Market market;
     EXPECT_FALSE(market.isActive());
 }
 
-TEST(StockMarket, ObserverReceivesRegisteredTrade) {
-    StockMarket market;
+TEST(Market, ObserverReceivesRegisteredTrade) {
+    Market market;
 
     int   callbackCount = 0;
     Trade* lastTrade = nullptr;
@@ -32,8 +30,8 @@ TEST(StockMarket, ObserverReceivesRegisteredTrade) {
     };
 
     Trade trade{
-        seller,
-        buyer,
+        seller.clientId,
+        buyer.clientId,
         std::chrono::system_clock::now(),
         5,
     };
@@ -43,8 +41,8 @@ TEST(StockMarket, ObserverReceivesRegisteredTrade) {
     EXPECT_NE(lastTrade, nullptr);
     EXPECT_EQ(callbackCount, 1);
     EXPECT_EQ(lastTrade->volume, 5);
-    EXPECT_EQ(lastTrade->buyer.clientId, 1);
-    EXPECT_EQ(lastTrade->seller.clientId, 2);
+    EXPECT_EQ(lastTrade->buyerId, 1);
+    EXPECT_EQ(lastTrade->sellerId, 2);
     delete lastTrade;
 }
 

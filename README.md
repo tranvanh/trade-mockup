@@ -54,10 +54,12 @@ To build Client application call `build.sh Release clean`. The path to executabl
 - [x] Model generating buy/sell THREAD - give certain delay of buy/sell generation
 - [x] Mock database storing the information THREAD SAFE
 - [x] Matching trade/sell
+- [ ] Add trade database
 - [ ] Yield list of latest 100 trades happened around the given timestamp
 - [ ] Iterator to navigate the trades chronologicaly
 - [x] Create server-client connection
 - [x] Add commands and the input handling for client side
+- [x] Let client listen to happening trades
 - [ ] Error handling of connection/communication/parsing issues
 - [x] Heavy load handling, used clientApp with simulate currently crashes as the buffer communication buffer gets overwhelmed
 - [x] Handle multiple clients and handle reconnection
