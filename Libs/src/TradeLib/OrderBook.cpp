@@ -105,11 +105,12 @@ int OrderBook::getSoldVolumes(const int buyer, const int seller) const {
 void OrderBook::matchOrders(Order& requester, PriceLevel& level) {
     while (!level.orders.empty() && requester.volume > 0) {
         auto& order       = level.orders.front();
-        int   soldVolumes = getSoldVolumes(requester.volume, order.volume);
-        int buyerId = requester.type ==  OrderType::BUY ? requester.clientId : order.clientId;
-        int sellerId = requester.type ==  OrderType::SELL ? requester.clientId : order.clientId;
+        const int   soldVolumes = getSoldVolumes(requester.volume, order.volume);
+        const int   soldPrice   = requester.price < order.price ? requester.price : order.price;
+        const int   buyerId     = requester.type == OrderType::BUY ? requester.clientId : order.clientId;
+        const int   sellerId    = requester.type == OrderType::SELL ? requester.clientId : order.clientId;
 
-        Trade trade(buyerId, sellerId, std::chrono::system_clock::now(), soldVolumes);
+        Trade trade(buyerId, sellerId, soldPrice, soldVolumes, std::chrono::system_clock::now());
         onTradeCallbacks(trade);
 
         requester.volume -= soldVolumes;
