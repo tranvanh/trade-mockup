@@ -18,7 +18,7 @@ static void BM_OrderBook_SingleRegisterOrder(benchmark::State& state) {
     for (auto _ : state) {
         state.PauseTiming();
         auto  book = std::make_unique<OrderBook>();
-        Order order(666, OrderType::BUY, 100, 10, std::chrono::system_clock::now());
+        Order order(666, OrderType::BUY, 100, 10);
         state.ResumeTiming();
         book->registerOrder(order);
         benchmark::ClobberMemory();
@@ -34,10 +34,10 @@ static void BM_StockMarket_FilledBookRegisterOrder(benchmark::State& state) {
     int endRange = state.range(0);
     auto  book = std::make_unique<OrderBook>();
     for (int i = endRange; i >= 0; --i) {
-        Order order(666, OrderType::BUY, i, 10, std::chrono::system_clock::now());
+        Order order(666, OrderType::BUY, i, 10);
         book->registerOrder(order);
     }
-    Order order(69, OrderType::BUY, endRange+1, 10, std::chrono::system_clock::now());
+    Order order(69, OrderType::BUY, endRange+1, 10);
 
     for (auto _ : state) {
         book->registerOrder(order);
@@ -45,7 +45,7 @@ static void BM_StockMarket_FilledBookRegisterOrder(benchmark::State& state) {
 
         // erase the previous order by buing it out
         state.PauseTiming();
-        Order eraser(69, OrderType::SELL, endRange+1, 10, std::chrono::system_clock::now());
+        Order eraser(69, OrderType::SELL, endRange+1, 10);
         book->registerOrder(eraser);
         state.ResumeTiming();
     }
