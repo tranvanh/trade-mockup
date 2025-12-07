@@ -79,3 +79,9 @@ To build Client application call `build.sh Release clean`. The path to executabl
 - [x] Add asserts
 - [x] Add Sandbox target
 - [x] Add Serialization utilities
+- [x] Add Sandbox target
+- [x] Add Serialization utilities
+- [x] Add option to pre-fill the market with mock data
+- [x] Add FlatMap and use it in orderbook
+- [x] Add option for client to listen on to trades
+- [x] Add queries for more market

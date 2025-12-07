@@ -9,5 +9,6 @@ endif()
 
 if(BUILD_BENCHMARK)
     add_subdirectory(TradeLib.Benchmark)
+    add_subdirectory(UtilsLib.Benchmark)
 endif()
 

@@ -1,10 +1,9 @@
 #pragma once
 #include "TradeLib/Order.h"
 #include "TradeLib/Trade.h"
-#include "UtilsLib/ThreadSafeQueue.h"
-#include <map>
-#include <unordered_set>
 #include "UtilsLib/CallbackList.h"
+#include "UtilsLib/FlatMap.h"
+#include "UtilsLib/ThreadSafeQueue.h"
 
 
 TRANVANH_NAMESPACE_BEGIN
@@ -15,20 +14,20 @@ class Market;
 /// valid state. All is done on main thread, but note that registerOrder can be called from different threads
 class OrderBook {
     struct PriceLevel {
-        int price = 0;
-        int volume = 0;
+        int               price  = 0;
+        int               volume = 0;
         std::deque<Order> orders;
     };
 
-    ThreadSafeQueue<Order>                       mOrderQueue;
+    ThreadSafeQueue<Order> mOrderQueue;
 
     // \todo use one single container and reduce code
     // \todo try to use flat container
-    std::map<int, std::shared_ptr<PriceLevel>, std::greater<>> mBuyers;
-    std::map<int, std::shared_ptr<PriceLevel>>                    mSellers;
+    FlatMap<int, std::shared_ptr<PriceLevel>> mBuyers;
+    FlatMap<int, std::shared_ptr<PriceLevel>> mSellers;
 
 public:
-
+    OrderBook();
     ~OrderBook();
     void registerOrder(const Order& order);
     void pollOrders();
