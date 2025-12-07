@@ -2,6 +2,7 @@
 #include "UtilsLib/Serialization.h"
 #include <algorithm>
 #include <functional>
+#include <optional>
 #include <vector>
 
 TRANVANH_NAMESPACE_BEGIN
@@ -73,7 +74,7 @@ public:
 
     std::optional<TValue> get(const TKey& key) const {
         auto pos = find(key);
-        return pos != end() ? pos->second : std::nullopt;
+        return pos != end() ? std::optional<TValue>(pos->second) : std::nullopt;
     }
 
     bool contains(const TKey& key) const { return find(key) != end(); }
