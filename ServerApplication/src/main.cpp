@@ -1,5 +1,4 @@
 #include "ServerApplication.h"
-#include <UtilsLib/Common.h>
 #include <UtilsLib/Logger.h>
 
 // ### TODO
@@ -31,6 +30,10 @@
 // Deduplicator
 // * De-duplicates any message from the exchange based on its unique id.
 // * Optimized for performance, uses floating window for history trades.
+
+// Fills the provided OrderBook with a large number of randomly generated orders.
+// Orders will have varying type (BUY/SELL), price, and volume.
+// Note: This is defined in a .cpp on purpose to keep mock helpers out of the public headers.
 
 int main() {
     using namespace tranvanh;

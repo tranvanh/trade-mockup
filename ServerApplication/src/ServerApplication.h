@@ -19,7 +19,7 @@ class ServerApplication
     Server                         mServer;
 
 public:
-    ServerApplication();
+    ServerApplication(const bool filled = false);
     virtual void run() override;
 
 private:
