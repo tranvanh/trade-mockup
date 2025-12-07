@@ -110,7 +110,7 @@ void OrderBook::matchOrders(Order& requester, PriceLevel& level) {
         const int   buyerId     = requester.type == OrderType::BUY ? requester.clientId : order.clientId;
         const int   sellerId    = requester.type == OrderType::SELL ? requester.clientId : order.clientId;
 
-        Trade trade(buyerId, sellerId, soldPrice, soldVolumes, std::chrono::system_clock::now());
+        Trade trade(buyerId, sellerId, soldPrice, soldVolumes);
         onTradeCallbacks(trade);
 
         requester.volume -= soldVolumes;
