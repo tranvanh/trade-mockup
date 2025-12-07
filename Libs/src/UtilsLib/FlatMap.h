@@ -8,10 +8,11 @@
 TRANVANH_NAMESPACE_BEGIN
 
 template <typename T>
-concept FlatMapKey = std::totally_ordered<T> && std::default_initializable<T> && std::copyable<T> &&
-                     std::movable<T> && !std::is_reference_v<T> && !std::is_const_v<T>;
+concept FlatMapKey =
+    std::totally_ordered<T> && std::default_initializable<T> && std::copyable<T> && std::movable<T> &&
+    !std::is_reference_v<T> && !std::is_const_v<T> && std::is_move_assignable_v<T>;
 template <typename T>
-concept FlatMapValue = std::destructible<T> && !std::is_reference_v<T>;
+concept FlatMapValue = std::destructible<T> && !std::is_reference_v<T> && std::is_move_assignable_v<T>;
 
 template <FlatMapKey TKey, FlatMapValue TValue, size_t TInitSize = 10>
 requires(TInitSize > 0)
@@ -49,6 +50,16 @@ public:
         --mFilledSize;
         return true;
     }
+
+    size_t erase(Iterator first, Iterator last) { return erase(ConstIterator(first), ConstIterator(last)); }
+
+    size_t erase(ConstIterator first, ConstIterator last) {
+        mData.erase(first, last);
+        size_t removed = (last - first);
+        mFilledSize -= removed;
+        return removed;
+    }
+
 
     bool insert(const Item& item) {
         auto range = std::equal_range(mData.begin(), mData.begin() + mFilledSize, item, mComp);
