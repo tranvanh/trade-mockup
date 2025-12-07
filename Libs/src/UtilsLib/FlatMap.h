@@ -7,7 +7,15 @@
 
 TRANVANH_NAMESPACE_BEGIN
 
-template <std::totally_ordered TKey, typename TValue, size_t TInitSize = 10>
+template <typename T>
+concept FlatMapKey = std::totally_ordered<T> && std::default_initializable<T> && std::copyable<T> &&
+                     std::movable<T> && !std::is_reference_v<T> && !std::is_const_v<T>;
+template <typename T>
+concept FlatMapValue = std::destructible<T> && !std::is_reference_v<T>;
+
+template <FlatMapKey TKey, FlatMapValue TValue, size_t TInitSize = 10>
+requires(TInitSize > 0)
+
 class FlatMap {
     using Item          = std::pair<TKey, TValue>;
     using Iterator      = std::vector<Item>::iterator;
@@ -43,7 +51,7 @@ public:
     }
 
     bool insert(const Item& item) {
-        auto range = std::equal_range(mData.begin(), mData.begin()+mFilledSize, item, mComp);
+        auto range = std::equal_range(mData.begin(), mData.begin() + mFilledSize, item, mComp);
         if (range.first != range.second) {
             return false;
         }
@@ -53,7 +61,7 @@ public:
     }
 
     bool insert(Item&& item) {
-        auto range = std::equal_range(mData.begin(), mData.begin()+mFilledSize, item, mComp);
+        auto range = std::equal_range(mData.begin(), mData.begin() + mFilledSize, item, mComp);
         if (range.first != range.second) {
             return false;
         }
@@ -79,9 +87,9 @@ public:
 
     bool contains(const TKey& key) const { return find(key) != end(); }
 
-    bool empty() const { return mData.empty(); }
+    bool   empty() const { return mData.empty(); }
     size_t size() const { return mData.size(); }
-    void clear() {
+    void   clear() {
         mData.clear();
         mFilledSize = 0;
         mData.reserve(TInitSize);
