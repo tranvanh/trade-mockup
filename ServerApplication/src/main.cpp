@@ -1,5 +1,6 @@
 #include "ServerApplication.h"
 #include <UtilsLib/Logger.h>
+#include <cxxopts.hpp>
 
 // ### TODO
 // - [x] Model generating buy/sell THREAD - give certain delay of buy/sell generation
@@ -35,10 +36,28 @@
 // Orders will have varying type (BUY/SELL), price, and volume.
 // Note: This is defined in a .cpp on purpose to keep mock helpers out of the public headers.
 
-int main() {
+int main(int argc, char* argv[]) {
     using namespace tranvanh;
     Logger::instance().setLevel(Logger::LogLevel::DEBUG);
-    ServerApplication app;
+
+    bool filled = false;
+    try {
+        cxxopts::Options options("ServerApp", "Example argument parsing");
+        options.add_options()("filled", "Fill market with mock data", cxxopts::value<bool>())("h,help",
+                                                                                                "Print help");
+        const auto result = options.parse(argc, argv);
+        if (result.count("help")) {
+            std::cout << options.help() << std::endl;
+            return 0;
+        }
+        if (result.count("filled")) {
+            filled = result["filled"].as<bool>();
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Argument parsing error: " << e.what() << "\n";
+        return 1;
+    }
+    ServerApplication app(filled);
     app.run();
     return 0;
 }
