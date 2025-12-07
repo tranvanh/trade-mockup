@@ -1,6 +1,7 @@
 #include "TradeLib/OrderBook.h"
 #include "TradeLib/Trade.h"
 #include "UtilsLib/Logger.h"
+#include <optional>
 
 
 TRANVANH_NAMESPACE_BEGIN
@@ -63,7 +64,7 @@ void OrderBook::insertSeller(const Order& seller) {
 }
 
 void OrderBook::processBuyer(Order buyer) {
-    int removeToRange = 0;
+    std::optional<int> removeToRange = std::nullopt;
     for (auto& [price, level] : mSellers) {
         if (price > buyer.price || buyer.volume <= 0) {
             break;
@@ -76,12 +77,14 @@ void OrderBook::processBuyer(Order buyer) {
     if (buyer.volume > 0) {
         insertBuyer(buyer);
     }
-    const auto endRange = mSellers.find(removeToRange);
-    mSellers.erase(mSellers.begin(), endRange);
+    if (removeToRange) {
+        const auto endRange = mSellers.find(*removeToRange);
+        mSellers.erase(mSellers.begin(), endRange);
+    }
 }
 
 void OrderBook::processSeller(Order seller) {
-    int removeToRange = 0;
+    std::optional<int> removeToRange = std::nullopt;
     for (auto& [price, level] : mBuyers) {
         if (seller.price > price || seller.volume <= 0) {
             break;
@@ -94,8 +97,10 @@ void OrderBook::processSeller(Order seller) {
     if (seller.volume > 0) {
         insertSeller(seller);
     }
-    const auto endRange = mBuyers.find(removeToRange);
-    mBuyers.erase(mBuyers.begin(), endRange);
+    if (removeToRange) {
+        const auto endRange = mBuyers.find(*removeToRange);
+        mBuyers.erase(mBuyers.begin(), endRange);
+    }
 }
 
 int OrderBook::getSoldVolumes(const int buyer, const int seller) const {
