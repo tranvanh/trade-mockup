@@ -34,8 +34,8 @@ public:
         }) {
         mData.reserve(TInitSize);
     }
-    FlatMap(std::function<bool(const TKey&, const TKey&)>&& comp)
-        : mComp([comp = std::move(comp)](const Item& a, const Item& b) {
+    FlatMap(const std::function<bool(const TKey&, const TKey&)>& comp)
+        : mComp([comp](const Item& a, const Item& b) {
             return comp(a.first, b.first);
         }) {
         mData.reserve(TInitSize);
@@ -82,12 +82,14 @@ public:
     }
 
     Iterator find(const TKey& key) {
-        auto range = std::equal_range(mData.begin(), mData.end(), std::make_pair(key, 0), mComp);
+        // Use a dummy TValue instance for comparison
+        auto range = std::equal_range(mData.begin(), mData.end(), std::make_pair(key, TValue{}), mComp);
         return range.first == range.second ? end() : range.first;
     }
 
     ConstIterator find(const TKey& key) const {
-        auto range = std::equal_range(mData.cbegin(), mData.cend(), std::make_pair(key, 0), mComp);
+        // Use a dummy TValue instance for comparison
+        auto range = std::equal_range(mData.cbegin(), mData.cend(), std::make_pair(key, TValue{}), mComp);
         return range.first == range.second ? cend() : range.first;
     }
 

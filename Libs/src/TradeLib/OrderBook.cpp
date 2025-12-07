@@ -1,10 +1,16 @@
 #include "TradeLib/OrderBook.h"
 #include "TradeLib/Trade.h"
 #include "UtilsLib/Logger.h"
+#include <functional>
 #include <optional>
 
 
 TRANVANH_NAMESPACE_BEGIN
+
+OrderBook::OrderBook()
+    : mBuyers([](const int a, const int b) {
+        return a > b;
+    }) {}
 
 OrderBook::~OrderBook() {
     mOrderQueue.stop();
@@ -109,11 +115,11 @@ int OrderBook::getSoldVolumes(const int buyer, const int seller) const {
 
 void OrderBook::matchOrders(Order& requester, PriceLevel& level) {
     while (!level.orders.empty() && requester.volume > 0) {
-        auto& order       = level.orders.front();
-        const int   soldVolumes = getSoldVolumes(requester.volume, order.volume);
-        const int   soldPrice   = requester.price < order.price ? requester.price : order.price;
-        const int   buyerId     = requester.type == OrderType::BUY ? requester.clientId : order.clientId;
-        const int   sellerId    = requester.type == OrderType::SELL ? requester.clientId : order.clientId;
+        auto&     order       = level.orders.front();
+        const int soldVolumes = getSoldVolumes(requester.volume, order.volume);
+        const int soldPrice   = requester.price < order.price ? requester.price : order.price;
+        const int buyerId     = requester.type == OrderType::BUY ? requester.clientId : order.clientId;
+        const int sellerId    = requester.type == OrderType::SELL ? requester.clientId : order.clientId;
 
         Trade trade(buyerId, sellerId, soldPrice, soldVolumes);
         onTradeCallbacks(trade);
@@ -127,7 +133,4 @@ void OrderBook::matchOrders(Order& requester, PriceLevel& level) {
         }
     }
 }
-
-
-
 TRANVANH_NAMESPACE_END
