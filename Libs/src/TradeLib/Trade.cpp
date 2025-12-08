@@ -2,10 +2,10 @@
 
 TRANVANH_NAMESPACE_BEGIN
 
-std::ostream& operator<<(std::ostream& os, const Trade& trade) {
+std::ostream& Trade::serialize(std::ostream& os) const {
     return os << "Trade:"
-              << " buyer=" << std::setw(4) << trade.buyer.clientId << " seller=" << std::setw(4) << trade.seller.clientId
-              << " price=" << std::setw(5) << trade.buyer.price << " volume=" << std::setw(4) << trade.volume;
+              << " buyer=" << std::setw(4) << buyerId << " seller=" << std::setw(4) << sellerId
+              << " price=" << std::setw(5) << price << " volume=" << std::setw(4) << volume;
 }
 
 bool Trade::compareLowerPrice(const Trade& t1, const Trade& t2) {

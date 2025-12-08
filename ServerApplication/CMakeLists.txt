@@ -3,6 +3,7 @@ project(TradeServer)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 
 if (NOT (CMAKE_GENERATOR STREQUAL "Ninja Multi-Config"))
     message(FATAL_ERROR

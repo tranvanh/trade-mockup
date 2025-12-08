@@ -1,104 +1,136 @@
 #include "TradeLib/OrderBook.h"
-#include "TradeLib/StockMarket.h"
 #include "TradeLib/Trade.h"
 #include "UtilsLib/Logger.h"
-#include "UtilsLib/TimePointUtils.h"
-#include <iostream>
+#include <functional>
+#include <optional>
+
 
 TRANVANH_NAMESPACE_BEGIN
 
-OrderBook::OrderBook(StockMarket& stockMarket)
-    : mStockMarket(stockMarket) {}
+OrderBook::OrderBook()
+    : mBuyers([](const int a, const int b) {
+        return a > b;
+    }) {}
+
+OrderBook::~OrderBook() {
+    mOrderQueue.stop();
+}
 
 void OrderBook::registerOrder(const Order& order) {
     mOrderQueue.push(order);
 }
 
-void OrderBook::run() {
+void OrderBook::pollOrders() {
     auto& logger = Logger::instance();
     logger.log(Logger::LogLevel::DEBUG, "Initialize Order book");
-    while (mStockMarket.isActive()) {
-        const auto order = mOrderQueue.pop();
-        ASSERT(order.has_value(), "Invalid order value");
-        switch (order->type) {
-        case OrderType::BUY:
-            processBuyer(*order);
-            break;
-        case OrderType::SELL:
-            processSeller(*order);
-            break;
-        }
+    const auto order = mOrderQueue.pop();
+    ASSERT(order.has_value(), "Invalid order value");
+    processOrder(*order);
+}
+
+void OrderBook::processOrder(const Order& order) {
+    switch (order.type) {
+    case OrderType::BUY:
+        processBuyer(order);
+        break;
+    case OrderType::SELL:
+        processSeller(order);
+        break;
     }
 }
 
-OrderBook::~OrderBook() {}
-
-void OrderBook::cleanUpBuyers(const std::unordered_set<int>& toRemove) {
-    std::erase_if(mBuyers, [&toRemove](const std::pair<int, Order>& item) {
-        return toRemove.contains(item.second.clientId);
-    });
+void OrderBook::insertBuyer(const Order& buyer) {
+    auto it = mBuyers.find(buyer.price);
+    if (it == mBuyers.end()) {
+        auto priceLevel    = std::make_shared<PriceLevel>();
+        priceLevel->price  = buyer.price;
+        priceLevel->volume = buyer.volume;
+        priceLevel->orders.push_back(buyer);
+        mBuyers.insert({ buyer.price, priceLevel });
+    } else {
+        auto priceLevel = it->second;
+        priceLevel->volume += buyer.volume;
+        priceLevel->orders.push_back(buyer);
+    }
 }
 
-void OrderBook::cleanUpSellers(const std::unordered_set<int>& toRemove) {
-    std::erase_if(mSellers, [&toRemove](const std::pair<int, Order>& item) {
-        return toRemove.contains(item.second.clientId);
-    });
+void OrderBook::insertSeller(const Order& seller) {
+    auto it = mSellers.find(seller.price);
+    if (it == mSellers.end()) {
+        auto priceLevel    = std::make_shared<PriceLevel>();
+        priceLevel->price  = seller.price;
+        priceLevel->volume = seller.volume;
+        priceLevel->orders.push_back(seller);
+        mSellers.insert({ seller.price, priceLevel });
+    } else {
+        auto priceLevel = it->second;
+        priceLevel->volume += seller.volume;
+        priceLevel->orders.push_back(seller);
+    }
 }
 
 void OrderBook::processBuyer(Order buyer) {
-    std::unordered_set<int> toRemove;
-    for (auto& [price, seller] : mSellers) {
-        if (seller.price > buyer.price || buyer.volume <= 0) {
+    std::optional<int> removeToRange = std::nullopt;
+    for (auto& [price, level] : mSellers) {
+        if (price > buyer.price || buyer.volume <= 0) {
             break;
         }
-        if (seller.clientId == buyer.clientId) {
-            continue;
-        }
-        matchOrders(buyer, seller);
-        if (seller.volume <= 0) {
-            toRemove.insert(seller.clientId);
+        matchOrders(buyer, *level);
+        if (level->orders.empty()) {
+            removeToRange = level->price;
         }
     }
     if (buyer.volume > 0) {
-        mBuyers.insert({ buyer.price, buyer });
+        insertBuyer(buyer);
     }
-    cleanUpSellers(toRemove);
+    if (removeToRange) {
+        const auto endRange = mSellers.find(*removeToRange);
+        mSellers.erase(mSellers.begin(), endRange);
+    }
 }
 
 void OrderBook::processSeller(Order seller) {
-        std::unordered_set<int> toRemove;
-        for (auto& [price, buyer] : mBuyers) {
-            if (seller.price > buyer.price || seller.volume <= 0) {
-                break;
-            }
-            if (buyer.clientId == seller.clientId) {
-                continue;
-            }
-            matchOrders(buyer, seller);
-            if(buyer.volume <= 0){
-                toRemove.insert(seller.clientId);
-            }
+    std::optional<int> removeToRange = std::nullopt;
+    for (auto& [price, level] : mBuyers) {
+        if (seller.price > price || seller.volume <= 0) {
+            break;
         }
-        if (seller.volume > 0) {
-            mSellers.insert({ seller.price, seller });
+        matchOrders(seller, *level);
+        if (level->orders.empty()) {
+            removeToRange = level->price;
         }
-        cleanUpBuyers(toRemove);
+    }
+    if (seller.volume > 0) {
+        insertSeller(seller);
+    }
+    if (removeToRange) {
+        const auto endRange = mBuyers.find(*removeToRange);
+        mBuyers.erase(mBuyers.begin(), endRange);
+    }
 }
 
 int OrderBook::getSoldVolumes(const int buyer, const int seller) const {
     return buyer < seller ? buyer : seller;
 }
 
-void OrderBook::matchOrders(Order& buyer, Order& seller) {
-    Trade trade{
-        .seller    = seller,
-        .buyer     = buyer,
-        .tradeTime = std::chrono::system_clock::now(),
-        .volume    = getSoldVolumes(seller.volume, buyer.volume),
-    };
-    mStockMarket.registerTrade(trade);
-    buyer.volume -= seller.volume;
-    seller.volume -= trade.volume;
-}
+void OrderBook::matchOrders(Order& requester, PriceLevel& level) {
+    while (!level.orders.empty() && requester.volume > 0) {
+        auto&     order       = level.orders.front();
+        const int soldVolumes = getSoldVolumes(requester.volume, order.volume);
+        const int soldPrice   = requester.price < order.price ? requester.price : order.price;
+        const int buyerId     = requester.type == OrderType::BUY ? requester.clientId : order.clientId;
+        const int sellerId    = requester.type == OrderType::SELL ? requester.clientId : order.clientId;
 
+        Trade trade(buyerId, sellerId, soldPrice, soldVolumes);
+        onTradeCallbacks(trade);
+
+        requester.volume -= soldVolumes;
+        order.volume -= soldVolumes;
+        level.volume -= soldVolumes;
+
+        if (order.volume <= 0) {
+            level.orders.pop_front();
+        }
+    }
+}
 TRANVANH_NAMESPACE_END

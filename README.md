@@ -9,18 +9,33 @@ Purpose of this project is to practice various technical topics as thread safety
 - Processes orders and delegades them to the market
 - Serves as a communication layer between the market and the client
 
-## TradeLib - Shared
-- Trading specific components
-- Order book with order matching algorithm. Matching highest buyer with lowest seller
-- Stock market manager registering orders and trades
+# Libs
+- independent libraries, intended to be installed
 
-## UtilsLib - Static
-- Observer pattern components
-- Server and Client using unix sockets. Client sends message size first and the content later, unsuring content consistency on receiving end.
-- Thread safe queue
-- Logger
+- **TradeLib - Shared**
+    - Trading specific components
+    - Order book with order matching algorithm. Matching highest buyer with lowest seller
+    - Stock market manager registering orders and trades
+  
+- **TradeLib.Test**
+    - Using Google tests
+  
+- **TradeLib.Benchmark**
+    - Using Google benchmark
 
-Client and Server applications share common utility libraries providing various useful functionality. Thus the goal is to have UtilsLabs as generic as possible, which could be reused for any other future projects
+- **UtilsLib - Shared**
+    - Observer pattern components
+    - Server and Client using unix sockets. Client sends message size first and the content later, unsuring content consistency on receiving end.
+    - Thread safe queue
+    - Logger
+
+- **UtilsLib.Sandbox**
+    - Sandbox place to test UtilsLibs
+
+- **UtilsLib.Test**
+    - Using Google tests
+
+Client and Server applications share common utility libraries providing various useful functionality. Thus the goal is to have UtilsLibs as generic as possible, which could be reused for any other future projects
 
 ## How to
 
@@ -39,10 +54,12 @@ To build Client application call `build.sh Release clean`. The path to executabl
 - [x] Model generating buy/sell THREAD - give certain delay of buy/sell generation
 - [x] Mock database storing the information THREAD SAFE
 - [x] Matching trade/sell
+- [ ] Add trade database
 - [ ] Yield list of latest 100 trades happened around the given timestamp
 - [ ] Iterator to navigate the trades chronologicaly
 - [x] Create server-client connection
 - [x] Add commands and the input handling for client side
+- [x] Let client listen to happening trades
 - [ ] Error handling of connection/communication/parsing issues
 - [x] Heavy load handling, used clientApp with simulate currently crashes as the buffer communication buffer gets overwhelmed
 - [x] Handle multiple clients and handle reconnection
@@ -60,3 +77,11 @@ To build Client application call `build.sh Release clean`. The path to executabl
 - [ ] Implement polling for macos and windows
 - [x] Assert, debug, release builds
 - [x] Add asserts
+- [x] Add Sandbox target
+- [x] Add Serialization utilities
+- [x] Add Sandbox target
+- [x] Add Serialization utilities
+- [x] Add option to pre-fill the market with mock data
+- [x] Add FlatMap and use it in orderbook
+- [x] Add option for client to listen on to trades
+- [x] Add queries for more market

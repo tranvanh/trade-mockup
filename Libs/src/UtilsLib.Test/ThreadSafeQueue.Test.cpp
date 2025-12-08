@@ -5,33 +5,39 @@
 
 TRANVANH_NAMESPACE_BEGIN
 
+TEST(ThreadSafeQueue, non_blocking_pop) {
+    ThreadSafeQueue<int> tsQueue;
+    tsQueue.try_pop();
+    EXPECT_TRUE(true);
+}
+
 TEST(ThreadSafeQueue, orderSingleThread) {
-    ThreadSafeQueue<int> queue;
-    queue.push(1);
-    queue.push(2);
-    queue.push(3);
-    EXPECT_FALSE(queue.empty());
-    EXPECT_EQ(queue.pop(), 1);
-    EXPECT_EQ(queue.pop(), 2);
-    EXPECT_EQ(queue.pop(), 3);
-    EXPECT_TRUE(queue.empty());
+    ThreadSafeQueue<int> tsQueue;
+    tsQueue.push(1);
+    tsQueue.push(2);
+    tsQueue.push(3);
+    EXPECT_FALSE(tsQueue.empty());
+    EXPECT_EQ(tsQueue.pop(), 1);
+    EXPECT_EQ(tsQueue.pop(), 2);
+    EXPECT_EQ(tsQueue.pop(), 3);
+    EXPECT_TRUE(tsQueue.empty());
 }
 
 TEST(ThreadSafeQueue, orderMultiThread) {
-    ThreadSafeQueue<int> queue;
-    std::thread          t([&queue]() {
+    ThreadSafeQueue<int> tsQueue;
+    std::thread          t([&tsQueue]() {
         std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(2000));
-        queue.push(3);
+        tsQueue.push(3);
     });
-    EXPECT_TRUE(queue.empty());
-    queue.push(1);
-    queue.push(2);
-    EXPECT_FALSE(queue.empty());
-    EXPECT_EQ(queue.pop(), 1);
-    EXPECT_EQ(queue.pop(), 2);
-    EXPECT_EQ(queue.pop(), 3);
-    EXPECT_TRUE(queue.empty());
-    EXPECT_TRUE(queue.empty());
+    EXPECT_TRUE(tsQueue.empty());
+    tsQueue.push(1);
+    tsQueue.push(2);
+    EXPECT_FALSE(tsQueue.empty());
+    EXPECT_EQ(tsQueue.pop(), 1);
+    EXPECT_EQ(tsQueue.pop(), 2);
+    EXPECT_EQ(tsQueue.pop(), 3);
+    EXPECT_TRUE(tsQueue.empty());
+    EXPECT_TRUE(tsQueue.empty());
     t.join();
 }
 

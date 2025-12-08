@@ -1,4 +1,4 @@
-#include "UtilsLib/TimePointUtils.h"
+#include "UtilsLib/Serialization.h"
 
 TRANVANH_NAMESPACE_BEGIN
 
@@ -10,6 +10,10 @@ std::ostream& operator<<(std::ostream& os, const timepoint_t& timepoint) {
     // Append milliseconds
     os << '.' << std::setw(3) << std::setfill('0') << ms.count();
     return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const Serializable& object){
+    return object.serialize(os);
 }
 
 TRANVANH_NAMESPACE_END

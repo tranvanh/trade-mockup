@@ -22,7 +22,7 @@ Server::Server(const AddressType addressType, const std::string& address)
 bool Server::startListen(const int port, std::function<void(std::vector<char>, const int)> onReceive) {
     auto&       logger = Logger::instance();
     sockaddr_in socketAddress;
-    socklen_t   socketLen;
+    socklen_t   socketLen = 0;
 
     memset(&socketAddress, '\0', sizeof(socketAddress));
 
@@ -132,7 +132,6 @@ bool Server::poll(sockaddr_in                                       socketAddres
 bool Server::receive(const int clientSocket, std::function<void(std::vector<char>, const int)> onReceive) {
     auto&             logger = Logger::instance();
     std::vector<char> buffer(BUFSIZ);
-    int               recvLength = -1;
     logger.log(Logger::LogLevel::DEBUG, "Start receiving.");
     auto clientIter = mClientConnections.find(clientSocket);
     ASSERT(clientIter != mClientConnections.end(), "Client socket was not found among accepted");
@@ -180,15 +179,11 @@ bool Server::receiveContent(const int clientSocket, const size_t msgLen) {
     auto&  logger            = Logger::instance();
     size_t received          = 0;
     int    receiveBufferSize = BUFSIZ < msgLen ? BUFSIZ : msgLen;
-    size_t recvLength        = -1;
+    size_t recvLength        = 0;
     logger.log(Logger::LogLevel::DEBUG, "Start receiving, receiveBuffer ", receiveBufferSize);
     while (received < msgLen) {
         logger.log(Logger::LogLevel::DEBUG, "Receiving...", receiveBufferSize);
-        if ((recvLength = recv(clientSocket, mReceiveBuffer.data(), receiveBufferSize, 0)) < 0) {
-            perror("client size recv");
-            return false;
-        }
-        if (recvLength == 0) {
+        if ((recvLength = recv(clientSocket, mReceiveBuffer.data(), receiveBufferSize, 0)) == 0) {
             return false;
         }
         logger.log(Logger::LogLevel::DEBUG, "Received [", recvLength, "/", msgLen, "]");
