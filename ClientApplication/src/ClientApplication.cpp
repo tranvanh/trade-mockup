@@ -12,8 +12,6 @@ void ClientApplication::run() {
     }
     if (mSimulation) {
         mGenerator.simulateMarket();
-        while (isRunning) {
-        }
     } else {
         processUserInputs();
     }
