@@ -39,7 +39,7 @@ void ThreadSafeQueue<Type>::push(const Type& value) {
 template <typename Type>
 void ThreadSafeQueue<Type>::push(Type&& value) {
     std::lock_guard<std::mutex> lock(m);
-    mQueue.emplace_back(std::move(value));
+    mQueue.emplace_back(std::forward<Type>(value));
     cv.notify_one();
 }
 
