@@ -1,16 +1,28 @@
 #include "UtilsLib/Client.h"
 #include "UtilsLib/Logger.h"
 #include <cstring>
-#include <thread>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <thread>
 #include <unistd.h>
 
 TRANVANH_NAMESPACE_BEGIN
 
+std::optional<int> Client::openSocket() {
+    if (mSockets.size() > 0) {
+        Logger& logger = Logger::instance();
+        logger.log(Logger::LogLevel::ERROR, "Can't open more than 1 socket for a client");
+        return std::nullopt;
+    }
+    return NetworkComponent::openSocket();
+}
+
 bool Client::connectToServer(const char* url, const int port) const {
+    ASSERT(!mSockets.empty(), "No socket is openned");
+    ASSERT(mSockets.size() > 1, "Client has more than one socket openned");
+
     Logger&     logger = Logger::instance();
     sockaddr_in socketAddress;
     hostent*    host;
@@ -26,17 +38,17 @@ bool Client::connectToServer(const char* url, const int port) const {
     memcpy(&socketAddress.sin_addr, host->h_addr_list[0], host->h_length);
     for (int i = 0; i < TRY_COUNT; ++i) {
         logger.log(Logger::LogLevel::INFO, "Trying to connect... [", i + 1, "/", TRY_COUNT, "]");
-        if(i > 0){
+        if (i > 0) {
             std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(3000));
         }
-        if (connect(mSocket, (sockaddr*)&socketAddress, sizeof(socketAddress)) < 0) {
+        if (connect(mSockets[0], (sockaddr*)&socketAddress, sizeof(socketAddress)) < 0) {
             logger.log(Logger::LogLevel::ERROR, "Error while connecting");
             continue;
         }
         logger.log(Logger::LogLevel::INFO, "Connected");
         return true;
     }
-    close(mSocket);
+    close(mSockets[0]);
     return false;
 }
 
@@ -55,14 +67,14 @@ bool Client::sendMessage(const char* msg) const {
 
 bool Client::sendSize(const char* msg) const {
     size_t msgSize = strlen(msg);
-    if (send(getSocket(), &msgSize, sizeof(msgSize), 0) < 0) {
+    if (send(mSockets[0], &msgSize, sizeof(msgSize), 0) < 0) {
         return false;
     }
     return true;
 }
 
 bool Client::sendContent(const char* msg) const {
-    if (send(getSocket(), msg, strlen(msg), 0) < 0) {
+    if (send(mSockets[0], msg, strlen(msg), 0) < 0) {
         return false;
     }
     return true;

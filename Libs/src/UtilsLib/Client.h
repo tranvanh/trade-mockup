@@ -1,5 +1,5 @@
 #pragma once
-#include "UtilsLib/NetworkUtils.h"
+#include "UtilsLib/NetworkComponent.h"
 
 TRANVANH_NAMESPACE_BEGIN
 
@@ -12,6 +12,7 @@ public:
 
     // Client send follows a rule of sending a size first and content after
     bool sendMessage(const char* msg) const;
+    virtual std::optional<int> openSocket() override;
 
 private:
     bool sendSize(const char* msg) const;

@@ -21,8 +21,6 @@ void OrderBook::registerOrder(const Order& order) {
 }
 
 void OrderBook::pollOrders() {
-    auto& logger = Logger::instance();
-    logger.log(Logger::LogLevel::DEBUG, "Initialize Order book");
     const auto order = mOrderQueue.pop();
     ASSERT(order.has_value(), "Invalid order value");
     processOrder(*order);

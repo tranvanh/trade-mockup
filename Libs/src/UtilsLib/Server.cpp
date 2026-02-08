@@ -19,7 +19,7 @@ Server::Server(const AddressType addressType, const std::string& address)
     : mAddressType(addressType)
     , mAddress(address) {}
 
-bool Server::startListen(const int port, std::function<void(std::vector<char>, const int)> onReceive) {
+bool Server::startListen(const int socket, const int port, std::function<void(std::vector<char>, const int)> onReceive) {
     auto&       logger = Logger::instance();
     sockaddr_in socketAddress;
     socklen_t   socketLen = 0;
@@ -47,26 +47,26 @@ bool Server::startListen(const int port, std::function<void(std::vector<char>, c
     logger.log(Logger::LogLevel::INFO, "Binding...");
     // \todo make this debug only begin
     int yes = 1;
-    if (setsockopt(mSocket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) < 0) {
+    if (setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) < 0) {
         perror("setsockopt");
         return false;
     }
     // debug only end
-    if (bind(mSocket, (struct sockaddr*)&socketAddress, sizeof(socketAddress)) < 0) {
+    if (bind(socket, (struct sockaddr*)&socketAddress, sizeof(socketAddress)) < 0) {
         perror("bind");
         return false;
     }
     logger.log(Logger::LogLevel::INFO, "Binded");
     logger.log(Logger::LogLevel::INFO, "Start listening on port:", port);
     constexpr int BACKLOG = 4; // todo improve
-    listen(mSocket, BACKLOG);
+    listen(socket, BACKLOG);
     logger.log(Logger::LogLevel::INFO, "Listening...");
     logger.log(Logger::LogLevel::INFO, "Start polling events");
-    poll(socketAddress, socketLen, std::move(onReceive));
+    poll(socket, socketAddress, socketLen, std::move(onReceive));
     return true;
 }
 
-bool Server::poll(sockaddr_in                                       socketAddress,
+bool Server::poll(const int socketId, sockaddr_in                                       socketAddress,
                   socklen_t                                         socketLen,
                   std::function<void(std::vector<char>, const int)> onReceive) {
 #if defined(__linux__)
@@ -78,8 +78,8 @@ bool Server::poll(sockaddr_in                                       socketAddres
         return false;
     }
     ev.events  = EPOLLIN;
-    ev.data.fd = mSocket;
-    if (epoll_ctl(epollfd, EPOLL_CTL_ADD, mSocket, &ev) == -1) {
+    ev.data.fd = socketId;
+    if (epoll_ctl(epollfd, EPOLL_CTL_ADD, socketId, &ev) == -1) {
         perror("epoll_ctl: listen_sock");
         return false;
     }
@@ -94,9 +94,9 @@ bool Server::poll(sockaddr_in                                       socketAddres
         }
 
         for (int i = 0; i < eventCount; ++i) {
-            if (events[i].data.fd == mSocket) {
+            if (events[i].data.fd == socketId) {
                 // Accept new client
-                if ((clientSocket = accept(mSocket, (sockaddr*)&socketAddress, &socketLen)) < 0) {
+                if ((clientSocket = accept(socketId, (sockaddr*)&socketAddress, &socketLen)) < 0) {
                     perror("accept");
                     return false;
                 }
@@ -193,9 +193,9 @@ bool Server::receiveContent(const int clientSocket, const size_t msgLen) {
     return true;
 }
 
-bool Server::setNonBlockingSocket(const int socket) {
-    int flags = fcntl(socket, F_GETFL, 0);                  // get current flag
-    return fcntl(socket, F_SETFL, flags | O_NONBLOCK) >= 0; // set non blocking flag;
+bool Server::setNonBlockingSocket(const int socketId) {
+    int flags = fcntl(socketId, F_GETFL, 0);                  // get current flag
+    return fcntl(socketId, F_SETFL, flags | O_NONBLOCK) >= 0; // set non blocking flag;
 }
 
 TRANVANH_NAMESPACE_END

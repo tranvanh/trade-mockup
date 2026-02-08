@@ -1,5 +1,5 @@
 #pragma once
-#include "UtilsLib/NetworkUtils.h"
+#include "UtilsLib/NetworkComponent.h"
 #include <functional>
 #include <netinet/in.h>
 #include <string>
@@ -34,13 +34,16 @@ public:
 
     Server(const AddressType addressType, const std::string& address = "");
     Server(const Server&) = delete;
-    bool startListen(const int port, std::function<void(std::vector<char>, const int)> onReceive);
+    bool startListen(const int                                         socketId,
+                     const int                                         port,
+                     std::function<void(std::vector<char>, const int)> onReceive);
 
 private:
-    bool poll(sockaddr_in                                       socketAddress,
+    bool poll(const int                                         socketId,
+              sockaddr_in                                       socketAddress,
               socklen_t                                         socketLen,
               std::function<void(std::vector<char>, const int)> onReceive);
-    bool setNonBlockingSocket(const int socket);
+    bool setNonBlockingSocket(const int socketId);
 
     // Server receiving follows a rule of receiving message size first and content after
     bool receive(const int clientSocket, std::function<void(std::vector<char>, const int)> onReceive);

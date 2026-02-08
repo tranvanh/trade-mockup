@@ -4,6 +4,7 @@ project(Libs)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+include(FetchContent)
 
 if (NOT (CMAKE_GENERATOR STREQUAL "Ninja Multi-Config"))
     message(FATAL_ERROR
@@ -25,7 +26,6 @@ set(CMAKE_C_FLAGS_ASSERT "${CMAKE_C_FLAGS_DEBUG}" CACHE STRING "" FORCE)
 option(BUILD_TESTS "Build tests" OFF)
 enable_testing()
 if(BUILD_TESTS)
-    include(FetchContent)
     FetchContent_Declare(
         googletest
         GIT_REPOSITORY https://github.com/google/googletest.git
@@ -41,7 +41,6 @@ endif()
 option(BUILD_BENCHMARK "Build benchmark" OFF)
 enable_testing()
 if(BUILD_BENCHMARK)
-    include(FetchContent)
     FetchContent_Declare(
         googlebenchmark
         GIT_REPOSITORY https://github.com/google/benchmark.git
@@ -53,6 +52,5 @@ if(BUILD_BENCHMARK)
     set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "Disable gtest tests in benchmark" FORCE)
     FetchContent_MakeAvailable(googlebenchmark)
 endif()
-
 
 add_subdirectory(src)

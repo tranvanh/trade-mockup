@@ -21,10 +21,14 @@ StockMarketGenerator::StockMarketGenerator(ClientApplication& app)
 
 void StockMarketGenerator::simulateMarket() {
     while (mApplication.isRunning) {
-        mApplication.runBackgroundTask(
-            std::bind_front(&StockMarketGenerator::generateOrder, this, OrderType::BUY));
-        mApplication.runBackgroundTask(
-            std::bind_front(&StockMarketGenerator::generateOrder, this, OrderType::SELL));
+        for (int i = 0; i < 100; ++i) {
+            mApplication.runBackgroundTask(
+                std::bind_front(&StockMarketGenerator::generateOrder, this, OrderType::BUY));
+            mApplication.runBackgroundTask(
+                std::bind_front(&StockMarketGenerator::generateOrder, this, OrderType::SELL));
+        }
+        // Give thread pool a bit of time to clear out so it is not flooded all the time
+        std::this_thread::sleep_for(std::chrono::seconds(2));
     }
 }
 

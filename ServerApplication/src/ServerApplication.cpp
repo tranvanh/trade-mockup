@@ -62,9 +62,18 @@ void ServerApplication::run() {
             processServerMessage(std::string(bufferData.data(), len));
         });
     };
-    if (!mServer.openSocket() || mServer.startListen(8080, onReceive)) {
-        stop();
-    }
+    const auto socketInit = [this, onReceive](const int port) {
+        const auto socketId = mServer.openSocket();
+        if (!socketId || mServer.startListen(*socketId, port, onReceive)) {
+            stop();
+        }
+        return Address{.socket = *socketId, .port = port};
+    };
+
+    mAddressBook.reserve(size_t(ROUTE::SIZE));
+    mAddressBook.emplace_back(socketInit(8080)); // market socket
+    mAddressBook.emplace_back(socketInit(8181)); // command socket
+
 }
 
 void ServerApplication::processServerMessage(const std::string& msg) {
