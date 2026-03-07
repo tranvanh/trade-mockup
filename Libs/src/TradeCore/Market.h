@@ -4,23 +4,22 @@
 #include "TradeCore/Trade.h"
 #include <atomic>
 
-TRANVANH_NAMESPACE_BEGIN
-class Market {
-    // \todo add more books for various symbols. Each running in its own thread
-    // \todo add publisher
-    OrderBook        mBook;
-    std::atomic_bool mActive = false;
+namespace TradeCore {
 
-public:
-    ~Market() { mActive = false; };
+    class Market {
+        // \todo add more books for various symbols. Each running in its own thread
+        // \todo add publisher
+        OrderBook        mBook;
+        std::atomic_bool mActive = false;
 
-    void run();
-    bool isActive() { return mActive; }
-    void registerOrder(const Order& order);
+    public:
+        ~Market() { mActive = false; };
 
-    [[nodiscard]] CallbackLifetime addOnTradeObserver(
-        const std::function<void(const Trade& trade)>& callback);
+        void run();
+        bool isActive() { return mActive; }
+        void registerOrder(const Order& order);
 
-};
-
-TRANVANH_NAMESPACE_END
+        [[nodiscard]] toybox::CallbackLifetime addOnTradeObserver(
+            const std::function<void(const Trade& trade)>& callback);
+    };
+}

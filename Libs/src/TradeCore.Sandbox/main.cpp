@@ -1,14 +1,14 @@
 #include "Toybox/Common.h"
 
-TRANVANH_NAMESPACE_BEGIN
+TOYBOX_NAMESPACE_BEGIN
 
 void sandbox() {
     // Add sandbox code
 }
 
-TRANVANH_NAMESPACE_END
+TOYBOX_NAMESPACE_END
 
 int main() {
-    tranvanh::sandbox();
+    toybox::sandbox();
     return 0;
 }

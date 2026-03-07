@@ -1,201 +1,97 @@
 #include "Toybox/Server.h"
 #include "Toybox/Logger.h"
-#include <arpa/inet.h>
-#include <cstring>
-#include <fcntl.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
-
-#if defined(__linux__)
-#   include <sys/epoll.h>
-#endif
+#include "Toybox/NetworkComponent.h"
 
 TOYBOX_NAMESPACE_BEGIN
 
-#define MAX_EVENTS 10 // \todo tweak
+class Session final : public NetworkComponent {
+    struct Message {
+        std::vector<char> body   = std::vector<char>(BUFSIZ);
+        size_t            length = 0;
+    };
+    Message mMessage;
 
-Server::Server(const AddressType addressType, const std::string& address)
-    : mAddressType(addressType)
-    , mAddress(address) {}
+public:
+    explicit Session(asio::ip::tcp::socket socket)
+        : NetworkComponent(std::move(socket)) {}
 
-bool Server::startListen(const int socket, const int port, std::function<void(std::vector<char>, const int)> onReceive) {
-    auto&       logger = Logger::instance();
-    sockaddr_in socketAddress;
-    socklen_t   socketLen = 0;
+    virtual ~Session() = default;
+    virtual void start() override;
+    virtual void read() override;
 
-    memset(&socketAddress, '\0', sizeof(socketAddress));
+    virtual void write() override;
+    // void send();
 
-    socketAddress.sin_family = AF_INET;
-    socketAddress.sin_port   = htons(port);
+    std::function<void(std::string)> onRecieve;
 
-    switch (mAddressType) {
-    case AddressType::ANY:
-        socketAddress.sin_addr.s_addr = htonl(INADDR_ANY);
-        break;
-    case AddressType::LOCAL:
-        socketAddress.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-        break;
-    case AddressType::PUBLIC:
-        // \todo check the address is valid
-        socketAddress.sin_addr.s_addr = inet_addr(mAddress.c_str());
-        break;
-    default:
-        socketAddress.sin_addr.s_addr = htonl(INADDR_ANY);
-    }
+private:
+    void readHeader();
+    void readBody();
+};
 
-    logger.log(Logger::LogLevel::INFO, "Binding...");
-    // \todo make this debug only begin
-    int yes = 1;
-    if (setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) < 0) {
-        perror("setsockopt");
-        return false;
-    }
-    // debug only end
-    if (bind(socket, (struct sockaddr*)&socketAddress, sizeof(socketAddress)) < 0) {
-        perror("bind");
-        return false;
-    }
-    logger.log(Logger::LogLevel::INFO, "Binded");
-    logger.log(Logger::LogLevel::INFO, "Start listening on port:", port);
-    constexpr int BACKLOG = 4; // todo improve
-    listen(socket, BACKLOG);
-    logger.log(Logger::LogLevel::INFO, "Listening...");
-    logger.log(Logger::LogLevel::INFO, "Start polling events");
-    poll(socket, socketAddress, socketLen, std::move(onReceive));
-    return true;
+void Session::start() {
+    read();
 }
 
-bool Server::poll(const int socketId, sockaddr_in                                       socketAddress,
-                  socklen_t                                         socketLen,
-                  std::function<void(std::vector<char>, const int)> onReceive) {
-#if defined(__linux__)
-    auto&       logger = Logger::instance();
-    epoll_event ev, events[MAX_EVENTS];
-    int         epollfd = epoll_create1(0);
-    if (epollfd == -1) {
-        perror("epoll_create1");
-        return false;
-    }
-    ev.events  = EPOLLIN;
-    ev.data.fd = socketId;
-    if (epoll_ctl(epollfd, EPOLL_CTL_ADD, socketId, &ev) == -1) {
-        perror("epoll_ctl: listen_sock");
-        return false;
-    }
-
-    int clientSocket = 0;
-    logger.log(Logger::LogLevel::INFO, "Polling...");
-    while (true) {
-        int eventCount = epoll_wait(epollfd, events, MAX_EVENTS, -1);
-        if (eventCount == -1) {
-            perror("epoll_wait");
-            return false;
-        }
-
-        for (int i = 0; i < eventCount; ++i) {
-            if (events[i].data.fd == socketId) {
-                // Accept new client
-                if ((clientSocket = accept(socketId, (sockaddr*)&socketAddress, &socketLen)) < 0) {
-                    perror("accept");
-                    return false;
-                }
-                if (!setNonBlockingSocket(clientSocket)) {
-                    logger.log(Logger::LogLevel::ERROR,
-                               "Failed to set nonblocking flag to socket ",
-                               clientSocket);
-                    perror("set non blocking");
-                    continue;
-                }
-                ev.events  = EPOLLIN;
-                ev.data.fd = clientSocket;
-                if (epoll_ctl(epollfd, EPOLL_CTL_ADD, clientSocket, &ev) == -1) {
-                    perror("epoll_ctl: client socket");
-                    continue;
-                }
-                mClientConnections.insert({ clientSocket, ClientConnection() });
-            } else if (events[i].events & EPOLLIN) {
-                // Receive data event
-                receive(events[i].data.fd, onReceive);
-            }
-        }
-    }
-    return true;
-// Linux-specific code
-#else
-    ASSERT(false, "Missing implementation for given os");
-    // Other OS (e.g. Windows, BSD, etc.)
-    return false;
-#endif
+void Session::read() {
+    readHeader();
 }
 
-bool Server::receive(const int clientSocket, std::function<void(std::vector<char>, const int)> onReceive) {
-    auto&             logger = Logger::instance();
-    std::vector<char> buffer(BUFSIZ);
-    logger.log(Logger::LogLevel::DEBUG, "Start receiving.");
-    auto clientIter = mClientConnections.find(clientSocket);
-    ASSERT(clientIter != mClientConnections.end(), "Client socket was not found among accepted");
-    ClientConnection& clientConnetion = clientIter->second;
+void Session::readHeader() {
+    auto self = shared_from_this();
 
-    bool success = true;
-    switch (clientConnetion.state) {
-    case ClientConnection::State::WAITING: {
-        success = receiveSize(clientSocket, clientConnetion.msgLen);
-        if (success) {
-            clientConnetion.state = ClientConnection::State::SIZE_RECEIVED;
-        }
-        break;
-    }
-    case ClientConnection::State::SIZE_RECEIVED: {
-        size_t msgLen = clientConnetion.msgLen;
-        success       = receiveContent(clientSocket, msgLen);
-        if (success) {
-            onReceive(std::vector<char>(mReceiveBuffer.begin(), mReceiveBuffer.begin() + msgLen), msgLen);
-        }
-        clientConnetion.state = ClientConnection::State::WAITING;
-        break;
-    }
-    }
-    return true;
+    asio::async_read(mSocket,
+                     asio::buffer(&mMessage.length, sizeof(mMessage.length)),
+                     [this, self](auto ec, auto) {
+                         if (!ec) {
+                             mMessage.length = ntohl(mMessage.length);
+                             readBody();
+                         }
+                     });
 }
 
-bool Server::receiveSize(const int clientSocket, size_t& out) {
-    auto& logger     = Logger::instance();
-    int   recvLength = -1;
-    if ((recvLength = recv(clientSocket, &out, sizeof(size_t), 0)) < 0) {
-        return false;
-    }
-    if (recvLength == 0) {
-        logger.log(Logger::LogLevel::WARNING, "Client [", clientSocket, "] disconnected");
-        mClientConnections.erase(clientSocket);
-        close(clientSocket);
-        return false;
-    }
-    logger.log(Logger::LogLevel::DEBUG, "Received message size [", out, "]");
-    return true;
+void Session::readBody() {
+    auto self = shared_from_this();
+    mMessage.body.resize(mMessage.length);
+
+    asio::async_read(mSocket,
+                     asio::buffer(mMessage.body),
+                     [this, self](asio::error_code ec, [[maybe_unused]] std::size_t length) {
+                         if (!ec) {
+                             onRecieve(std::string(mMessage.body.data(), mMessage.length));
+                             readHeader();
+                         }
+                     });
 }
 
-bool Server::receiveContent(const int clientSocket, const size_t msgLen) {
-    auto&  logger            = Logger::instance();
-    size_t received          = 0;
-    int    receiveBufferSize = BUFSIZ < msgLen ? BUFSIZ : msgLen;
-    size_t recvLength        = 0;
-    logger.log(Logger::LogLevel::DEBUG, "Start receiving, receiveBuffer ", receiveBufferSize);
-    while (received < msgLen) {
-        logger.log(Logger::LogLevel::DEBUG, "Receiving...", receiveBufferSize);
-        if ((recvLength = recv(clientSocket, mReceiveBuffer.data(), receiveBufferSize, 0)) == 0) {
-            return false;
+void Session::write() {}
+//
+// void Session::send() {
+//
+// }
+
+// ========================================================
+// Server
+// ========================================================
+
+Server::Server(short port)
+    : mAcceptor(mContext, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port)) {}
+
+void Server::run() {
+    mContext.run();
+    accept();
+}
+
+void Server::accept() {
+    mAcceptor.async_accept([this](asio::error_code ec, asio::ip::tcp::socket socket) {
+        if (!ec) {
+            std::lock_guard<std::mutex> lock(mActiveSessions.mtx);
+            auto session = std::make_shared<Session>(std::move(socket));
+            mActiveSessions.data.insert(session);
+            session->start();
         }
-        logger.log(Logger::LogLevel::DEBUG, "Received [", recvLength, "/", msgLen, "]");
-        received += recvLength;
-        receiveBufferSize = BUFSIZ < (msgLen - received) ? BUFSIZ : (msgLen - received);
-    }
-    return true;
-}
-
-bool Server::setNonBlockingSocket(const int socketId) {
-    int flags = fcntl(socketId, F_GETFL, 0);                  // get current flag
-    return fcntl(socketId, F_SETFL, flags | O_NONBLOCK) >= 0; // set non blocking flag;
+        accept();
+    });
 }
 
 TOYBOX_NAMESPACE_END

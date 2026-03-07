@@ -1,22 +1,20 @@
 #pragma once
-#include "Toybox/NetworkComponent.h"
+#include "Toybox/Common.h"
+#include <asio.hpp>
 
 TOYBOX_NAMESPACE_BEGIN
 
-class Client : public NetworkComponent {
-    mutable std::mutex mSendLock;
+class Client {
+    asio::io_context      mContext;
+    asio::ip::tcp::socket mSocket;
 
 public:
+    explicit Client(short port);
     virtual ~Client() = default;
-    bool connectToServer(const char* url, const int port) const;
+    void run();
 
     // Client send follows a rule of sending a size first and content after
-    bool sendMessage(const char* msg) const;
-    virtual std::optional<int> openSocket() override;
-
-private:
-    bool sendSize(const char* msg) const;
-    bool sendContent(const char* msg) const;
+    void sendMessage(const std::string& msg);
 };
 
 TOYBOX_NAMESPACE_END

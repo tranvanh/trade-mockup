@@ -4,23 +4,19 @@
 
 TOYBOX_NAMESPACE_BEGIN
 
-using asio::ip::tcp;
-
-class Session : public std::enable_shared_from_this<Session> {
+class NetworkComponent : public std::enable_shared_from_this<NetworkComponent> {
 public:
-    explicit Session(tcp::socket socket)
+    explicit NetworkComponent(asio::ip::tcp::socket socket)
         : mSocket(std::move(socket)) {}
 
-    virtual ~Session() = default;
+    virtual ~NetworkComponent() = default;
     virtual void start() = 0;
     virtual void read() = 0;
-    virtual void send() = 0;
+    virtual void write() = 0;
 
 protected:
     asio::streambuf mBuffer;
-
-private:
-    tcp::socket     mSocket;
+    asio::ip::tcp::socket     mSocket;
 };
 
 TOYBOX_NAMESPACE_END

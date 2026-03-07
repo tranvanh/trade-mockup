@@ -7,6 +7,16 @@
 
 TOYBOX_NAMESPACE_BEGIN
 
+/// Interface used for Seriazable objects
+struct Serializable {
+    virtual ~Serializable() = default;
+    virtual std::ostream& serialize(std::ostream& os) const = 0;
+};
+
+TOYBOX_NAMESPACE_END
+
+std::ostream& operator<<(std::ostream& os, const toybox::Serializable& trade);
+
 using timepoint_t = std::chrono::time_point<std::chrono::system_clock>;
 std::ostream& operator<<(std::ostream& os, const timepoint_t& timepoint);
 
@@ -59,14 +69,3 @@ std::ostream& operator<<(std::ostream& os, const SR& range) {
     return os;
 }
 
-/// Interface used for Seriazable objects
-class Serializable {
-protected:
-    virtual ~Serializable() = default;
-    virtual std::ostream& serialize(std::ostream& os) const = 0;
-
-public:
-    friend std::ostream& operator<<(std::ostream& os, const Serializable& trade);
-};
-
-TOYBOX_NAMESPACE_END

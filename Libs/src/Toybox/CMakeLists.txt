@@ -6,6 +6,8 @@ FetchContent_Declare(asio
 )
 FetchContent_MakeAvailable(asio)
 
+find_package(Threads REQUIRED)
+
 # Create a lib
 file(GLOB SOURCES *.cpp *.h)
 add_library(Toybox SHARED ${SOURCES})
@@ -22,6 +24,7 @@ target_compile_definitions(Toybox PUBLIC
         $<$<CONFIG:DEBUG>:DEBUG_BUILD>
         ASIO_STANDALONE
 )
+target_link_libraries(Toybox PUBLIC Threads::Threads)
 
 # install libraries
 install(TARGETS Toybox
