@@ -1,24 +1,14 @@
 #pragma once
-#include <atomic>
-#include <forward_list>
-#include <functional>
-#include <thread>
-#include <TradeLib/Order.h>
-#include <unordered_map>
-#include <TradeLib/Market.h>
-#include <TradeLib/Trade.h>
-#include <UtilsLib/Application.h>
-#include <UtilsLib/CallbackOwner.h>
-#include <UtilsLib/Server.h>
-
-
-using namespace tranvanh;
+#include <TradeCore/Market.h>
+#include <Toybox/Application.h>
+#include <Toybox/CallbackOwner.h>
+#include <Toybox/Server.h>
 
 class ServerApplication
-    : public CallbackOwner
-    , public Application {
-    Market                    mStockMarket;
-    Server                         mServer;
+    : public toybox::CallbackOwner
+    , public toybox::Application {
+    TradeCore::Market                    mStockMarket;
+    toybox::Server                         mServer;
 
     struct Address {
         int socket = -1;

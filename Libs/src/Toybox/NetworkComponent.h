@@ -1,12 +1,12 @@
 #pragma once
 #include "Toybox/Common.h"
-#include <asio.hpp>
+#include <boost/asio.hpp>
 
 TOYBOX_NAMESPACE_BEGIN
 
 class NetworkComponent : public std::enable_shared_from_this<NetworkComponent> {
 public:
-    explicit NetworkComponent(asio::ip::tcp::socket socket)
+    explicit NetworkComponent(boost::asio::ip::tcp::socket socket)
         : mSocket(std::move(socket)) {}
 
     virtual ~NetworkComponent() = default;
@@ -15,8 +15,8 @@ public:
     virtual void write() = 0;
 
 protected:
-    asio::streambuf mBuffer;
-    asio::ip::tcp::socket     mSocket;
+    boost::asio::streambuf mBuffer;
+    boost::asio::ip::tcp::socket     mSocket;
 };
 
 TOYBOX_NAMESPACE_END

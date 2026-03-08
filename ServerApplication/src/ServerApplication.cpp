@@ -3,14 +3,14 @@
 #include <nlohmann/json.hpp>
 #include <random>
 #include <string>
-#include <TradeLib/Order.h>
-#include <UtilsLib/Logger.h>
+#include <Toybox/Logger.h>
+#include <TradeCore/Order.h>
 #include <vector>
 
 constexpr int THREAD_COUNT = 6;
 constexpr int FILLED_COUNT = 100;
 
-void fillMarketWithMockData(Market& market, int count) {
+void fillMarketWithMockData(TradeCore::Market& market, int count) {
     if (count <= 0)
         return;
 
@@ -18,77 +18,67 @@ void fillMarketWithMockData(Market& market, int count) {
     std::mt19937       gen(rd());
 
     std::uniform_int_distribution<int> typeDist(0, 1);
-    std::uniform_int_distribution<int> priceDist(1, PRICE_MAX);
-    std::uniform_int_distribution<int> volumeDist(1, VOLUME_MAX);
+    std::uniform_int_distribution<int> priceDist(1, TradeCore::PRICE_MAX);
+    std::uniform_int_distribution<int> volumeDist(1, TradeCore::VOLUME_MAX);
     std::uniform_int_distribution<int> clientDist(1, 1'000'000);
 
     for (int i = 0; i < count; ++i) {
-        const auto type   = typeDist(gen) == 0 ? OrderType::BUY : OrderType::SELL;
+        const auto type   = typeDist(gen) == 0 ? TradeCore::OrderType::BUY : TradeCore::OrderType::SELL;
         const int  price  = priceDist(gen);
         const int  volume = volumeDist(gen);
         const int  client = clientDist(gen);
 
-        Order order(client, type, price, volume);
+        TradeCore::Order order(client, type, price, volume);
         market.registerOrder(order);
     }
 }
 
 ServerApplication::ServerApplication(const bool filled)
     : Application(THREAD_COUNT)
-    , mServer(Server::AddressType::ANY) {
-    auto& logger = Logger::instance();
+    , mServer(8080) {
+    auto& logger = toybox::Logger::instance();
     if (filled) {
-        logger.log(Logger::LogLevel::INFO, "Filling the market...");
+        logger.log(toybox::Logger::LogLevel::INFO, "Filling the market...");
         fillMarketWithMockData(mStockMarket, FILLED_COUNT);
-        logger.log(Logger::LogLevel::INFO, "Market filled with ", FILLED_COUNT, " orders.");
+        logger.log(toybox::Logger::LogLevel::INFO, "Market filled with ", FILLED_COUNT, " orders.");
     }
 
-    registerCallback(mStockMarket.addOnTradeObserver([&logger](const Trade& trade) {
-        logger.log(Logger::LogLevel::INFO, trade);
+    registerCallback(mStockMarket.addOnTradeObserver([&logger](const TradeCore::Trade& trade) {
+        logger.log(toybox::Logger::LogLevel::INFO, trade);
     }));
 }
 
 void ServerApplication::run() {
-    Application::run();
-    auto& logger = Logger::instance();
-    logger.log(Logger::LogLevel::DEBUG, "Initialize application");
+    toybox::Application::run();
+    auto& logger = toybox::Logger::instance();
+    logger.log(toybox::Logger::LogLevel::DEBUG, "Initialize application");
     runBackgroundTask([this]() {
         mStockMarket.run();
     });
-    auto onReceive = [this](std::vector<char> bufferData, const int len) {
-        auto& logger = Logger::instance();
-        logger.log(Logger::LogLevel::INFO, "Received message...");
-        runBackgroundTask([this, bufferData, len]() {
-            processServerMessage(std::string(bufferData.data(), len));
+
+    mServer.onRecieve = [this](std::string msg) {
+        auto& logger = toybox::Logger::instance();
+        logger.log(toybox::Logger::LogLevel::INFO, "Received message...");
+        runBackgroundTask([this, msg]() {
+            processServerMessage(msg);
         });
     };
-    const auto socketInit = [this, onReceive](const int port) {
-        const auto socketId = mServer.openSocket();
-        if (!socketId || mServer.startListen(*socketId, port, onReceive)) {
-            stop();
-        }
-        return Address{.socket = *socketId, .port = port};
-    };
-
-    mAddressBook.reserve(size_t(ROUTE::SIZE));
-    mAddressBook.emplace_back(socketInit(8080)); // market socket
-    mAddressBook.emplace_back(socketInit(8181)); // command socket
-
+    mServer.run();
 }
 
 void ServerApplication::processServerMessage(const std::string& msg) {
-    auto& logger = Logger::instance();
-    logger.log(Logger::LogLevel::INFO, "Processing server message...", msg);
+    auto& logger = toybox::Logger::instance();
+    logger.log(toybox::Logger::LogLevel::INFO, "Processing server message...", msg);
 
-    int            clientId = 0;
-    int            price    = 0;
-    int            volume   = 0;
-    OrderType      type     = OrderType::BUY;
-    nlohmann::json msgJson  = nlohmann::json::parse(msg);
+    int                  clientId = 0;
+    int                  price    = 0;
+    int                  volume   = 0;
+    TradeCore::OrderType type     = TradeCore::OrderType::BUY;
+    nlohmann::json       msgJson  = nlohmann::json::parse(msg);
     msgJson["clientId"].get_to(clientId);
     msgJson["price"].get_to(price);
     msgJson["volume"].get_to(volume);
-    type = msgJson["type"].get<int>() == 0 ? OrderType::BUY : OrderType::SELL;
-    Order order(clientId, type, price, volume);
+    type = msgJson["type"].get<int>() == 0 ? TradeCore::OrderType::BUY : TradeCore::OrderType::SELL;
+    TradeCore::Order order(clientId, type, price, volume);
     mStockMarket.registerOrder(order);
 }

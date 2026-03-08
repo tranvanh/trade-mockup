@@ -1,12 +1,12 @@
 #pragma once
 #include "Toybox/Common.h"
-#include <asio.hpp>
+#include <boost/asio.hpp>
 
 TOYBOX_NAMESPACE_BEGIN
 
 class Client {
-    asio::io_context      mContext;
-    asio::ip::tcp::socket mSocket;
+    boost::asio::io_context      mContext;
+    boost::asio::ip::tcp::socket mSocket;
 
 public:
     explicit Client(short port);

@@ -2,10 +2,11 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <unordered_map>
-#include <UtilsLib/Logger.h>
+#include <Toybox/Logger.h>
 
 void ClientApplication::run() {
     Application::run();
+    // mClient->connect
     if(!mClient.openSocket() || !mClient.connectToServer("127.0.0.1", 8080)){
         stop();
         return;
@@ -25,7 +26,7 @@ void ClientApplication::processUserInputs() const {
         Command cmd = parseCommand(line);
         switch(cmd.type){
             case CommandType::INVALID:
-                Logger::instance().log(Logger::LogLevel::ERROR, "Invalid command");
+                toybox::Logger::instance().log(toybox::Logger::LogLevel::ERROR, "Invalid command");
                 break;
             case CommandType::EXIT:
                 return;
@@ -38,8 +39,8 @@ void ClientApplication::processUserInputs() const {
 
 void ClientApplication::handleCommand(const Command& cmd) const {
     ASSERT(cmd.type == CommandType::BUY || cmd.type == CommandType::SELL, "Command behaviour not defined");
-    OrderType type = cmd.type == CommandType::BUY ? OrderType::BUY : OrderType::SELL;
-    Order     order(mId, type, cmd.price, cmd.volume);
+    TradeCore::OrderType type = cmd.type == CommandType::BUY ? TradeCore::OrderType::BUY : TradeCore::OrderType::SELL;
+    TradeCore::Order     order(mId, type, cmd.price, cmd.volume);
     registerOrder(std::move(order));
 }
 
@@ -70,7 +71,7 @@ ClientApplication::Command ClientApplication::parseCommand(const std::string& li
     return cmd;
 }
 
-void ClientApplication::registerOrder(Order order) const {
+void ClientApplication::registerOrder(TradeCore::Order order) const {
     nlohmann::json msgJson;
     msgJson["clientId"]     = order.clientId;
     msgJson["type"]   = int(order.type);

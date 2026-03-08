@@ -5,8 +5,8 @@
 #include <functional>
 #include <iomanip>
 #include <thread>
+#include <Toybox/Logger.h>
 #include <utility>
-#include <UtilsLib/Logger.h>
 
 constexpr int ID_COUNT = 100; // Possible Number of simulated IDs
 
@@ -23,20 +23,23 @@ void StockMarketGenerator::simulateMarket() {
     while (mApplication.isRunning) {
         for (int i = 0; i < 100; ++i) {
             mApplication.runBackgroundTask(
-                std::bind_front(&StockMarketGenerator::generateOrder, this, OrderType::BUY));
+                std::bind_front(&StockMarketGenerator::generateOrder, this, TradeCore::OrderType::BUY));
             mApplication.runBackgroundTask(
-                std::bind_front(&StockMarketGenerator::generateOrder, this, OrderType::SELL));
+                std::bind_front(&StockMarketGenerator::generateOrder, this, TradeCore::OrderType::SELL));
         }
         // Give thread pool a bit of time to clear out so it is not flooded all the time
         std::this_thread::sleep_for(std::chrono::seconds(2));
     }
 }
 
-void StockMarketGenerator::generateOrder(OrderType type) {
-    auto& logger = Logger::instance();
-    logger.log(Logger::LogLevel::DEBUG, "Start generating orders ", type);
-    logger.log(Logger::LogLevel::DEBUG, "Generating ", type);
-    Order order(randomValueOfMax(ID_COUNT), type, randomValueOfMax(PRICE_MAX), randomValueOfMax(VOLUME_MAX));
+void StockMarketGenerator::generateOrder(TradeCore::OrderType type) {
+    auto& logger = toybox::Logger::instance();
+    logger.log(toybox::Logger::LogLevel::DEBUG, "Start generating orders ", type);
+    logger.log(toybox::Logger::LogLevel::DEBUG, "Generating ", type);
+    TradeCore::Order order(randomValueOfMax(ID_COUNT),
+                           type,
+                           randomValueOfMax(TradeCore::PRICE_MAX),
+                           randomValueOfMax(TradeCore::VOLUME_MAX));
     mApplication.registerOrder(std::move(order));
     std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(randomValueOfMax(10) * 100));
 }
