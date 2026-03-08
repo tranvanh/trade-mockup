@@ -77,14 +77,24 @@ void Session::write() {}
 Server::Server(short port)
     : mAcceptor(mContext, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)) {}
 
+Server::~Server() {
+    mContext.stop();
+}
+
 void Server::run() {
-    mContext.run();
     accept();
+    mContext.run();
 }
 
 void Server::accept() {
     mAcceptor.async_accept([this](boost::system::error_code ec, boost::asio::ip::tcp::socket socket) {
         if (!ec) {
+            // Get identification info
+            const auto           remote_endpoint = socket.remote_endpoint();
+            const std::string    address         = remote_endpoint.address().to_string();
+            const unsigned short port            = remote_endpoint.port();
+            Logger::instance().log(Logger::LogLevel::INFO,
+                                   "New connection from " + address + ":" + std::to_string(port));
             std::lock_guard<std::mutex> lock(mActiveSessions.mtx);
             auto session = std::make_shared<Session>(std::move(socket), *this);
             mActiveSessions.data.insert(session);

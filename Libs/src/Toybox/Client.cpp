@@ -3,15 +3,24 @@
 
 TOYBOX_NAMESPACE_BEGIN
 
-Client::Client(short port) : mSocket(mContext) {
-    mSocket.connect(boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port));
-};
+Client::Client() : mSocket(mContext) {
+}
+
+Client::~Client() {
+    mContext.stop();
+}
+
+bool Client::connect(const std::string& address, short port){
+    boost::system::error_code ec;
+    mSocket.connect(boost::asio::ip::tcp::endpoint(boost::asio::ip::make_address(address), port), ec);
+    return ec == boost::system::errc::success;
+}
 
 void Client::run() {
     mContext.run();
 }
 
-void Client::sendMessage(const std::string& msg) {
+void Client::sendMessage(const std::string& msg) const{
     uint32_t len = htonl(static_cast<uint32_t>(msg.size()));
 
     std::vector<boost::asio::const_buffer> buffers;

@@ -6,15 +6,15 @@ TOYBOX_NAMESPACE_BEGIN
 
 class Client {
     boost::asio::io_context      mContext;
-    boost::asio::ip::tcp::socket mSocket;
+    mutable boost::asio::ip::tcp::socket mSocket;
 
 public:
-    explicit Client(short port);
-    virtual ~Client() = default;
+    Client();
+    ~Client();
     void run();
-
+    bool connect(const std::string& address, short port );
     // Client send follows a rule of sending a size first and content after
-    void sendMessage(const std::string& msg);
+    void sendMessage(const std::string& msg) const;
 };
 
 TOYBOX_NAMESPACE_END

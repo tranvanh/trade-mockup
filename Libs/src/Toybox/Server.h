@@ -17,6 +17,7 @@ class Server {
 
 public:
     explicit Server(short port);
+    ~Server();
     void run();
 
     std::function<void(std::string)> onRecieve;

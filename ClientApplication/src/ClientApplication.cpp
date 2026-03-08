@@ -6,11 +6,12 @@
 
 void ClientApplication::run() {
     Application::run();
-    // mClient->connect
-    if(!mClient.openSocket() || !mClient.connectToServer("127.0.0.1", 8080)){
+    if(!mClient.connect("127.0.0.1", 8080)){
+        toybox::Logger::instance().log(toybox::Logger::LogLevel::ERROR, "Failed to connect");
         stop();
         return;
     }
+    mClient.run();
     if (mSimulation) {
         mGenerator.simulateMarket();
     } else {
@@ -71,12 +72,12 @@ ClientApplication::Command ClientApplication::parseCommand(const std::string& li
     return cmd;
 }
 
-void ClientApplication::registerOrder(TradeCore::Order order) const {
+void ClientApplication::registerOrder(TradeCore::Order order) const{
     nlohmann::json msgJson;
     msgJson["clientId"]     = order.clientId;
     msgJson["type"]   = int(order.type);
     msgJson["price"]  = order.price;
     msgJson["volume"] = order.volume;
     const std::string msg   = nlohmann::to_string(msgJson);
-    mClient.sendMessage(msg.c_str());
+    mClient.sendMessage(msg);
 }

@@ -20,7 +20,7 @@ class ClientApplication : public toybox::Application {
     toybox::Client               mClient;
 
 public:
-    ClientApplication(const uint id, const bool isSimulation = false)
+    explicit ClientApplication(const uint id, const bool isSimulation = false)
         : toybox::Application(THREAD_COUNT)
         , mId(id)
         , mSimulation(isSimulation)
