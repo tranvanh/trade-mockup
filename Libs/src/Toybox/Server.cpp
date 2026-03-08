@@ -39,7 +39,6 @@ void Session::read() {
 
 void Session::readHeader() {
     auto self = shared_from_this();
-
     boost::asio::async_read(mSocket,
                      boost::asio::buffer(&mMessage.length, sizeof(mMessage.length)),
                      [this, self](auto ec, auto) {

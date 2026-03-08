@@ -1,11 +1,13 @@
 #include "Toybox/Common.h"
-#include "Toybox/Server.h"
+#include "Toybox/Client.h"
 
 TOYBOX_NAMESPACE_BEGIN
 
 void sandbox() {
-    Server s(8080);
-    s.run();
+    Client client;
+    client.connect("127.0.0.1", 8080);
+    client.sendMessage("hello world");
+    client.run();
     std::cout << "finised" << std::endl;
     // Add sandbox code
 }

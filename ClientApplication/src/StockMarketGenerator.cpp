@@ -20,6 +20,8 @@ StockMarketGenerator::StockMarketGenerator(ClientApplication& app)
 }
 
 void StockMarketGenerator::simulateMarket() {
+    auto& logger = toybox::Logger::instance();
+    logger.log(toybox::Logger::LogLevel::DEBUG, "Start generating orders ");
     while (mApplication.isRunning) {
         for (int i = 0; i < 100; ++i) {
             mApplication.runBackgroundTask(
@@ -34,7 +36,6 @@ void StockMarketGenerator::simulateMarket() {
 
 void StockMarketGenerator::generateOrder(TradeCore::OrderType type) {
     auto& logger = toybox::Logger::instance();
-    logger.log(toybox::Logger::LogLevel::DEBUG, "Start generating orders ", type);
     logger.log(toybox::Logger::LogLevel::DEBUG, "Generating ", type);
     TradeCore::Order order(randomValueOfMax(ID_COUNT),
                            type,

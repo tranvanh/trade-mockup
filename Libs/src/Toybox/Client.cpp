@@ -21,7 +21,7 @@ void Client::run() {
 }
 
 void Client::sendMessage(const std::string& msg) const{
-    uint32_t len = htonl(static_cast<uint32_t>(msg.size()));
+    auto len = msg.size();
 
     std::vector<boost::asio::const_buffer> buffers;
     buffers.emplace_back(boost::asio::buffer(&len, sizeof(len)));
