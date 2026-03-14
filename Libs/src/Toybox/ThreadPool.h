@@ -1,0 +1,24 @@
+#pragma once
+#include "Toybox/ThreadSafeQueue.h"
+#include <atomic>
+#include <functional>
+#include <vector>
+
+TOYBOX_NAMESPACE_BEGIN
+
+class ThreadPool {
+    ThreadSafeQueue<std::function<void()>> mTasksQueue;
+    std::deque<std::thread>                mWorkers;
+    const int                              mWorkersCount;
+    std::atomic_bool                       mIsRunning;
+
+public:
+    ThreadPool(const int workersCount);
+    ~ThreadPool();
+    void addTask(const std::function<void()>& task);
+    void addTask(std::function<void()>&& task);
+    void run();
+    void stop();
+};
+
+TOYBOX_NAMESPACE_END

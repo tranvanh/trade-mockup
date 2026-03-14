@@ -15,13 +15,15 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(cxxopts)
 
+find_package(Boost REQUIRED)
+
 set(CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/../includeLibs)
 
-find_package(UtilsLib)
-find_package(TradeLib)
+find_package(Toybox)
+find_package(TradeCore)
 
 file(GLOB SOURCES *.cpp *.h)
 add_executable(clientApp ${SOURCES})
 
 target_compile_options(clientApp PRIVATE -Wall -Wextra -Wpedantic -Werror)
-target_link_libraries(clientApp PRIVATE UtilsLib TradeLib nlohmann_json::nlohmann_json cxxopts)
+target_link_libraries(clientApp PRIVATE Toybox TradeCore nlohmann_json::nlohmann_json cxxopts Boost::headers)

@@ -1,5 +1,5 @@
 #include "ServerApplication.h"
-#include <UtilsLib/Logger.h>
+#include <Toybox/Logger.h>
 #include <cxxopts.hpp>
 
 // ### TODO
@@ -46,7 +46,7 @@
 // Note: This is defined in a .cpp on purpose to keep mock helpers out of the public headers.
 
 int main(int argc, char* argv[]) {
-    using namespace tranvanh;
+    using namespace toybox;
     Logger::instance().setLevel(Logger::LogLevel::DEBUG);
 
     bool filled = false;

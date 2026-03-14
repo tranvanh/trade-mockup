@@ -1,9 +1,9 @@
 #include "ClientApplication.h"
-#include <UtilsLib/Logger.h>
+#include <Toybox/Logger.h>
 #include <cxxopts.hpp>
 
 int main(int argc, char* argv[]) {
-    Logger::instance().setLevel(Logger::LogLevel::DEBUG);
+    toybox::Logger::instance().setLevel(toybox::Logger::LogLevel::DEBUG);
     bool simulate = false;
     int  id       = 0;
     try {

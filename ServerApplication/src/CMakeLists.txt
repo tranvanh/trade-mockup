@@ -19,10 +19,11 @@ set(LIB_PATH ${CMAKE_SOURCE_DIR}/../includeLibs)
 
 set(CMAKE_PREFIX_PATH ${LIB_PATH})
 
-find_package(UtilsLib)
-find_package(TradeLib)
+find_package(Toybox)
+find_package(TradeCore)
+find_package(Boost)
 
 file(GLOB SOURCES *.cpp *.h)
 add_executable(serverApp ${SOURCES})
 
-target_link_libraries(serverApp PRIVATE UtilsLib TradeLib nlohmann_json::nlohmann_json cxxopts)
+target_link_libraries(serverApp PRIVATE Toybox TradeCore nlohmann_json::nlohmann_json cxxopts Boost::headers)
