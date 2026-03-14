@@ -1,9 +1,5 @@
 #pragma once
-#include <TradeLib/Order.h>
-#include <string>
-#include <list>
-
-using namespace tranvanh;
+#include <TradeCore/Order.h>
 
 class ClientApplication;
 
@@ -16,6 +12,6 @@ public:
     void simulateMarket();
     
 private:
-    void generateOrder(OrderType tradeType);
+    void generateOrder(TradeCore::OrderType tradeType);
 };
 
