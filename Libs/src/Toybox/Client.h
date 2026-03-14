@@ -7,6 +7,7 @@ TOYBOX_NAMESPACE_BEGIN
 class Client {
     boost::asio::io_context      mContext;
     mutable boost::asio::ip::tcp::socket mSocket;
+    mutable std::vector<boost::asio::const_buffer> mBuffer;
 
 public:
     Client();

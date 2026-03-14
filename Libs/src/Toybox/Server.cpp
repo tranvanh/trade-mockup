@@ -6,11 +6,10 @@ TOYBOX_NAMESPACE_BEGIN
 
 class Session final : public NetworkComponent {
     const Server& mServer;
-    struct Message {
+    struct {
         std::vector<char> body   = std::vector<char>(BUFSIZ);
-        size_t            length = 0;
-    };
-    Message mMessage;
+        std::size_t            length = 0;
+    } mMessage;
 
 public:
     explicit Session(boost::asio::ip::tcp::socket socket, const Server& server)
@@ -41,9 +40,8 @@ void Session::readHeader() {
     auto self = shared_from_this();
     boost::asio::async_read(mSocket,
                      boost::asio::buffer(&mMessage.length, sizeof(mMessage.length)),
-                     [this, self](auto ec, auto) {
+                     [this, self](boost::system::error_code ec, std::size_t) {
                          if (!ec) {
-                             mMessage.length = ntohl(mMessage.length);
                              readBody();
                          }
                      });
@@ -54,7 +52,7 @@ void Session::readBody() {
     mMessage.body.resize(mMessage.length);
 
     boost::asio::async_read(mSocket,
-                     boost::asio::buffer(mMessage.body),
+                     boost::asio::buffer(mMessage.body, mMessage.length*sizeof(char)),
                      [this, self](boost::system::error_code ec, [[maybe_unused]] std::size_t length) {
                          if (!ec) {
                              mServer.onRecieve(std::string(mMessage.body.data(), mMessage.length));

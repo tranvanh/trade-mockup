@@ -21,16 +21,16 @@ void Client::run() {
 }
 
 void Client::sendMessage(const std::string& msg) const{
-    auto len = msg.size();
+    const auto len = msg.size();
 
-    std::vector<boost::asio::const_buffer> buffers;
-    buffers.emplace_back(boost::asio::buffer(&len, sizeof(len)));
-    buffers.emplace_back(boost::asio::buffer(msg));
+    mBuffer.clear();
+    mBuffer.emplace_back(boost::asio::buffer(&len, sizeof(len)));
+    mBuffer.emplace_back(boost::asio::buffer(msg));
 
     // guaranteed to send complete buffers
     boost::asio::async_write(
         mSocket,
-        buffers,
+        mBuffer,
         [](std::error_code ec, std::size_t)
         {
             if (ec) {
