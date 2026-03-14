@@ -11,6 +11,7 @@ Purpose of this project is to practice various technical topics as thread safety
 
 # Libs
 - independent libraries, intended to be installed
+- dependency: boost
 
 - **TradeCore - Shared**
     - Trading specific components
