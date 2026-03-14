@@ -12,27 +12,27 @@ Purpose of this project is to practice various technical topics as thread safety
 # Libs
 - independent libraries, intended to be installed
 
-- **TradeLib - Shared**
+- **TradeCore - Shared**
     - Trading specific components
     - Order book with order matching algorithm. Matching highest buyer with lowest seller
     - Stock market manager registering orders and trades
   
-- **TradeLib.Test**
+- **TradeCore.Test**
     - Using Google tests
   
-- **TradeLib.Benchmark**
+- **TradeCore.Benchmark**
     - Using Google benchmark
 
-- **UtilsLib - Shared**
+- **Toybox - Shared**
     - Observer pattern components
-    - Server and Client using unix sockets. Client sends message size first and the content later, unsuring content consistency on receiving end.
+    - Server and Client wraping boost asio. Client sends message size first and the content later, unsuring content consistency on receiving end.
     - Thread safe queue
     - Logger
 
-- **UtilsLib.Sandbox**
-    - Sandbox place to test UtilsLibs
+- **Toybox.Sandbox**
+    - Sandbox place to test Toybox
 
-- **UtilsLib.Test**
+- **Toybox.Test**
     - Using Google tests
 
 Client and Server applications share common utility libraries providing various useful functionality. Thus the goal is to have UtilsLibs as generic as possible, which could be reused for any other future projects
@@ -54,7 +54,7 @@ To build Client application call `build.sh Release clean`. The path to executabl
 - [x] Model generating buy/sell THREAD - give certain delay of buy/sell generation
 - [x] Mock database storing the information THREAD SAFE
 - [x] Matching trade/sell
-- [ ] Add trade database
+- [ ] Add trade database using SQL
 - [ ] Yield list of latest 100 trades happened around the given timestamp
 - [ ] Iterator to navigate the trades chronologicaly
 - [x] Create server-client connection
@@ -85,3 +85,4 @@ To build Client application call `build.sh Release clean`. The path to executabl
 - [x] Add FlatMap and use it in orderbook
 - [x] Add option for client to listen on to trades
 - [x] Add queries for more market
+- [ ] Use profiler 
