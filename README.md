@@ -88,3 +88,5 @@ To build Client application call `build.sh Release clean`. The path to executabl
 - [x] Add queries for more market
 - [ ] Use profiler 
 - [ ] Memory pool
+- [ ] Lock free queue
+- [ ] High performance logger
