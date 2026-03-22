@@ -23,6 +23,32 @@ TEST(ThreadSafeQueue, orderSingleThread) {
     EXPECT_TRUE(tsQueue.empty());
 }
 
+TEST(ThreadSafeQueue, popAfterStop) {
+    ThreadSafeQueue<int> tsQueue;
+    tsQueue.stop();
+    tsQueue.push(1);
+    tsQueue.push(2);
+    tsQueue.push(3);
+    EXPECT_FALSE(tsQueue.empty());
+    EXPECT_EQ(*tsQueue.pop(), 1);
+    EXPECT_EQ(*tsQueue.pop(), 2);
+    EXPECT_EQ(*tsQueue.pop(), 3);
+    EXPECT_TRUE(tsQueue.empty());
+}
+
+TEST(ThreadSafeQueue, callPopOnEmptyFromDifferentThreads) {
+    ThreadSafeQueue<int> tsQueue;
+    std::thread          t([&tsQueue]() {
+        EXPECT_TRUE(tsQueue.empty());
+        EXPECT_TRUE(!tsQueue.pop().has_value());
+    });
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    tsQueue.stop();
+    EXPECT_TRUE(tsQueue.empty());
+    EXPECT_TRUE(!tsQueue.pop().has_value());
+    t.join();
+}
+
 TEST(ThreadSafeQueue, orderMultiThread) {
     ThreadSafeQueue<int> tsQueue;
     std::thread          t([&tsQueue]() {
@@ -33,35 +59,35 @@ TEST(ThreadSafeQueue, orderMultiThread) {
     tsQueue.push(1);
     tsQueue.push(2);
     EXPECT_FALSE(tsQueue.empty());
-    EXPECT_EQ(tsQueue.pop(), 1);
-    EXPECT_EQ(tsQueue.pop(), 2);
-    EXPECT_EQ(tsQueue.pop(), 3);
+    EXPECT_EQ(*tsQueue.pop(), 1);
+    EXPECT_EQ(*tsQueue.pop(), 2);
+    EXPECT_EQ(*tsQueue.pop(), 3);
     EXPECT_TRUE(tsQueue.empty());
     EXPECT_TRUE(tsQueue.empty());
     t.join();
 }
 
-// TEST(ThreadSafeQueue, multiConsumerProducer) {
-//     ThreadSafeQueue<int>           queue;
-//     std::forward_list<std::thread> threads;
-//     const int                      numProcuders = 3;
-//     const int                      numConsumers = 3;
-//     std::atomic<int>               result;
-//     for (int i = 0; i < numProcuders; ++i) {
-//         threads.emplace_front([&queue, i]() {
-//             queue.push(i + 1);
-//         });
-//     }
-//     for (int i = 0; i < numConsumers; ++i) {
-//         threads.emplace_front([&queue, &result]() {
-//             result += queue.pop();
-//         });
-//     }
-//     for (auto& t : threads) {
-//         t.join();
-//     }
-//     EXPECT_TRUE(queue.empty());
-//     EXPECT_EQ(result, 6);
-// }
+TEST(ThreadSafeQueue, multiConsumerProducer) {
+    ThreadSafeQueue<int>           queue;
+    std::forward_list<std::thread> threads;
+    const int                      numProcuders = 3;
+    const int                      numConsumers = 3;
+    std::atomic<int>               result(0);
+    for (int i = 0; i < numProcuders; ++i) {
+        threads.emplace_front([&queue, i]() {
+            queue.push(i + 1);
+        });
+    }
+    for (int i = 0; i < numConsumers; ++i) {
+        threads.emplace_front([&queue, &result]() {
+            result = result + *queue.pop();
+        });
+    }
+    for (auto& t : threads) {
+        t.join();
+    }
+    EXPECT_TRUE(queue.empty());
+    EXPECT_EQ(result, 6);
+}
 
 TOYBOX_NAMESPACE_END

@@ -31,15 +31,19 @@ public:
 
 template <typename Type>
 void ThreadSafeQueue<Type>::push(const Type& value) {
-    std::lock_guard<std::mutex> lock(m);
-    mQueue.emplace_back(value);
+    {
+        std::lock_guard<std::mutex> lock(m);
+        mQueue.emplace_back(value);
+    }
     cv.notify_one();
 }
 
 template <typename Type>
 void ThreadSafeQueue<Type>::push(Type&& value) {
-    std::lock_guard<std::mutex> lock(m);
-    mQueue.emplace_back(std::forward<Type>(value));
+    {
+        std::lock_guard<std::mutex> lock(m);
+        mQueue.emplace_back(std::forward<Type>(value));
+    }
     cv.notify_one();
 }
 
@@ -49,7 +53,7 @@ std::optional<Type> ThreadSafeQueue<Type>::pop() {
     cv.wait(lock, [this]() {
         return !mQueue.empty() || mStop;
     });
-    if (mStop) {
+    if (mStop && mQueue.empty()) {
         return std::nullopt;
     }
     Type value = mQueue.front();
@@ -76,8 +80,10 @@ bool               ThreadSafeQueue<Type>:: empty(){
 
 template <typename Type>
 void ThreadSafeQueue<Type>::stop() {
-    std::lock_guard<std::mutex> lock(m);
-    mStop = true;
+    {
+        std::lock_guard<std::mutex> lock(m);
+        mStop = true;
+    }
     cv.notify_all();
 }
 

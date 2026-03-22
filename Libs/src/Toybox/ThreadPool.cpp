@@ -7,9 +7,9 @@ ThreadPool::ThreadPool(const int workersCount)
     , mIsRunning(false) {}
 
 ThreadPool::~ThreadPool() {
-    stop();
-    for (auto& worker : mWorkers) {
-        worker.join();
+    // For workers to not be cleared only means, that stop was not previously called
+    if (!mWorkers.empty()) {
+        stop();
     }
 }
 
@@ -19,19 +19,30 @@ void ThreadPool::run() {
         mWorkers.emplace_back([this]() {
             while (mIsRunning) {
                 auto task = mTasksQueue.pop();
-                if(!mIsRunning){
-                    return;
+                if (task) {
+                    (*task)();
                 }
-                ASSERT(task.has_value(), "Invalid task value");
-                (*task)();
             }
         });
     }
 }
 
 void ThreadPool::stop() {
+    if (mWorkers.empty()) {
+        return;
+    }
     mIsRunning = false;
     mTasksQueue.stop();
+    for (auto& worker : mWorkers) {
+        worker.join();
+    }
+    mWorkers.clear();
+    while (!mTasksQueue.empty()) {
+        auto task = mTasksQueue.pop();
+        if (task) {
+            (*task)();
+        }
+    }
 }
 
 void ThreadPool::addTask(const std::function<void()>& task){
