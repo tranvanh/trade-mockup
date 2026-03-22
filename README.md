@@ -87,3 +87,4 @@ To build Client application call `build.sh Release clean`. The path to executabl
 - [x] Add option for client to listen on to trades
 - [x] Add queries for more market
 - [ ] Use profiler 
+- [ ] Memory pool
