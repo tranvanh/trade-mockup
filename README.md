@@ -9,47 +9,36 @@ Purpose of this project is to practice various technical topics as thread safety
 - Processes orders and delegades them to the market
 - Serves as a communication layer between the market and the client
 
-# Libs
-- independent libraries, intended to be installed
-- dependency: boost
+# TradeCore
+- Trading specific components
+- Order book with order matching algorithm. Matching highest buyer with lowest seller
+- Stock market manager registering orders and trades
 
-- **TradeCore - Shared**
-    - Trading specific components
-    - Order book with order matching algorithm. Matching highest buyer with lowest seller
-    - Stock market manager registering orders and trades
-  
 - **TradeCore.Test**
     - Using Google tests
-  
+
 - **TradeCore.Benchmark**
     - Using Google benchmark
 
-- **Toybox - Shared**
-    - Observer pattern components
-    - Server and Client wraping boost asio. Client sends message size first and the content later, unsuring content consistency on receiving end.
-    - Thread safe queue
-    - Logger
+# Toybox
+- Fetched from [github.com/tranvanh/toybox](https://github.com/tranvanh/toybox) (tag `1.0`)
 
-- **Toybox.Sandbox**
-    - Sandbox place to test Toybox
+## How to build
 
-- **Toybox.Test**
-    - Using Google tests
+This is a single CMake project. Configure and build from the root:
 
-Client and Server applications share common utility libraries providing various useful functionality. Thus the goal is to have UtilsLibs as generic as possible, which could be reused for any other future projects
+```bash
+cmake -S . -B build -G "Ninja Multi-Config"
+cmake --build build --config Release
+```
 
-## How to
+Executables are placed in `build/ClientApplication/src/Release/ClientApplication` and `build/ServerApplication/src/Release/ServerApplication`.
 
-In order to run Client or Server, you must have UtilsLib and TradeLib installed.
+`ClientApplication` accepts `<userId> [simulate]` — `<userId>` is any positive number, `simulate` optionally triggers automatic order generation.
 
-### Installing //todo improve the build/install/run instructions
-
-From the root `Libs` run `bash install.sh Release clean`. You can specify your own installation prefix inside the `install.sh`. Note that in Client application and Server application, both have my path which is a working state and will be further improve. If you're installing to the system include. Simply remove CMAKE_PREFIX_PATH or specify yours.
-
-To build Client application call `build.sh Release clean`. The path to executable is `./ClientApplication/build/src/clientApp <userId> [simulate]`.
- `<userId>` is just an identification, could be any positive number, `simulate` is optional argument to simulate the order creation, id's are randomly generated.
- 
- Same build process applies to Server application, except it does not have arguments.
+Optional build flags:
+- `-DBUILD_TESTS=ON` — builds TradeCore.Test (requires GTest, fetched automatically)
+- `-DBUILD_BENCHMARK=ON` — builds TradeCore.Benchmark (requires Google Benchmark, fetched automatically)
 
 ### TODO
 - [x] Model generating buy/sell THREAD - give certain delay of buy/sell generation

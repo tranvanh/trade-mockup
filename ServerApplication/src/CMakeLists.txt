@@ -1,29 +1,4 @@
-include(FetchContent)
-FetchContent_Declare(
-  json
-  GIT_REPOSITORY https://github.com/nlohmann/json.git
-  GIT_TAG v3.11.3
-  GIT_SHALLOW TRUE
-)
-FetchContent_MakeAvailable(json)
-
-FetchContent_Declare(
-        cxxopts
-        GIT_REPOSITORY https://github.com/jarro2783/cxxopts.git
-        GIT_TAG v3.3.1
-        GIT_SHALLOW TRUE
-)
-FetchContent_MakeAvailable(cxxopts)
-
-set(LIB_PATH ${CMAKE_SOURCE_DIR}/../includeLibs)
-
-set(CMAKE_PREFIX_PATH ${LIB_PATH})
-
-find_package(Toybox)
-find_package(TradeCore)
-find_package(Boost)
-
 file(GLOB SOURCES *.cpp *.h)
-add_executable(serverApp ${SOURCES})
-
-target_link_libraries(serverApp PRIVATE Toybox TradeCore nlohmann_json::nlohmann_json cxxopts Boost::headers)
+add_executable(ServerApplication ${SOURCES})
+target_compile_options(ServerApplication PRIVATE -Wall -Wextra -Wpedantic -Werror)
+target_link_libraries(ServerApplication PRIVATE TradeCore nlohmann_json::nlohmann_json cxxopts Boost::headers)

@@ -1,0 +1,5 @@
+file(GLOB SOURCES *.cpp *.h)
+add_library(TradeCore STATIC ${SOURCES})
+target_include_directories(TradeCore PUBLIC ${CMAKE_SOURCE_DIR})
+target_link_libraries(TradeCore PUBLIC Toybox)
+target_compile_options(TradeCore PRIVATE -Wall -Wextra -Wpedantic -Werror)
