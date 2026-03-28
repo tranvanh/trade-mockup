@@ -16,6 +16,7 @@ namespace TradeCore {
         ~Market() { mActive = false; };
 
         void run();
+        void stop();
         bool isActive() { return mActive; }
         void registerOrder(const Order& order);
 

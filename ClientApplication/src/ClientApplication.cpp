@@ -1,83 +1,47 @@
 #include "ClientApplication.h"
-#include <iostream>
 #include <nlohmann/json.hpp>
-#include <unordered_map>
 #include <Toybox/Logger.h>
+#include <stdexcept>
+
+ClientApplication::ClientApplication()
+    : toybox::Application(THREAD_COUNT)
+    , mGenerator(*this)
+    , mCli(*this) {}
 
 void ClientApplication::run() {
-    Application::run();
-    if(!mClient.connect("127.0.0.1", 8080)){
-        toybox::Logger::instance().log(toybox::Logger::LogLevel::ERROR, "Failed to connect");
+    mCli.run();
+}
+
+void ClientApplication::configure(int id, std::string server, int port) {
+    mId     = static_cast<uint>(id);
+    mServer = std::move(server);
+    mPort   = port;
+}
+
+bool ClientApplication::connect() {
+    try {
+        Application::run();
+        if (!mClient.connect(mServer, mPort))
+            return false;
+        mClient.run();
+        return true;
+    } catch (const std::exception& e) {
         stop();
-        return;
-    }
-    mClient.run();
-    if (mSimulation) {
-        mGenerator.simulateMarket();
-    } else {
-        processUserInputs();
+        throw std::runtime_error(
+            std::string("Connection to ") + mServer + ":" + std::to_string(mPort)
+            + " failed: " + e.what());
     }
 }
 
-void ClientApplication::processUserInputs() const {
-    std::string line;
-    while (std::cout << "> " && std::getline(std::cin, line)) {
-        if (line.empty())
-            continue;
-        Command cmd = parseCommand(line);
-        switch(cmd.type){
-            case CommandType::INVALID:
-                toybox::Logger::instance().log(toybox::Logger::LogLevel::ERROR, "Invalid command");
-                break;
-            case CommandType::EXIT:
-                return;
-            default:
-                handleCommand(cmd);
-                break;
-        }
-    }
+void ClientApplication::simulateMarket() {
+    runBackgroundTask([this]() { mGenerator.simulateMarket(); });
 }
 
-void ClientApplication::handleCommand(const Command& cmd) const {
-    ASSERT(cmd.type == CommandType::BUY || cmd.type == CommandType::SELL, "Command behaviour not defined");
-    TradeCore::OrderType type = cmd.type == CommandType::BUY ? TradeCore::OrderType::BUY : TradeCore::OrderType::SELL;
-    TradeCore::Order     order(mId, type, cmd.price, cmd.volume);
-    registerOrder(std::move(order));
-}
-
-ClientApplication::Command ClientApplication::parseCommand(const std::string& line) const {
-    Command            cmd;
-    std::istringstream iss(line);
-    std::string        symbol;
-    if (!(iss >> symbol)) {
-        return cmd;
-    }
-    int    volume;
-    double price;
-    if (symbol == "buy") {
-        if (iss >> price >> volume && price > 0 && volume > 0) {
-            cmd.type   = CommandType::BUY;
-            cmd.price  = price;
-            cmd.volume = volume;
-        }
-    } else if (symbol == "sell") {
-        if (iss >> price >> volume && price > 0 && volume > 0) {
-            cmd.type   = CommandType::SELL;
-            cmd.volume = volume;
-            cmd.price  = price;
-        }
-    } else if (symbol == "exit") {
-        cmd.type = CommandType::EXIT;
-    }
-    return cmd;
-}
-
-void ClientApplication::registerOrder(TradeCore::Order order) const{
-    nlohmann::json msgJson;
-    msgJson["clientId"]     = order.clientId;
-    msgJson["type"]   = int(order.type);
-    msgJson["price"]  = order.price;
-    msgJson["volume"] = order.volume;
-    const std::string msg   = nlohmann::to_string(msgJson);
-    mClient.sendMessage(msg);
+void ClientApplication::registerOrder(TradeCore::Order order) const {
+    nlohmann::json msg;
+    msg["clientId"] = order.clientId;
+    msg["type"]     = int(order.type);
+    msg["price"]    = order.price;
+    msg["volume"]   = order.volume;
+    mClient.sendMessage(nlohmann::to_string(msg));
 }

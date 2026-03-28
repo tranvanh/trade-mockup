@@ -1,35 +1,35 @@
 #pragma once
+#include "ClientCli.h"
 #include "StockMarketGenerator.h"
 #include <TradeCore/Order.h>
 #include <Toybox/Application.h>
 #include <Toybox/Client.h>
+#include <string>
 
 constexpr int THREAD_COUNT = 2;
 
 class ClientApplication : public toybox::Application {
-    uint mId = 0;
-    enum CommandType { BUY, SELL, EXIT, INVALID };
-    struct Command {
-        CommandType type   = INVALID;
-        int         price  = 0;
-        int         volume = 0;
-    };
-
-    bool                 mSimulation = false;
+    uint mId{0};
+    std::string mServer;
+    int mPort{0};
     StockMarketGenerator mGenerator;
-    toybox::Client               mClient;
+    toybox::Client mClient;
+    ClientCli mCli;
 
 public:
-    explicit ClientApplication(const uint id, const bool isSimulation = false)
-        : toybox::Application(THREAD_COUNT)
-        , mId(id)
-        , mSimulation(isSimulation)
-        , mGenerator(*this){};
-    virtual void run() override;
-    void         registerOrder(TradeCore::Order order) const;
+    ClientApplication();
 
-private:
-    void    processUserInputs() const;
-    Command parseCommand(const std::string& line) const;
-    void    handleCommand(const Command& cmd) const;
+    // Interactive entry point: runs the CLI (prompts config, connects, command loop)
+    void run() override;
+
+    // Called by Cli after config is gathered
+    void configure(int id, std::string server, int port);
+
+    bool connect();
+
+    void simulateMarket();
+
+    void registerOrder(TradeCore::Order order) const;
+
+    int id() const { return static_cast<int>(mId); }
 };

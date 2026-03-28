@@ -29,12 +29,14 @@ void StockMarketGenerator::simulateMarket() {
             mApplication.runBackgroundTask(
                 std::bind_front(&StockMarketGenerator::generateOrder, this, TradeCore::OrderType::SELL));
         }
-        // Give thread pool a bit of time to clear out so it is not flooded all the time
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+        // Sleep in short intervals so shutdown is noticed quickly
+        for (int i = 0; i < 20 && mApplication.isRunning; ++i)
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 }
 
 void StockMarketGenerator::generateOrder(TradeCore::OrderType type) {
+    if (!mApplication.isRunning) return;
     auto& logger = toybox::Logger::instance();
     logger.log(toybox::Logger::LogLevel::DEBUG, "Generating ", type);
     TradeCore::Order order(randomValueOfMax(ID_COUNT),
@@ -42,5 +44,6 @@ void StockMarketGenerator::generateOrder(TradeCore::OrderType type) {
                            randomValueOfMax(TradeCore::PRICE_MAX),
                            randomValueOfMax(TradeCore::VOLUME_MAX));
     mApplication.registerOrder(std::move(order));
+    if (!mApplication.isRunning) return;
     std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(randomValueOfMax(10) * 100));
 }

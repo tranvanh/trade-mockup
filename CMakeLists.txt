@@ -20,7 +20,7 @@ include(FetchContent)
 FetchContent_Declare(
   toybox
   GIT_REPOSITORY git@github.com:tranvanh/toybox.git
-  GIT_TAG 1.0
+  GIT_TAG v1.0
   GIT_SHALLOW TRUE
 )
 FetchContent_MakeAvailable(toybox)
@@ -41,9 +41,30 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(cxxopts)
 
+FetchContent_Declare(
+  replxx
+  GIT_REPOSITORY https://github.com/AmokHuginnsson/replxx.git
+  GIT_TAG release-0.0.4
+  GIT_SHALLOW TRUE
+)
+set(REPLXX_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(replxx)
+
+FetchContent_Declare(
+  ftxui
+  GIT_REPOSITORY https://github.com/ArthurSonzogni/FTXUI.git
+  GIT_TAG v5.0.0
+  GIT_SHALLOW TRUE
+)
+set(FTXUI_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(FTXUI_BUILD_TESTS    OFF CACHE BOOL "" FORCE)
+set(FTXUI_BUILD_DOCS     OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(ftxui)
+
 find_package(Boost REQUIRED)
 
 add_subdirectory(TradeCore)
+add_subdirectory(TradeGUI)
 add_subdirectory(ClientApplication)
 add_subdirectory(ServerApplication)
 
