@@ -19,8 +19,8 @@ include(FetchContent)
 
 FetchContent_Declare(
   toybox
-  GIT_REPOSITORY git@github.com:tranvanh/toybox.git
-  GIT_TAG 1.0
+  GIT_REPOSITORY https://github.com/tranvanh/toybox.git
+  GIT_TAG v1.0
   GIT_SHALLOW TRUE
 )
 FetchContent_MakeAvailable(toybox)

@@ -1,3 +1,5 @@
+/build/
+/build-run/
 */build
 */.vscode
 Libs/src/.vscode/settings.json

@@ -21,7 +21,7 @@ Purpose of this project is to practice various technical topics as thread safety
     - Using Google benchmark
 
 # Toybox
-- Fetched from [github.com/tranvanh/toybox](https://github.com/tranvanh/toybox) (tag `1.0`)
+- Fetched from [github.com/tranvanh/toybox](https://github.com/tranvanh/toybox) (tag `v1.0`)
 
 ## How to build
 

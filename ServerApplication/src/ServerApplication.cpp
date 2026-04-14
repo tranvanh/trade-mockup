@@ -56,6 +56,10 @@ void ServerApplication::run() {
         mStockMarket.run();
     });
 
+    mServer.onConnect = [&logger](const unsigned short port) {
+        logger.log(toybox::Logger::LogLevel::INFO, "Client connected on port ", port);
+    };
+
     mServer.onRecieve = [this](std::string msg) {
         auto& logger = toybox::Logger::instance();
         logger.log(toybox::Logger::LogLevel::INFO, "Received message...");
@@ -63,6 +67,11 @@ void ServerApplication::run() {
             processServerMessage(msg);
         });
     };
+
+    mServer.onDisconnect = [&logger](const unsigned short port) {
+        logger.log(toybox::Logger::LogLevel::INFO, "Client disconnected on port ", port);
+    };
+
     mServer.run();
 }
 
