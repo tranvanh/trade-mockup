@@ -5,8 +5,7 @@
 #include <gtest/gtest.h>
 #include <sstream>
 
-TRANVANH_NAMESPACE_BEGIN
-
+using namespace TradeCore;
 
 TEST(Trade, OstreamOutputsKeyFields) {
     Order buyer( 123, OrderType::BUY, 150, 3 );
@@ -23,5 +22,3 @@ TEST(Trade, OstreamOutputsKeyFields) {
     EXPECT_NE(s.find("price="), std::string::npos);
     EXPECT_NE(s.find("volume="), std::string::npos);
 }
-
-TRANVANH_NAMESPACE_END

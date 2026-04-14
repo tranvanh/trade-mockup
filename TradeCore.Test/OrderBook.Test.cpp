@@ -5,7 +5,7 @@
 #include <utility>
 #include <vector>
 
-TRANVANH_NAMESPACE_BEGIN
+using namespace TradeCore;
 
 // Helper: compare that a trade involves exactly these two client IDs (order-agnostic)
 static bool tradeInvolvesClients(const Trade& t, int idA, int idB) {
@@ -223,5 +223,3 @@ TEST(OrderBook, SweepRemovesLevelsNoPhantomTrades) {
 
     EXPECT_EQ(trades.size(), 2u); // no new trades
 }
-
-TRANVANH_NAMESPACE_END

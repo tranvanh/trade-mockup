@@ -1,36 +1,20 @@
 #include "ClientApplication.h"
+#include <TradeCommon/ClientOptions.h>
 #include <Toybox/Logger.h>
-#include <cxxopts.hpp>
 
 int main(int argc, char* argv[]) {
-    toybox::Logger::instance().setLevel(toybox::Logger::LogLevel::DEBUG);
-    bool simulate = false;
-    int  id       = 0;
+    toybox::Logger::instance().setLevel(toybox::Logger::LogLevel::ERROR);
     try {
-        cxxopts::Options options("ClientApp", "Example argument parsing");
-        options.add_options()("id", "client id", cxxopts::value<int>())("simulate",
-                                                                        "generate orders",
-                                                                        cxxopts::value<bool>())("h,help",
-                                                                                                "Print help");
-        const auto result = options.parse(argc, argv);
-        if (result.count("help")) {
-            std::cout << options.help() << std::endl;
+        const auto parsed = TradeCommon::parseClientLaunchOptions(argc, argv);
+        if (parsed.showHelp) {
+            std::cout << parsed.helpText << std::endl;
             return 0;
         }
-        if (result.count("id")) {
-            id = result["id"].as<int>();
-        } else if (result.count("simulate")) {
-            simulate = result["simulate"].as<bool>();
-        }
-        else {
-            std::cerr << "Error: --id or --simulate required\n";
-            return 1;
-        }
+        ClientApplication app(parsed.options);
+        app.run();
     } catch (const std::exception& e) {
-        std::cerr << "Argument parsing error: " << e.what() << "\n";
+        std::cerr << "Client startup error: " << e.what() << "\n";
         return 1;
     }
-    ClientApplication app(id, simulate);
-    app.run();
     return 0;
 }

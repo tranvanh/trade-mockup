@@ -1,4 +1,4 @@
 file(GLOB SOURCES *.cpp *.h)
 add_executable(ServerApplication ${SOURCES})
 target_compile_options(ServerApplication PRIVATE -Wall -Wextra -Wpedantic -Werror)
-target_link_libraries(ServerApplication PRIVATE TradeCore nlohmann_json::nlohmann_json cxxopts Boost::headers)
+target_link_libraries(ServerApplication PRIVATE TradeCore TradeCommon ftxui::screen ftxui::dom ftxui::component)

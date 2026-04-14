@@ -42,8 +42,21 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(cxxopts)
 
 find_package(Boost REQUIRED)
+find_package(Threads REQUIRED)
+
+set(FTXUI_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(FTXUI_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(FTXUI_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+FetchContent_Declare(
+  ftxui
+  GIT_REPOSITORY https://github.com/ArthurSonzogni/FTXUI.git
+  GIT_TAG v5.0.0
+  GIT_SHALLOW TRUE
+)
+FetchContent_MakeAvailable(ftxui)
 
 add_subdirectory(TradeCore)
+add_subdirectory(TradeCommon)
 add_subdirectory(ClientApplication)
 add_subdirectory(ServerApplication)
 
@@ -61,6 +74,7 @@ if(BUILD_TESTS)
     include(GoogleTest)
     enable_testing()
     add_subdirectory(TradeCore.Test)
+    add_subdirectory(TradeCommon.Test)
 endif()
 
 if(BUILD_BENCHMARK)
