@@ -13,6 +13,10 @@ namespace TradeCore {
 
     }
 
+    void Market::stop() {
+        mActive = false;
+    }
+
     void Market::registerOrder(const Order& order) {
         mBook.registerOrder(order);
     }

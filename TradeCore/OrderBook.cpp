@@ -118,7 +118,7 @@ namespace TradeCore {
             const int buyerId     = requester.type == OrderType::BUY ? requester.clientId : order.clientId;
             const int sellerId    = requester.type == OrderType::SELL ? requester.clientId : order.clientId;
 
-            Trade trade(buyerId, sellerId, soldPrice, soldVolumes);
+            Trade trade(sellerId, buyerId, soldPrice, soldVolumes);
             onTradeCallbacks(trade);
 
             requester.volume -= soldVolumes;
