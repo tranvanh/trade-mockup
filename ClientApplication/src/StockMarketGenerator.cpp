@@ -1,16 +1,13 @@
 #include "StockMarketGenerator.h"
 #include "ClientApplication.h"
-#include <atomic>
 #include <chrono>
 #include <functional>
-#include <iomanip>
 #include <thread>
 #include <Toybox/Logger.h>
-#include <utility>
 
-constexpr int ID_COUNT = 100; // Possible Number of simulated IDs
+constexpr int ID_COUNT = 100;
 
-int randomValueOfMax(const int max) {
+static int randomValueOfMax(const int max) {
     return std::rand() / ((RAND_MAX + 1u) / max);
 }
 
@@ -19,28 +16,36 @@ StockMarketGenerator::StockMarketGenerator(ClientApplication& app)
     std::srand(std::time(nullptr));
 }
 
+void StockMarketGenerator::start() {
+    if (mSimActive.exchange(true)) {
+        return;
+    }
+    mApplication.runBackgroundTask([this] { simulateMarket(); });
+}
+
+void StockMarketGenerator::stop() {
+    mSimActive.store(false);
+}
+
 void StockMarketGenerator::simulateMarket() {
     auto& logger = toybox::Logger::instance();
-    logger.log(toybox::Logger::LogLevel::DEBUG, "Start generating orders ");
-    while (mApplication.isRunning) {
+    logger.log(toybox::Logger::LogLevel::DEBUG, "Simulation started");
+    while (mSimActive && mApplication.isRunning) {
         for (int i = 0; i < 100; ++i) {
             mApplication.runBackgroundTask(
                 std::bind_front(&StockMarketGenerator::generateOrder, this, TradeCore::OrderType::BUY));
             mApplication.runBackgroundTask(
                 std::bind_front(&StockMarketGenerator::generateOrder, this, TradeCore::OrderType::SELL));
         }
-        // Give thread pool a bit of time to clear out so it is not flooded all the time
         std::this_thread::sleep_for(std::chrono::seconds(2));
     }
+    logger.log(toybox::Logger::LogLevel::DEBUG, "Simulation stopped");
 }
 
-void StockMarketGenerator::generateOrder(TradeCore::OrderType type) {
-    auto& logger = toybox::Logger::instance();
-    logger.log(toybox::Logger::LogLevel::DEBUG, "Generating ", type);
+void StockMarketGenerator::generateOrder(TradeCore::OrderType type) const{
     TradeCore::Order order(randomValueOfMax(ID_COUNT),
                            type,
                            randomValueOfMax(TradeCore::PRICE_MAX),
                            randomValueOfMax(TradeCore::VOLUME_MAX));
     mApplication.registerOrder(std::move(order));
-    std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(randomValueOfMax(10) * 100));
 }
