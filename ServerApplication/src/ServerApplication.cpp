@@ -32,6 +32,7 @@ void ServerApplication::run() {
     };
 
     mServer.onRecieve = [this](std::string msg) {
+        // \todo instead of running background task for every received message. Add it to a msg queue and drain from separate queue
         runBackgroundTask([this, msg] { processServerMessage(msg); });
     };
 
