@@ -5,6 +5,7 @@
 using namespace ftxui;
 
 constexpr size_t MAX_LINES = 10;
+
 namespace tradegui {
     static Component makeScrollableList(
         std::function<std::deque<std::string>()> snapshot,
@@ -14,7 +15,8 @@ namespace tradegui {
             Elements elems;
             elems.reserve(MAX_LINES);
 
-            for (size_t i = lines.size() - MAX_LINES; i < lines.size(); ++i) {
+            const size_t offset = lines.size() < MAX_LINES ? lines.size() : MAX_LINES;
+            for (size_t i = lines.size() - offset; i < lines.size(); ++i) {
                 elems.push_back(text(lines[i]));
             }
 
