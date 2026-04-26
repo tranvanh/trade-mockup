@@ -61,10 +61,8 @@ Optional build flags:
 - [x] Add thread pool
 - [ ] Add thread scheduler
 - [ ] Add multiple symbols to the stock market
-- [ ] Restructure UtilsLib folders
 - [x] Add google tests 
-- [ ] Add tests for Order book, network sending/receiving, command parsing
-- [ ] Implement polling for macos and windows
+- [ ] Add tests for Order book, network sending/receiving, command parsing\
 - [x] Assert, debug, release builds
 - [x] Add asserts
 - [x] Add Sandbox target
@@ -77,5 +75,6 @@ Optional build flags:
 - [x] Add queries for more market
 - [ ] Use profiler 
 - [ ] Memory pool
-- [ ] Lock free queue
+- [x] Lock free queue
 - [ ] High performance logger
+- [x] Add GUI
