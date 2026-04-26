@@ -1,83 +1,89 @@
 #include "ClientApplication.h"
-#include <iostream>
 #include <nlohmann/json.hpp>
-#include <unordered_map>
+#include <random>
+#include <sstream>
 #include <Toybox/Logger.h>
+
+uint ClientApplication::generateId() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<uint> dist(1, 999999);
+    return dist(gen);
+}
+
+ClientApplication::ClientApplication()
+    : toybox::Application(CLIENT_THREAD_COUNT)
+    , mId(generateId())
+    , mUIStream([this](std::string line) {
+        mUIState.pushLog(std::move(line));
+        mScreen.PostEvent(ftxui::Event::Custom);
+    })
+    , mGenerator(*this)
+    , mScreen(ftxui::ScreenInteractive::Fullscreen()) {}
 
 void ClientApplication::run() {
     Application::run();
-    if(!mClient.connect("127.0.0.1", 8080)){
-        toybox::Logger::instance().log(toybox::Logger::LogLevel::ERROR, "Failed to connect");
-        stop();
-        return;
-    }
-    mClient.run();
-    if (mSimulation) {
-        mGenerator.simulateMarket();
+    toybox::Logger::instance().setOutputStream(mUIStream);
+
+    mClient.onReceive = [this](std::string msg) {
+        try {
+            auto j = nlohmann::json::parse(msg);
+            std::ostringstream oss;
+            oss << "TRADE B#" << j["buyerId"].get<int>()
+                << " S#" << j["sellerId"].get<int>()
+                << " @" << j["price"].get<int>()
+                << " x" << j["volume"].get<int>();
+            mUIState.pushTrade(oss.str());
+            mScreen.PostEvent(ftxui::Event::Custom);
+        } catch (...) {
+            mUIState.pushLog("Received unparseable message");
+            mScreen.PostEvent(ftxui::Event::Custom);
+        }
+    };
+
+    if (!mClient.connect("127.0.0.1", 8080)) {
+        mUIState.pushLog("[ERROR] Failed to connect to server at 127.0.0.1:8080");
+        mScreen.PostEvent(ftxui::Event::Custom);
     } else {
-        processUserInputs();
+        mUIState.pushLog("[INFO] Connected to server");
+        mScreen.PostEvent(ftxui::Event::Custom);
     }
+
+    runBackgroundTask([this] { mClient.run(); });
 }
 
-void ClientApplication::processUserInputs() const {
-    std::string line;
-    while (std::cout << "> " && std::getline(std::cin, line)) {
-        if (line.empty())
-            continue;
-        Command cmd = parseCommand(line);
-        switch(cmd.type){
-            case CommandType::INVALID:
-                toybox::Logger::instance().log(toybox::Logger::LogLevel::ERROR, "Invalid command");
-                break;
-            case CommandType::EXIT:
-                return;
-            default:
-                handleCommand(cmd);
-                break;
-        }
-    }
+void ClientApplication::stop() {
+    mGenerator.stop();
+    mClient.stop();
+    Application::stop();
 }
 
-void ClientApplication::handleCommand(const Command& cmd) const {
-    ASSERT(cmd.type == CommandType::BUY || cmd.type == CommandType::SELL, "Command behaviour not defined");
-    TradeCore::OrderType type = cmd.type == CommandType::BUY ? TradeCore::OrderType::BUY : TradeCore::OrderType::SELL;
-    TradeCore::Order     order(mId, type, cmd.price, cmd.volume);
-    registerOrder(std::move(order));
+void ClientApplication::registerOrder(TradeCore::Order order) const {
+    nlohmann::json j;
+    j["clientId"] = order.clientId;
+    j["type"]     = static_cast<int>(order.type);
+    j["price"]    = order.price;
+    j["volume"]   = order.volume;
+    mClient.sendMessage(nlohmann::to_string(j));
 }
 
-ClientApplication::Command ClientApplication::parseCommand(const std::string& line) const {
-    Command            cmd;
-    std::istringstream iss(line);
-    std::string        symbol;
-    if (!(iss >> symbol)) {
-        return cmd;
-    }
-    int    volume;
-    double price;
-    if (symbol == "buy") {
-        if (iss >> price >> volume && price > 0 && volume > 0) {
-            cmd.type   = CommandType::BUY;
-            cmd.price  = price;
-            cmd.volume = volume;
-        }
-    } else if (symbol == "sell") {
-        if (iss >> price >> volume && price > 0 && volume > 0) {
-            cmd.type   = CommandType::SELL;
-            cmd.volume = volume;
-            cmd.price  = price;
-        }
-    } else if (symbol == "exit") {
-        cmd.type = CommandType::EXIT;
-    }
-    return cmd;
+void ClientApplication::subscribe() {
+    mClient.subscribe();
+    mUIState.pushLog("[INFO] Subscribed to trade feed");
+    mScreen.PostEvent(ftxui::Event::Custom);
 }
 
-void ClientApplication::registerOrder(TradeCore::Order order) const{
-    nlohmann::json msgJson;
-    msgJson["clientId"]     = order.clientId;
-    msgJson["type"]   = int(order.type);
-    msgJson["price"]  = order.price;
-    msgJson["volume"] = order.volume;
-    const std::string msg   = nlohmann::to_string(msgJson);
-    mClient.sendMessage(msg);
+void ClientApplication::toggleSimulate() {
+    if (mGenerator.isActive()) {
+        mGenerator.stop();
+        mUIState.pushLog("[INFO] Simulation stopped");
+    } else {
+        mGenerator.start();
+        mUIState.pushLog("[INFO] Simulation started");
+    }
+    mScreen.PostEvent(ftxui::Event::Custom);
+}
+
+bool ClientApplication::isSimulating() const {
+    return mGenerator.isActive();
 }

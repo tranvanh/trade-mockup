@@ -29,6 +29,7 @@ namespace TradeCore {
         ~OrderBook();
         void registerOrder(const Order& order);
         void pollOrders();
+        void stop() { mOrderQueue.stop(); }
 
         toybox::CallbackList<void(const Trade& trade)> onTradeCallbacks;
 
