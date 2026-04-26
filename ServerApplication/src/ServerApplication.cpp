@@ -1,7 +1,9 @@
 #include "ServerApplication.h"
 #include <nlohmann/json.hpp>
+#include <chrono>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <Toybox/Logger.h>
 #include <TradeCore/Order.h>
 
@@ -10,7 +12,6 @@ ServerApplication::ServerApplication()
     , mServer(8080, SERVER_THREAD_COUNT/2)
     , mUIStream([this](std::string line) {
         mUIState.pushLog(std::move(line));
-        mScreen.PostEvent(ftxui::Event::Custom);
     })
     , mScreen(ftxui::ScreenInteractive::Fullscreen()) {
     registerCallback(mStockMarket.addOnTradeObserver(
@@ -23,13 +24,11 @@ void ServerApplication::run() {
     mServer.onConnect = [this](unsigned short port) {
         mUIState.addConnection(port);
         mUIState.pushLog("[INFO] Client connected on port " + std::to_string(port));
-        mScreen.PostEvent(ftxui::Event::Custom);
     };
 
     mServer.onDisconnect = [this](unsigned short port) {
         mUIState.removeConnection(port);
         mUIState.pushLog("[INFO] Client disconnected from port " + std::to_string(port));
-        mScreen.PostEvent(ftxui::Event::Custom);
     };
 
     mServer.onRecieve = [this](std::string msg) {
@@ -37,10 +36,19 @@ void ServerApplication::run() {
     };
 
     runBackgroundTask([this] { mStockMarket.run(); });
+    runBackgroundTask([this] {
+        while (isRunning) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(33));
+            mScreen.PostEvent(ftxui::Event::Custom);
+        }
+    });
     mServer.run();
 }
 
 void ServerApplication::stop() {
+    mServer.onConnect    = nullptr;
+    mServer.onDisconnect = nullptr;
+    mServer.onRecieve    = nullptr;
     mStockMarket.stop();
     Application::stop();
 }
@@ -52,7 +60,6 @@ void ServerApplication::onTradeExecuted(const TradeCore::Trade& trade) {
         << " @" << trade.price
         << " x" << trade.volume;
     mUIState.pushTrade(oss.str());
-    mScreen.PostEvent(ftxui::Event::Custom);
 
     nlohmann::json j;
     j["sellerId"] = trade.sellerId;
@@ -77,12 +84,10 @@ void ServerApplication::processServerMessage(const std::string& msg) {
             << " " << (type == TradeCore::OrderType::BUY ? "BUY" : "SELL")
             << " @" << price << " x" << volume;
         mUIState.pushLog(oss.str());
-        mScreen.PostEvent(ftxui::Event::Custom);
 
         TradeCore::Order order(clientId, type, price, volume);
         mStockMarket.registerOrder(order);
     } catch (const std::exception& e) {
         mUIState.pushLog(std::string("[ERROR] Bad message: ") + e.what());
-        mScreen.PostEvent(ftxui::Event::Custom);
     }
 }

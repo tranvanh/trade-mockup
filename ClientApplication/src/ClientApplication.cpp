@@ -1,7 +1,9 @@
 #include "ClientApplication.h"
 #include <nlohmann/json.hpp>
+#include <chrono>
 #include <random>
 #include <sstream>
+#include <thread>
 #include <Toybox/Logger.h>
 
 uint ClientApplication::generateId() {
@@ -16,7 +18,6 @@ ClientApplication::ClientApplication()
     , mId(generateId())
     , mUIStream([this](std::string line) {
         mUIState.pushLog(std::move(line));
-        mScreen.PostEvent(ftxui::Event::Custom);
     })
     , mGenerator(*this)
     , mScreen(ftxui::ScreenInteractive::Fullscreen()) {}
@@ -34,22 +35,24 @@ void ClientApplication::run() {
                 << " @" << j["price"].get<int>()
                 << " x" << j["volume"].get<int>();
             mUIState.pushTrade(oss.str());
-            mScreen.PostEvent(ftxui::Event::Custom);
         } catch (...) {
             mUIState.pushLog("Received unparseable message");
-            mScreen.PostEvent(ftxui::Event::Custom);
         }
     };
 
     if (!mClient.connect("127.0.0.1", 8080)) {
         mUIState.pushLog("[ERROR] Failed to connect to server at 127.0.0.1:8080");
-        mScreen.PostEvent(ftxui::Event::Custom);
     } else {
         mUIState.pushLog("[INFO] Connected to server");
-        mScreen.PostEvent(ftxui::Event::Custom);
     }
 
     runBackgroundTask([this] { mClient.run(); });
+    runBackgroundTask([this] {
+        while (isRunning) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(33));
+            mScreen.PostEvent(ftxui::Event::Custom);
+        }
+    });
 }
 
 void ClientApplication::stop() {
@@ -70,7 +73,6 @@ void ClientApplication::registerOrder(TradeCore::Order order) const {
 void ClientApplication::subscribe() {
     mClient.subscribe();
     mUIState.pushLog("[INFO] Subscribed to trade feed");
-    mScreen.PostEvent(ftxui::Event::Custom);
 }
 
 void ClientApplication::toggleSimulate() {
@@ -81,7 +83,6 @@ void ClientApplication::toggleSimulate() {
         mGenerator.start();
         mUIState.pushLog("[INFO] Simulation started");
     }
-    mScreen.PostEvent(ftxui::Event::Custom);
 }
 
 bool ClientApplication::isSimulating() const {

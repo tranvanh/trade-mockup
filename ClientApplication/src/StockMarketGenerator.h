@@ -17,5 +17,5 @@ public:
 
 private:
     void simulateMarket();
-    void generateOrder(TradeCore::OrderType type);
+    void generateOrder(TradeCore::OrderType type) const;
 };

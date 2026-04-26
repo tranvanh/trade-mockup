@@ -17,8 +17,9 @@ StockMarketGenerator::StockMarketGenerator(ClientApplication& app)
 }
 
 void StockMarketGenerator::start() {
-    if (mSimActive.exchange(true))
+    if (mSimActive.exchange(true)) {
         return;
+    }
     mApplication.runBackgroundTask([this] { simulateMarket(); });
 }
 
@@ -41,11 +42,10 @@ void StockMarketGenerator::simulateMarket() {
     logger.log(toybox::Logger::LogLevel::DEBUG, "Simulation stopped");
 }
 
-void StockMarketGenerator::generateOrder(TradeCore::OrderType type) {
+void StockMarketGenerator::generateOrder(TradeCore::OrderType type) const{
     TradeCore::Order order(randomValueOfMax(ID_COUNT),
                            type,
                            randomValueOfMax(TradeCore::PRICE_MAX),
                            randomValueOfMax(TradeCore::VOLUME_MAX));
     mApplication.registerOrder(std::move(order));
-    std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(randomValueOfMax(10) * 100));
 }
