@@ -1,35 +1,36 @@
 #pragma once
 #include "StockMarketGenerator.h"
 #include <TradeCore/Order.h>
+#include <TradeGUI/UIState.h>
+#include <TradeGUI/UIStream.h>
 #include <Toybox/Application.h>
 #include <Toybox/Client.h>
+#include <ftxui/component/screen_interactive.hpp>
 
-constexpr int THREAD_COUNT = 2;
+constexpr int CLIENT_THREAD_COUNT = 4;
 
 class ClientApplication : public toybox::Application {
-    uint mId = 0;
-    enum CommandType { BUY, SELL, EXIT, INVALID };
-    struct Command {
-        CommandType type   = INVALID;
-        int         price  = 0;
-        int         volume = 0;
-    };
-
-    bool                 mSimulation = false;
-    StockMarketGenerator mGenerator;
+    uint                         mId;
+    tradegui::UIState            mUIState;
+    tradegui::UIStream           mUIStream;
     toybox::Client               mClient;
+    StockMarketGenerator         mGenerator;
+    ftxui::ScreenInteractive     mScreen;
 
 public:
-    explicit ClientApplication(const uint id, const bool isSimulation = false)
-        : toybox::Application(THREAD_COUNT)
-        , mId(id)
-        , mSimulation(isSimulation)
-        , mGenerator(*this){};
-    virtual void run() override;
-    void         registerOrder(TradeCore::Order order) const;
+    ClientApplication();
+    void run()  override;
+    void stop() override;
+
+    void registerOrder(TradeCore::Order order) const;
+    void subscribe();
+    void toggleSimulate();
+    bool isSimulating() const;
+
+    uint                      id()      const { return mId; }
+    tradegui::UIState&        uiState() { return mUIState; }
+    ftxui::ScreenInteractive& screen()  { return mScreen; }
 
 private:
-    void    processUserInputs() const;
-    Command parseCommand(const std::string& line) const;
-    void    handleCommand(const Command& cmd) const;
+    static uint generateId();
 };

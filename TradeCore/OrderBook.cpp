@@ -21,7 +21,9 @@ namespace TradeCore {
 
     void OrderBook::pollOrders() {
         const auto order = mOrderQueue.pop();
-        ASSERT(order.has_value(), "Invalid order value");
+        if (!order.has_value()) {
+            return;
+        }
         processOrder(*order);
     }
 

@@ -2,43 +2,71 @@
 Purpose of this project is to practice various technical topics as thread safety, networking, design patterns, heavy load handling, optimization. Overall goal is to build efficent mock trading platform having multiple clients connecting to one single server, acting as a market and processing the orders.
 
 # Client Application
-- Sends orders to server in json format
-- Option to simulate order creations for stress testing
+- Full-screen terminal UI (FTXUI) — command history panel on the left, trade feed on the right
+- Commands: `subscribe`, `buy <price> <volume>`, `sell <price> <volume>`, `simulate` (toggle auto-generation)
+- Sends orders to the server in JSON format over TCP
+- Simulation mode generates bursts of random buy/sell orders for stress testing
 
 # Server Application
-- Processes orders and delegades them to the market
-- Serves as a communication layer between the market and the client
+- Full-screen terminal UI — active connections panel, trade feed, and message log
+- Processes incoming orders and forwards them to the market engine
+- Broadcasts matched trades to subscribed clients
+- Serves as the communication layer between the market and clients
+
+# TradeGUI
+- Shared FTXUI component library used by both applications
+- Thread-safe `UIState` with per-field mutex-guarded deques
+- `UIStream` — custom `std::ostream` that redirects `Logger` output into the UI without touching stdout
+- Panel factories: trade feed, log, connections, command history
 
 # TradeCore
-- Trading specific components
-- Order book with order matching algorithm. Matching highest buyer with lowest seller
-- Stock market manager registering orders and trades
+- Trading engine, built as a static library
+- `OrderBook` — single-symbol order book with price-time priority matching. Highest buyer matched with lowest seller; trade price is the resting order's price
+- `Market` — owns an `OrderBook`, runs its polling loop on a background thread, exposes a trade observer API
 
 - **TradeCore.Test**
-    - Using Google tests
+    - Unit tests using Google Test
 
 - **TradeCore.Benchmark**
-    - Using Google benchmark
+    - Micro-benchmarks using Google Benchmark
 
 # Toybox
 - Fetched from [github.com/tranvanh/toybox](https://github.com/tranvanh/toybox) (tag `1.0`)
+- Provides: `ThreadSafeQueue`, `FlatMap`, `CallbackList`/`CallbackLifetime`/`CallbackOwner`, `Server`/`Client` (TCP, Boost.Asio), `Application` (thread pool), `Logger`, `Serialization`
 
 ## How to build
 
-This is a single CMake project. Configure and build from the root:
+Requires **Ninja Multi-Config** — CMake will error on any other generator.
 
 ```bash
 cmake -S . -B build -G "Ninja Multi-Config"
 cmake --build build --config Release
 ```
 
-Executables are placed in `build/ClientApplication/src/Release/ClientApplication` and `build/ServerApplication/src/Release/ServerApplication`.
-
-`ClientApplication` accepts `<userId> [simulate]` — `<userId>` is any positive number, `simulate` optionally triggers automatic order generation.
-
 Optional build flags:
-- `-DBUILD_TESTS=ON` — builds TradeCore.Test (requires GTest, fetched automatically)
-- `-DBUILD_BENCHMARK=ON` — builds TradeCore.Benchmark (requires Google Benchmark, fetched automatically)
+- `-DBUILD_TESTS=ON` — builds TradeCore.Test (GTest fetched automatically)
+- `-DBUILD_BENCHMARK=ON` — builds TradeCore.Benchmark (Google Benchmark fetched automatically)
+
+## How to run
+
+```bash
+# Terminal 1 — start the server
+./build/ServerApplication/src/Release/ServerApplication
+
+# Terminal 2 — start a client
+./build/ClientApplication/src/Release/ClientApplication
+```
+
+Server listens on port **8080**. The client connects to `127.0.0.1:8080` automatically on startup.
+
+**Client TUI commands:**
+| Command | Effect |
+|---|---|
+| `subscribe` | Subscribe to live trade broadcasts from the server |
+| `buy <price> <volume>` | Place a buy order |
+| `sell <price> <volume>` | Place a sell order |
+| `simulate` | Toggle automatic order generation (stress-test mode) |
+| `Esc` | Quit |
 
 ### TODO
 - [x] Model generating buy/sell THREAD - give certain delay of buy/sell generation
@@ -61,10 +89,8 @@ Optional build flags:
 - [x] Add thread pool
 - [ ] Add thread scheduler
 - [ ] Add multiple symbols to the stock market
-- [ ] Restructure UtilsLib folders
 - [x] Add google tests 
-- [ ] Add tests for Order book, network sending/receiving, command parsing
-- [ ] Implement polling for macos and windows
+- [ ] Add tests for Order book, network sending/receiving, command parsing\
 - [x] Assert, debug, release builds
 - [x] Add asserts
 - [x] Add Sandbox target
@@ -77,5 +103,6 @@ Optional build flags:
 - [x] Add queries for more market
 - [ ] Use profiler 
 - [ ] Memory pool
-- [ ] Lock free queue
+- [x] Lock free queue
 - [ ] High performance logger
+- [x] Add GUI

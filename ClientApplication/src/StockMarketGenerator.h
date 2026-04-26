@@ -1,17 +1,21 @@
 #pragma once
 #include <TradeCore/Order.h>
+#include <atomic>
 
 class ClientApplication;
 
-/// Simulates a trade market and generates orders
 class StockMarketGenerator {
-    ClientApplication& mApplication;
+    ClientApplication&   mApplication;
+    std::atomic_bool     mSimActive{false};
 
 public:
-    StockMarketGenerator(ClientApplication& app);
-    void simulateMarket();
-    
-private:
-    void generateOrder(TradeCore::OrderType tradeType);
-};
+    explicit StockMarketGenerator(ClientApplication& app);
 
+    void start();
+    void stop();
+    bool isActive() const { return mSimActive.load(); }
+
+private:
+    void simulateMarket();
+    void generateOrder(TradeCore::OrderType type) const;
+};
