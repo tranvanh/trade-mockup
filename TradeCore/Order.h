@@ -5,16 +5,17 @@ namespace TradeCore {
     constexpr int PRICE_MAX  = 10000;
     constexpr int VOLUME_MAX = 1000;
 
-    enum class OrderType { BUY = 0, SELL = 1 };
+    enum class OrderType { BUY = 0, SELL = 1, UNKNOWN = 2 };
 
 
     struct Order : public toybox::Serializable {
         int         clientId = 0;
-        OrderType   type;
+        OrderType   type = OrderType::UNKNOWN;
         int         price = 0;
         int         volume = 0;
-        timepoint_t timeStamp;
+        timepoint_t timeStamp = {};
 
+        Order(){}
         Order(const int id, const OrderType type, const int price, const int volume)
             : clientId(id)
             , type(type)

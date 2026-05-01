@@ -3,6 +3,8 @@
 #include "TradeCore/Trade.h"
 #include <functional>
 #include <optional>
+#include <chrono>
+#include <thread>
 
 
 namespace TradeCore {
@@ -12,16 +14,17 @@ namespace TradeCore {
         }) {}
 
     OrderBook::~OrderBook() {
-        mOrderQueue.stop();
+        // mOrderQueue.stop();
     }
 
     void OrderBook::registerOrder(const Order& order) {
-        mOrderQueue.push(order);
+        mOrderQueue.try_push(order);
     }
 
     void OrderBook::pollOrders() {
-        const auto order = mOrderQueue.pop();
+        const auto order = mOrderQueue.try_pop();
         if (!order.has_value()) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(33));
             return;
         }
         processOrder(*order);
@@ -35,6 +38,8 @@ namespace TradeCore {
         case OrderType::SELL:
             processSeller(order);
             break;
+        case OrderType::UNKNOWN:
+            return;
         }
     }
 

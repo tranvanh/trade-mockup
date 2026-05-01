@@ -1,10 +1,12 @@
 #pragma once
 #include "Toybox/CallbackList.h"
 #include "Toybox/FlatMap.h"
-#include "Toybox/ThreadSafeQueue.h"
 #include "TradeCore/Order.h"
 #include "TradeCore/Trade.h"
+#include <Toybox/LockFreeRingQueue.h>
+#include <deque>
 
+constexpr size_t QUEUE_SIZE = 8192;
 
 namespace TradeCore {
     class Market;
@@ -18,7 +20,7 @@ namespace TradeCore {
             std::deque<Order> orders;
         };
 
-        toybox::ThreadSafeQueue<Order> mOrderQueue;
+        toybox::LockFreeRingQueue<Order,  QUEUE_SIZE> mOrderQueue;
 
         // \todo use one single container and reduce code
         toybox::FlatMap<int, std::shared_ptr<PriceLevel>> mBuyers;
@@ -29,7 +31,7 @@ namespace TradeCore {
         ~OrderBook();
         void registerOrder(const Order& order);
         void pollOrders();
-        void stop() { mOrderQueue.stop(); }
+        void stop() {}
 
         toybox::CallbackList<void(const Trade& trade)> onTradeCallbacks;
 
